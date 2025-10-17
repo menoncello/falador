@@ -1,0 +1,149 @@
+# Falador - .gitignore
+
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+.yarn/
+bun.lockb
+package-lock.json
+yarn.lock
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.astro/
+.turbo/
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+test-results/
+playwright-report/
+reports/
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# OS
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+bun-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Cache directories
+.cache/
+.parcel-cache/
+.npm/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+data/
+db/data/
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Audio files (local development)
+*.mp3
+*.m4b
+*.ogg
+*.wav
+*.flac
+uploads/
+audio-output/
+temp-audio/
+
+# Generated files
+generated/
+temp/
+tmp/
+
+# Cloud credentials
+*.pem
+*.key
+credentials.json
+service-account*.json
+gcp-key*.json
+
+# Misc
+.vscode-test
+.cache-loader
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Stryker mutation testing
+.stryker-tmp/
+stryker.log
+mutation-report/
+
+# Documentation artifacts (keep source, ignore generated)
+docs/.vitepress/cache
+docs/.vitepress/dist
+
+# Optional: Keep important docs but ignore temp/generated
+# !docs/PRD.md
+# !docs/solution-architecture.md
+# !docs/epics.md
+
+# Local configuration
+.bmad-local.yaml
+config.local.yaml
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Project-specific
+story-context-*.xml
+dev-notes/
+scratch/
+
+# Keep these files
+!.gitkeep
+!.nvmrc
+!.tool-versions
