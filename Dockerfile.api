@@ -18,7 +18,12 @@ RUN bun install --production --no-cache --ignore-scripts
 FROM oven/bun:1.3 AS builder
 WORKDIR /app
 
-# Copy dependencies from deps stage
+# Copy package files and install dev dependencies for build
+COPY package.json ./
+COPY packages/api-gateway/package.json ./packages/api-gateway/
+RUN bun install --no-cache --ignore-scripts
+
+# Copy dependencies from deps stage (production only)
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/api-gateway/node_modules ./packages/api-gateway/node_modules
 
