@@ -1,0 +1,38 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "_comment": "Falador Project - Mutation Testing Configuration",
+  "packageManager": "npm",
+  "testRunner": "command",
+  "commandRunner": {
+    "command": "bun test packages/"
+  },
+  "mutate": [
+    "packages/**/*.ts",
+    "plugins/**/*.ts",
+    "infrastructure/**/*.ts",
+    "!**/*.test.ts",
+    "!**/*.spec.ts",
+    "!**/tests/**",
+    "!**/__tests__/**"
+  ],
+  "thresholds": {
+    "high": 80,
+    "low": 60,
+    "break": 50
+  },
+  "coverageAnalysis": "perTest",
+  "reporters": ["html", "clear-text", "progress", "dashboard"],
+  "htmlReporter": {
+    "fileName": "reports/mutation/mutation-report.html"
+  },
+  "dashboard": {
+    "project": "github.com/falador/falador",
+    "version": "main"
+  },
+  "timeoutMS": 60000,
+  "concurrency": 4,
+  "mutator": {
+    "plugins": ["@stryker-mutator/typescript-checker"],
+    "excludedMutations": []
+  }
+}
