@@ -9,6 +9,10 @@ WORKDIR /app
 COPY package.json bun.lock ./
 COPY packages/api-gateway/package.json ./packages/api-gateway/
 
+# Configure bun to allow lockfile updates during Docker build
+RUN echo '[install]' > .bunfig.toml && \
+    echo 'frozen-lockfile = false' >> .bunfig.toml
+
 # Install dependencies (production only)
 RUN bun install --production
 
