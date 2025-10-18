@@ -6,13 +6,12 @@ FROM oven/bun:1.3 AS deps
 WORKDIR /app
 
 # Copy package files
-COPY package.json bun.lock ./
+COPY package.json ./
 COPY packages/api-gateway/package.json ./packages/api-gateway/
 
 # Install dependencies (production only)
-# Note: Bun may resolve dependencies differently in containers, causing lockfile mismatches
-# Unset CI to prevent Bun from auto-enabling frozen lockfile, then disable frozen lockfile explicitly
-RUN CI= BUN_LOCKFILE_FROZEN=false bun install --production
+# Note: Skip lockfile to avoid platform-specific dependency resolution conflicts
+RUN bun install --production --no-cache
 
 # Stage 2: Builder
 FROM oven/bun:1.3 AS builder
