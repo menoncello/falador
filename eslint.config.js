@@ -42,7 +42,10 @@ export default [
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/explicit-function-return-type': ['error', { allowExpressions: true }],
+      '@typescript-eslint/explicit-function-return-type': [
+        'error',
+        { allowExpressions: true },
+      ],
       '@typescript-eslint/explicit-module-boundary-types': 'error',
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/no-useless-constructor': 'error',
@@ -120,7 +123,14 @@ export default [
       'import/order': [
         'error',
         {
-          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+          ],
           'newlines-between': 'never',
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
@@ -157,15 +167,25 @@ export default [
       // Core ESLint - Code Quality
       complexity: ['error', 10],
       'max-depth': ['error', 3],
-      'max-lines': ['error', { max: 300, skipBlankLines: true, skipComments: true }],
-      'max-lines-per-function': ['error', { max: 30, skipBlankLines: true, skipComments: true }],
+      'max-lines': [
+        'error',
+        { max: 300, skipBlankLines: true, skipComments: true },
+      ],
+      'max-lines-per-function': [
+        'error',
+        { max: 30, skipBlankLines: true, skipComments: true },
+      ],
       'max-nested-callbacks': ['error', 3],
       'max-params': ['error', 4],
       'max-statements': ['error', 15],
       'no-console': 'off', // CLI needs console
       'no-magic-numbers': [
         'error',
-        { ignore: [0, 1, -1], ignoreArrayIndexes: true, ignoreDefaultValues: true },
+        {
+          ignore: [0, 1, -1],
+          ignoreArrayIndexes: true,
+          ignoreDefaultValues: true,
+        },
       ],
       'no-duplicate-imports': 'error',
       'no-else-return': 'error',
@@ -189,13 +209,22 @@ export default [
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-unsafe-call': 'off',
       'sonarjs/no-duplicate-string': 'off',
+      'sonarjs/no-hardcoded-passwords': 'off',
       'jsdoc/require-jsdoc': 'off',
       'jsdoc/require-description': 'off',
       'jsdoc/require-param': 'off',
       'jsdoc/require-returns': 'off',
+      'max-lines': 'off',
       'max-lines-per-function': 'off',
       'max-statements': 'off',
       'no-magic-numbers': 'off',
+      'import/no-default-export': 'off',
+    },
+  },
+  // Configuration files - Allow default exports
+  {
+    files: ['*.config.ts', '*.config.js'],
+    rules: {
       'import/no-default-export': 'off',
     },
   },

@@ -1,0 +1,62 @@
+{
+  "compilerOptions": {
+    // Environment setup & latest features
+    "lib": ["ES2022"],
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": false,
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "outDir": "./dist",
+
+    // Path aliases for clean architecture
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["./packages/core-domain/src/*"],
+      "@api/*": ["./packages/api-gateway/src/*"],
+      "@cli/*": ["./packages/cli/src/*"],
+      "@worker/*": ["./packages/job-worker/src/*"],
+      "@shared/*": ["./shared/*"],
+      "@infrastructure/*": ["./infrastructure/*"],
+      "@plugins/*": ["./plugins/*"]
+    },
+
+    // Best practices (strict mode enabled)
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+
+    // Stricter flags enabled for quality
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+
+    // Types
+    "types": ["@types/bun"]
+  },
+  "include": [
+    "packages/**/*",
+    "shared/**/*",
+    "infrastructure/**/*",
+    "plugins/**/*"
+  ],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/tests/**"]
+}

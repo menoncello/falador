@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+.next
+*.lock
+bun.lockb
+reports
+.stryker-tmp
