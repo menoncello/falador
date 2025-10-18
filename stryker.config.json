@@ -17,8 +17,8 @@
   ],
   "thresholds": {
     "high": 80,
-    "low": 60,
-    "break": 50
+    "low": 70,
+    "break": 80
   },
   "coverageAnalysis": "perTest",
   "reporters": ["html", "clear-text", "progress", "dashboard"],
