@@ -1,0 +1,115 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main, staging]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  SERVICE_NAME: falador-api
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Set environment suffix
+        id: env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "suffix=prod" >> $GITHUB_OUTPUT
+            echo "region=us-east1" >> $GITHUB_OUTPUT
+          else
+            echo "suffix=staging" >> $GITHUB_OUTPUT
+            echo "region=us-central1" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/falador/${{ env.SERVICE_NAME }}:${{ github.sha }} \
+            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/falador/${{ env.SERVICE_NAME }}:latest \
+            -f Dockerfile.api \
+            .
+
+      - name: Push Docker image to GCR
+        run: |
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/falador/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/falador/${{ env.SERVICE_NAME }}:latest
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}-${{ steps.env.outputs.suffix }}
+          region: ${{ steps.env.outputs.region }}
+          image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/falador/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          flags: |
+            --port=3000
+            --cpu=1
+            --memory=512Mi
+            --min-instances=1
+            --max-instances=10
+            --allow-unauthenticated
+            --timeout=60s
+          env_vars: |
+            NODE_ENV=production
+          secrets: |
+            DATABASE_URL=falador-db-url:latest
+            REDIS_URL=falador-redis-url:latest
+
+      - name: Run smoke tests
+        run: |
+          SERVICE_URL="${{ steps.deploy.outputs.url }}"
+          echo "Testing health endpoint at: $SERVICE_URL/health"
+
+          # Wait for service to be ready
+          for i in {1..30}; do
+            if curl -f -s "$SERVICE_URL/health" > /dev/null; then
+              echo "✅ Health check passed"
+              break
+            fi
+            echo "Waiting for service to be ready... ($i/30)"
+            sleep 2
+          done
+
+          # Verify health endpoint returns 200
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$SERVICE_URL/health")
+          if [ "$RESPONSE" -eq 200 ]; then
+            echo "✅ Smoke test passed - Health endpoint returned 200"
+          else
+            echo "❌ Smoke test failed - Health endpoint returned $RESPONSE"
+            exit 1
+          fi
+
+      - name: Output deployment URL
+        run: |
+          echo "🚀 Deployment successful!"
+          echo "Service URL: ${{ steps.deploy.outputs.url }}"
+          echo "Environment: ${{ steps.env.outputs.suffix }}"
+          echo "Region: ${{ steps.env.outputs.region }}"
