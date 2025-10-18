@@ -11,7 +11,8 @@ COPY packages/api-gateway/package.json ./packages/api-gateway/
 
 # Install dependencies (production only)
 # Note: Skip lockfile to avoid platform-specific dependency resolution conflicts
-RUN bun install --production --no-cache
+# Ignore prepare scripts (husky) as they're only needed for local development
+RUN bun install --production --no-cache --ignore-scripts
 
 # Stage 2: Builder
 FROM oven/bun:1.3 AS builder
