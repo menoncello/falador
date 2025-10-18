@@ -10,8 +10,10 @@ COPY package.json bun.lock ./
 COPY packages/api-gateway/package.json ./packages/api-gateway/
 
 # Install dependencies (production only)
-# Note: Not using --frozen-lockfile as Bun may resolve dependencies differently in containers
-RUN bun install --no-save --production
+# Note: Bun may resolve dependencies differently in containers, causing lockfile mismatches
+# Use BUN_LOCKFILE_FROZEN=false to allow dependency resolution without lockfile validation
+ENV BUN_LOCKFILE_FROZEN=false
+RUN bun install --production
 
 # Stage 2: Builder
 FROM oven/bun:1.3 AS builder
