@@ -1,0 +1,141 @@
+# Docker Compose configuration for Falador Audiobook Platform
+# Local development environment with hot reload
+
+version: '3.8'
+
+services:
+  # Main application service (API Gateway)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime # Use production-optimized runtime stage
+    container_name: falador-app
+    ports:
+      - '${PORT:-3000}:3000'
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://falador:${POSTGRES_PASSWORD:-falador_dev}@postgres:5432/${POSTGRES_DB:-falador}
+      - REDIS_URL=redis://redis:6379
+      - LOG_LEVEL=${LOG_LEVEL:-debug}
+      - PORT=3000
+    volumes:
+      # Mount source code for development (hot reload)
+      - ./packages:/app/packages
+      - ./package.json:/app/package.json
+      - ./bun.lockb:/app/bun.lockb
+      - ./tsconfig.json:/app/tsconfig.json
+      - ./turbo.json:/app/turbo.json
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - falador-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'bun',
+          'run',
+          '--bun',
+          '/app/packages/api-gateway/dist/index.js',
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL database service
+  postgres:
+    image: postgres:17.4-alpine
+    container_name: falador-postgres
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-falador}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-falador_dev}
+      - POSTGRES_DB=${POSTGRES_DB:-falador}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    volumes:
+      # Persistent data volume
+      - postgres_data:/var/lib/postgresql/data
+      # Initialization scripts
+      - ./scripts/init-db:/docker-entrypoint-initdb.d
+      # Database configuration
+      - ./scripts/postgres/postgresql.conf:/etc/postgresql/postgresql.conf
+    networks:
+      - falador-network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-falador} -d ${POSTGRES_DB:-falador}',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
+  # Redis service for caching and job queue
+  redis:
+    image: redis:7.0-alpine
+    container_name: falador-redis
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      # Redis data persistence
+      - redis_data:/data
+      # Redis configuration
+      - ./scripts/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - falador-network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  # Development helper service (optional - for database management)
+  pgadmin:
+    image: dpage/pgadmin4:8.12
+    container_name: falador-pgadmin
+    ports:
+      - '${PGADMIN_PORT:-5050}:80'
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL:-admin@falador.local}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD:-admin}
+      - PGADMIN_CONFIG_SERVER_MODE=False
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - falador-network
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - tools # Only start with --profile tools
+
+networks:
+  falador-network:
+    driver: bridge
+    name: falador-network
+
+volumes:
+  postgres_data:
+    name: falador_postgres_data
+    driver: local
+  redis_data:
+    name: falador_redis_data
+    driver: local
+  pgadmin_data:
+    name: falador_pgadmin_data
+    driver: local

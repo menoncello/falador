@@ -221,6 +221,28 @@ export default [
       'import/no-default-export': 'off',
     },
   },
+  // Docker test files - Very relaxed rules for OS commands
+  {
+    files: [
+      '**/tests/e2e/docker-containerization.spec.ts',
+      '**/tests/support/fixtures/docker.fixture.ts',
+      '**/tests/support/fixtures/factories/docker-factory.ts',
+    ],
+    rules: {
+      'sonarjs/os-command': 'off',
+      'sonarjs/no-os-command-from-path': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+      'sonarjs/no-unused-vars': 'off',
+      'no-nested-ternary': 'off',
+      'unicorn/no-nested-ternary': 'off',
+      'unicorn/prefer-ternary': 'off',
+      'complexity': 'off',
+      '@typescript-eslint/array-type': 'off',
+      'sonarjs/no-nested-conditional': 'off',
+    },
+  },
   // Configuration files - Allow default exports
   {
     files: ['*.config.ts', '*.config.js'],
