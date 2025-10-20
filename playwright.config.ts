@@ -98,9 +98,8 @@ const playwrightConfig = defineConfig({
   // Output folder for test artifacts
   outputDir: 'test-results/artifacts',
 
-  // Global setup/teardown (if needed)
-  // globalSetup: require.resolve('./tests/support/global-setup.ts'),
-  // globalTeardown: require.resolve('./tests/support/global-teardown.ts'),
+  // Global setup/teardown (disabled for now)
+  // globalSetup: './tests/support/global-setup.ts',
 });
 
 export default playwrightConfig;

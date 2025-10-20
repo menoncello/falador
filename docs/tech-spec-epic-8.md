@@ -37,11 +37,11 @@ Roles & Permissions
 
 ```typescript
 enum Role {
-  OWNER = 'owner',         // Full access, billing
-  ADMIN = 'admin',         // User management, project management
-  EDITOR = 'editor',       // Create/edit projects
-  REVIEWER = 'reviewer',   // Review and approve
-  VIEWER = 'viewer',       // Read-only access
+  OWNER = 'owner', // Full access, billing
+  ADMIN = 'admin', // User management, project management
+  EDITOR = 'editor', // Create/edit projects
+  REVIEWER = 'reviewer', // Review and approve
+  VIEWER = 'viewer', // Read-only access
 }
 
 interface Permission {
@@ -69,15 +69,8 @@ const rolePermissions: Record<Role, Permission[]> = {
     'voice:read',
     'voice:update',
   ],
-  reviewer: [
-    'project:read',
-    'project:approve',
-    'voice:read',
-  ],
-  viewer: [
-    'project:read',
-    'voice:read',
-  ],
+  reviewer: ['project:read', 'project:approve', 'voice:read'],
+  viewer: ['project:read', 'voice:read'],
 };
 ```
 
@@ -212,6 +205,7 @@ export class CreateOrganizationUseCase {
 ```
 
 **API Endpoints:**
+
 ```typescript
 POST   /api/v1/organizations
 GET    /api/v1/organizations
@@ -270,6 +264,7 @@ export class InviteUserUseCase {
 ```
 
 **Story 8.3: Role Management UI**
+
 - User list with roles
 - Role assignment/change
 - User removal
@@ -289,7 +284,10 @@ export class AuthorizationService {
     organizationId: string
   ): Promise<boolean> {
     // Get user's role in organization
-    const member = await this.memberRepository.findByUserAndOrg(userId, organizationId);
+    const member = await this.memberRepository.findByUserAndOrg(
+      userId,
+      organizationId
+    );
 
     if (!member || member.status !== 'active') {
       return false;
@@ -320,7 +318,11 @@ export class AuthorizationService {
     permission: string,
     organizationId: string
   ): Promise<void> {
-    const hasPermission = await this.checkPermission(userId, permission, organizationId);
+    const hasPermission = await this.checkPermission(
+      userId,
+      permission,
+      organizationId
+    );
 
     if (!hasPermission) {
       throw new ForbiddenError(`Permission denied: ${permission}`);
@@ -459,7 +461,10 @@ export class RequestApprovalUseCase {
     return request;
   }
 
-  private async notifyApprovers(request: ApprovalRequest, stepIndex: number): Promise<void> {
+  private async notifyApprovers(
+    request: ApprovalRequest,
+    stepIndex: number
+  ): Promise<void> {
     const workflow = await this.workflowRepository.findById(request.workflowId);
     const step = workflow.steps[stepIndex];
 
@@ -520,7 +525,10 @@ export class ApproveStepUseCase {
     return await this.requestRepository.save(request);
   }
 
-  private isStepComplete(step: ApprovalRequest['steps'][0], workflowStep: ApprovalStep): boolean {
+  private isStepComplete(
+    step: ApprovalRequest['steps'][0],
+    workflowStep: ApprovalStep
+  ): boolean {
     if (workflowStep.requiresAllApprovers) {
       return step.approvals.length === workflowStep.approvers.length;
     } else {
@@ -539,7 +547,9 @@ export class ApproveStepUseCase {
     }
 
     if (workflowStep.requiresAllApprovers) {
-      const allApproved = step.approvals.every((a) => a.decision === 'approved');
+      const allApproved = step.approvals.every(
+        (a) => a.decision === 'approved'
+      );
       return allApproved ? 'approved' : 'rejected';
     } else {
       return 'approved';
@@ -549,6 +559,7 @@ export class ApproveStepUseCase {
 ```
 
 **Story 8.8: Approval UI**
+
 - Pending approvals dashboard
 - Approval request details
 - Approve/reject buttons with comments
@@ -565,7 +576,10 @@ import { SAML } from '@node-saml/node-saml';
 export class SAMLService {
   private samlConfigs: Map<string, SAML> = new Map();
 
-  async configureSAML(organizationId: string, metadataUrl: string): Promise<void> {
+  async configureSAML(
+    organizationId: string,
+    metadataUrl: string
+  ): Promise<void> {
     const metadata = await this.fetchMetadata(metadataUrl);
 
     const saml = new SAML({
@@ -592,7 +606,9 @@ export class SAMLService {
     samlResponse: string
   ): Promise<User> {
     const saml = this.samlConfigs.get(organizationId);
-    const profile = await saml.validatePostResponseAsync({ SAMLResponse: samlResponse });
+    const profile = await saml.validatePostResponseAsync({
+      SAMLResponse: samlResponse,
+    });
 
     // Find or create user
     let user = await this.userRepository.findByEmail(profile.email);
@@ -622,6 +638,7 @@ export class SAMLService {
 ```
 
 **Story 8.10: SSO Configuration UI**
+
 - SAML metadata URL input
 - Test SSO connection
 - Default role for SSO users
@@ -644,7 +661,10 @@ export interface CMSIntegration {
 export class WordPressIntegration implements CMSIntegration {
   provider = 'wordpress' as const;
 
-  async connect(credentials: { siteUrl: string; apiKey: string }): Promise<void> {
+  async connect(credentials: {
+    siteUrl: string;
+    apiKey: string;
+  }): Promise<void> {
     // Validate WordPress REST API access
     const response = await fetch(`${credentials.siteUrl}/wp-json/wp/v2/posts`, {
       headers: {
@@ -671,12 +691,14 @@ export class WordPressIntegration implements CMSIntegration {
 ```
 
 **Story 8.12: Integration Management UI**
+
 - Add integration (select provider, enter credentials)
 - Test connection
 - Configure sync settings
 - Sync history
 
 **Story 8.13: Automated Publishing**
+
 - Trigger: On project approval
 - Fetch metadata from CMS
 - Generate audio
@@ -691,6 +713,7 @@ export class WordPressIntegration implements CMSIntegration {
 **Decision:** Organization-based multi-tenancy with shared database
 
 **Rationale:**
+
 - Simpler than per-tenant databases
 - Easier to manage and backup
 - Row-level security (RLS) isolates data
@@ -702,6 +725,7 @@ export class WordPressIntegration implements CMSIntegration {
 **Decision:** Role-based (not attribute-based) permissions
 
 **Rationale:**
+
 - Simpler to understand for non-technical admins
 - Sufficient for 90% of use cases
 - Can extend to ABAC later if needed
@@ -711,6 +735,7 @@ export class WordPressIntegration implements CMSIntegration {
 **Decision:** SAML 2.0 (not OIDC)
 
 **Rationale:**
+
 - Enterprise customers expect SAML
 - Supported by all major identity providers (Okta, Azure AD, Google Workspace)
 - OIDC can be added later for modern IdPs

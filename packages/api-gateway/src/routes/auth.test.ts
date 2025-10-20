@@ -23,7 +23,7 @@ describe('Auth Routes', () => {
 
       expect(response.status).toBe(400);
       const data = (await response.json()) as { error: string };
-      expect(data.error).toContain('Missing required fields');
+      expect(data.error).toBe('Missing required fields: email, name, password');
     });
 
     it('should reject registration without name', async () => {
@@ -79,6 +79,43 @@ describe('Auth Routes', () => {
       expect(data.tier).toBe('pro');
     });
 
+    it('should register with enterprise tier', async () => {
+      const response = await authRoutes.handle(
+        new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: 'enterprise@example.com',
+            name: 'Enterprise User',
+            password: TEST_CREDENTIALS.PASSWORD,
+            tier: 'enterprise',
+          }),
+        })
+      );
+
+      expect(response.status).toBe(201);
+      const data = (await response.json()) as { tier: string };
+      expect(data.tier).toBe('enterprise');
+    });
+
+    it('should register with free tier by default', async () => {
+      const response = await authRoutes.handle(
+        new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: 'free@example.com',
+            name: 'Free User',
+            password: TEST_CREDENTIALS.PASSWORD,
+          }),
+        })
+      );
+
+      expect(response.status).toBe(201);
+      const data = (await response.json()) as { tier: string };
+      expect(data.tier).toBe('free');
+    });
+
     it('should reject duplicate email registration', async () => {
       // Create first user
       await authRoutes.handle(
@@ -108,7 +145,7 @@ describe('Auth Routes', () => {
 
       expect(response.status).toBe(409);
       const data = (await response.json()) as { error: string };
-      expect(data.error).toContain('already exists');
+      expect(data.error).toBe('User with this email already exists');
     });
   });
 
@@ -246,9 +283,11 @@ describe('Auth Routes', () => {
         scopes: [],
       });
 
+      const token = db.createSession(user.id);
       const response = await authRoutes.handle(
         new Request(`http://localhost/api/auth/api-keys/${apiKey.id}`, {
           method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
         })
       );
 
@@ -256,13 +295,23 @@ describe('Auth Routes', () => {
     });
 
     it('should return 404 for non-existent API key', async () => {
+      const user = db.createUser({
+        email: TEST_CREDENTIALS.EMAIL,
+        name: TEST_CREDENTIALS.NAME,
+        password: TEST_CREDENTIALS.PASSWORD,
+      });
+
+      const token = db.createSession(user.id);
       const response = await authRoutes.handle(
         new Request('http://localhost/api/auth/api-keys/nonexistent', {
           method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
         })
       );
 
       expect(response.status).toBe(404);
+      const data = (await response.json()) as { error: string };
+      expect(data.error).toBe('API key not found');
     });
   });
 });

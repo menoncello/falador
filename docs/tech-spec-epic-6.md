@@ -118,6 +118,7 @@ DELETE /api/v1/api-keys/:id
 ### OAuth 2.0 Flows
 
 **Authorization Code Flow (Web Apps)**
+
 ```
 1. Client redirects to /oauth/authorize
 2. User logs in and grants permission
@@ -127,6 +128,7 @@ DELETE /api/v1/api-keys/:id
 ```
 
 **Device Flow (CLI)**
+
 ```
 1. CLI requests device code
 2. User visits URL and enters code
@@ -285,17 +287,20 @@ client.audio.download(result.audio_files[0].url, 'output.mp3')
 ### Phase 1: API Foundation (Stories 6.1-6.3)
 
 **Story 6.1: OpenAPI Specification**
+
 - Define complete API spec (OpenAPI 3.1)
 - Request/response schemas
 - Error codes and messages
 - Example requests/responses
 
 **Story 6.2: API Versioning Strategy**
+
 - URL versioning (/api/v1)
 - Version deprecation policy (6-month notice)
 - Breaking vs non-breaking changes
 
 **Story 6.3: API Documentation**
+
 - Redocly documentation portal
 - Interactive API explorer
 - Code examples in multiple languages
@@ -303,23 +308,33 @@ client.audio.download(result.audio_files[0].url, 'output.mp3')
 ### Phase 2: Authentication (Stories 6.4-6.5)
 
 **Story 6.4: OAuth 2.0 Implementation**
+
 ```typescript
 // infrastructure/auth/oauth.service.ts
 export class OAuthService {
-  async generateAuthorizationUrl(clientId: string, redirectUri: string, scope: string[]): Promise<string> {
+  async generateAuthorizationUrl(
+    clientId: string,
+    redirectUri: string,
+    scope: string[]
+  ): Promise<string> {
     const state = randomBytes(32).toString('hex');
     const codeChallenge = this.generatePKCEChallenge();
 
-    return `https://falador.com/oauth/authorize?` +
+    return (
+      `https://falador.com/oauth/authorize?` +
       `client_id=${clientId}&` +
       `redirect_uri=${encodeURIComponent(redirectUri)}&` +
       `scope=${scope.join(' ')}&` +
       `state=${state}&` +
       `code_challenge=${codeChallenge}&` +
-      `code_challenge_method=S256`;
+      `code_challenge_method=S256`
+    );
   }
 
-  async exchangeCodeForToken(code: string, codeVerifier: string): Promise<AccessToken> {
+  async exchangeCodeForToken(
+    code: string,
+    codeVerifier: string
+  ): Promise<AccessToken> {
     // Verify code challenge
     // Issue access token + refresh token
     // Store in database
@@ -328,6 +343,7 @@ export class OAuthService {
 ```
 
 **Story 6.5: API Key Management**
+
 - Generate API keys
 - Rotate keys
 - Revoke keys
@@ -336,12 +352,11 @@ export class OAuthService {
 ### Phase 3: Rate Limiting (Stories 6.6)
 
 **Story 6.6: Rate Limiter Implementation**
+
 ```typescript
 // infrastructure/middleware/rate-limiter.middleware.ts
 export class RateLimiterMiddleware {
-  constructor(
-    @inject('RedisClient') private redis: RedisClient
-  ) {}
+  constructor(@inject('RedisClient') private redis: RedisClient) {}
 
   async handle(req: Request, res: Response, next: NextFunction): Promise<void> {
     const key = `rate_limit:${req.user.id}:${Date.now() / 60000}`;
@@ -368,6 +383,7 @@ export class RateLimiterMiddleware {
 **Story 6.7: Webhook Subscription Management**
 
 **Story 6.8: Webhook Delivery System**
+
 ```typescript
 // infrastructure/services/webhook-delivery.service.ts
 export class WebhookDeliveryService {
@@ -388,7 +404,8 @@ export class WebhookDeliveryService {
 export class WebhookDeliveryWorker {
   async process(job: Job<WebhookDeliveryJob>): Promise<void> {
     const { subscriptionId, event, attempt } = job.data;
-    const subscription = await this.subscriptionRepository.findById(subscriptionId);
+    const subscription =
+      await this.subscriptionRepository.findById(subscriptionId);
 
     const signature = this.generateSignature(event, subscription.secret);
 
@@ -421,6 +438,7 @@ export class WebhookDeliveryWorker {
 ```
 
 **Story 6.9: Webhook Testing Tools**
+
 - Test webhook endpoint (send sample event)
 - Webhook logs (delivery history, retries)
 - Signature verification helper
@@ -428,16 +446,19 @@ export class WebhookDeliveryWorker {
 ### Phase 5: SDKs (Stories 6.10-6.12)
 
 **Story 6.10: SDK Code Generation**
+
 - OpenAPI Generator integration
 - TypeScript SDK generation
 - Python SDK generation
 
 **Story 6.11: SDK Publishing**
+
 - npm package (@falador/sdk)
 - PyPI package (falador)
 - Version alignment with API
 
 **Story 6.12: SDK Examples & Documentation**
+
 - Example projects
 - Integration guides
 - Best practices
@@ -484,6 +505,7 @@ nav:
 **Decision:** OAuth 2.0 for web apps, API keys for servers/CLI
 
 **Rationale:**
+
 - OAuth standard for user-delegated access
 - API keys simpler for server-to-server
 - Device flow enables CLI authentication
@@ -493,6 +515,7 @@ nav:
 **Decision:** BullMQ queue + exponential backoff
 
 **Rationale:**
+
 - Reliable delivery with retries
 - Prevents blocking main application
 - Exponential backoff prevents overwhelming failing endpoints
@@ -502,6 +525,7 @@ nav:
 **Decision:** Auto-generate from OpenAPI spec
 
 **Rationale:**
+
 - Consistency between API and SDKs
 - Automatic version synchronization
 - Reduced maintenance burden

@@ -19,8 +19,8 @@
   },
   "timeoutMS": 60000,
   "concurrency": 4,
-  "mutator": {
-    "plugins": ["@stryker-mutator/typescript-checker"],
+  "mutator": "@stryker-mutator/typescript",
+  "typescriptChecker": {
     "excludedMutations": []
   }
 }

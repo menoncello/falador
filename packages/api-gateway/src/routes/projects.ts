@@ -138,7 +138,19 @@ export const projectRoutes = new Elysia({ prefix: '/api/projects' })
   )
 
   // DELETE /api/projects/:id
-  .delete('/:id', ({ params, set }) => {
+  .delete('/:id', ({ params, headers, set }) => {
+    const authUser = extractAuthUser(headers['authorization'] || null);
+    if (!authUser) {
+      set.status = 401;
+      return { error: 'Unauthorized' };
+    }
+
+    const project = db.getProjectById(params.id);
+    if (!project || project.userId !== authUser.id) {
+      set.status = 404;
+      return { error: ERROR_PROJECT_NOT_FOUND };
+    }
+
     const deleted = db.deleteProject(params.id);
     if (!deleted) {
       set.status = 404;

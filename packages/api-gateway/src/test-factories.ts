@@ -7,6 +7,9 @@ import { faker } from '@faker-js/faker';
  * Provides realistic, unique data for each test run.
  */
 
+// Seed faker with current timestamp to ensure uniqueness across test runs
+faker.seed(Date.now());
+
 export interface UserFactoryData {
   email?: string;
   name?: string;
@@ -32,11 +35,17 @@ export interface ProjectFactoryData {
 export function createTestUser(
   overrides: UserFactoryData = {}
 ): Required<UserFactoryData> {
+  const timestamp = Date.now();
+  // Use faker for cryptographic safety instead of Math.random()
+  const randomSuffix = faker.string.alphanumeric({ length: 6 });
+
   return {
-    email: faker.internet.email(),
-    name: faker.person.fullName(),
-    password: faker.internet.password({ length: 16 }),
-    tier: 'free',
+    email:
+      overrides.email ||
+      `test-${timestamp}-${randomSuffix}@${faker.internet.domainName()}`,
+    name: overrides.name || faker.person.fullName(),
+    password: overrides.password || faker.internet.password({ length: 16 }),
+    tier: overrides.tier || 'free',
     ...overrides,
   } as Required<UserFactoryData>;
 }

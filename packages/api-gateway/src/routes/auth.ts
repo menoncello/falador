@@ -25,7 +25,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         email: body.email,
         name: body.name,
         password: body.password,
-        ...(body.tier && { tier: body.tier }),
+        ...(body.tier && { tier: body.tier as 'free' | 'pro' | 'enterprise' }),
       });
 
       set.status = 201;
@@ -129,7 +129,20 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
   )
 
   // DELETE /api/auth/api-keys/:id
-  .delete('/api-keys/:id', ({ params, set }) => {
+  .delete('/api-keys/:id', ({ params, headers, set }) => {
+    const authUser = extractAuthUser(headers['authorization'] || null);
+    if (!authUser) {
+      set.status = 401;
+      return { error: 'Unauthorized' };
+    }
+
+    // Get the API key to verify ownership
+    const apiKey = db.getApiKeyById(params.id);
+    if (!apiKey || apiKey.userId !== authUser.id) {
+      set.status = 404;
+      return { error: 'API key not found' };
+    }
+
     const deleted = db.deleteApiKey(params.id);
     if (!deleted) {
       set.status = 404;

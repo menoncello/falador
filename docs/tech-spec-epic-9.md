@@ -49,7 +49,10 @@ export interface DistributionPlatform {
   platform: 'acx' | 'audible' | 'spotify' | 'apple' | 'google';
   connect(credentials: PlatformCredentials): Promise<void>;
   validateContent(content: AudiobookContent): Promise<ValidationResult>;
-  submit(content: AudiobookContent, metadata: PlatformMetadata): Promise<SubmissionResult>;
+  submit(
+    content: AudiobookContent,
+    metadata: PlatformMetadata
+  ): Promise<SubmissionResult>;
   getStatus(submissionId: string): Promise<SubmissionStatus>;
   withdraw(submissionId: string): Promise<void>;
 }
@@ -75,7 +78,13 @@ interface DistributionSubmission {
   projectId: string;
   targetId: string; // References DistributionTarget
   platform: string;
-  status: 'preparing' | 'validating' | 'submitting' | 'submitted' | 'live' | 'failed';
+  status:
+    | 'preparing'
+    | 'validating'
+    | 'submitting'
+    | 'submitted'
+    | 'live'
+    | 'failed';
   metadata: PlatformMetadata;
   submissionId: string | null; // Platform-specific ID
   validationErrors: string[];
@@ -146,13 +155,20 @@ export class AudioFormatConverter {
         .audioFrequency(44100) // 44.1kHz or 22.05kHz for ACX
         .audioChannels(2) // Stereo
         .outputOptions([
-          '-metadata', `title=${input.metadata.title}`,
-          '-metadata', `artist=${input.metadata.narrator}`,
-          '-metadata', `album=${input.metadata.title}`,
-          '-metadata', `album_artist=${input.metadata.author}`,
-          '-metadata', `genre=${input.metadata.genre}`,
-          '-metadata', `date=${input.metadata.copyright.year}`,
-          '-metadata', `copyright=${input.metadata.copyright.holder}`,
+          '-metadata',
+          `title=${input.metadata.title}`,
+          '-metadata',
+          `artist=${input.metadata.narrator}`,
+          '-metadata',
+          `album=${input.metadata.title}`,
+          '-metadata',
+          `album_artist=${input.metadata.author}`,
+          '-metadata',
+          `genre=${input.metadata.genre}`,
+          '-metadata',
+          `date=${input.metadata.copyright.year}`,
+          '-metadata',
+          `copyright=${input.metadata.copyright.holder}`,
         ])
         .output(outputPath)
         .on('end', () => resolve())
@@ -173,7 +189,10 @@ export class AudioFormatConverter {
     return outputPath;
   }
 
-  private async embedChapterMarkers(filePath: string, chapters: Chapter[]): Promise<void> {
+  private async embedChapterMarkers(
+    filePath: string,
+    chapters: Chapter[]
+  ): Promise<void> {
     // Generate chapter metadata file (MP4Box format)
     const chapterFile = chapters
       .map((ch, i) => {
@@ -184,15 +203,22 @@ export class AudioFormatConverter {
       .join('\n');
 
     // Use MP4Box to inject chapters
-    await exec(`MP4Box -add "${filePath}#audio" -chap "${chapterFile}" "${filePath}"`);
+    await exec(
+      `MP4Box -add "${filePath}#audio" -chap "${chapterFile}" "${filePath}"`
+    );
   }
 
-  private async embedCoverArt(filePath: string, coverUrl: string): Promise<void> {
+  private async embedCoverArt(
+    filePath: string,
+    coverUrl: string
+  ): Promise<void> {
     // Download cover image
     const coverPath = await this.downloadImage(coverUrl);
 
     // Embed using ffmpeg
-    await exec(`ffmpeg -i "${filePath}" -i "${coverPath}" -map 0 -map 1 -c copy -disposition:v:0 attached_pic "${filePath}.tmp"`);
+    await exec(
+      `ffmpeg -i "${filePath}" -i "${coverPath}" -map 0 -map 1 -c copy -disposition:v:0 attached_pic "${filePath}.tmp"`
+    );
 
     // Replace original
     await fs.rename(`${filePath}.tmp`, filePath);
@@ -264,13 +290,19 @@ export class ACXIntegration implements DistributionPlatform {
 
   constructor(private httpClient: HttpClient) {}
 
-  async connect(credentials: { username: string; password: string }): Promise<void> {
+  async connect(credentials: {
+    username: string;
+    password: string;
+  }): Promise<void> {
     // ACX uses OAuth (hypothetical - actual implementation depends on API)
-    const response = await this.httpClient.post('https://api.acx.com/oauth/token', {
-      grant_type: 'password',
-      username: credentials.username,
-      password: credentials.password,
-    });
+    const response = await this.httpClient.post(
+      'https://api.acx.com/oauth/token',
+      {
+        grant_type: 'password',
+        username: credentials.username,
+        password: credentials.password,
+      }
+    );
 
     this.accessToken = response.data.access_token;
   }
@@ -287,7 +319,9 @@ export class ACXIntegration implements DistributionPlatform {
     const audioInfo = await this.getAudioInfo(content.audioUrl);
 
     if (audioInfo.bitrate < 32 || audioInfo.bitrate > 128) {
-      errors.push(`Bitrate must be 32-128kbps (current: ${audioInfo.bitrate}kbps)`);
+      errors.push(
+        `Bitrate must be 32-128kbps (current: ${audioInfo.bitrate}kbps)`
+      );
     }
 
     if (![22050, 44100].includes(audioInfo.sampleRate)) {
@@ -329,22 +363,25 @@ export class ACXIntegration implements DistributionPlatform {
     await this.uploadFile(coverUploadUrl, metadata.coverImageUrl);
 
     // 3. Submit metadata
-    const response = await this.httpClient.post('https://api.acx.com/v1/audiobooks', {
-      title: metadata.title,
-      author: metadata.author,
-      narrator: metadata.narrator,
-      publisher: metadata.publisher,
-      language: metadata.language,
-      genre: metadata.genre,
-      description: metadata.description,
-      isbn: metadata.isbn,
-      copyright: metadata.copyright,
-      dealType: metadata.acx.dealType,
-      royaltyShare: metadata.acx.royaltyShare,
-      territories: metadata.acx.territories,
-      audioFileUrl: uploadUrl,
-      coverArtUrl: coverUploadUrl,
-    });
+    const response = await this.httpClient.post(
+      'https://api.acx.com/v1/audiobooks',
+      {
+        title: metadata.title,
+        author: metadata.author,
+        narrator: metadata.narrator,
+        publisher: metadata.publisher,
+        language: metadata.language,
+        genre: metadata.genre,
+        description: metadata.description,
+        isbn: metadata.isbn,
+        copyright: metadata.copyright,
+        dealType: metadata.acx.dealType,
+        royaltyShare: metadata.acx.royaltyShare,
+        territories: metadata.acx.territories,
+        audioFileUrl: uploadUrl,
+        coverArtUrl: coverUploadUrl,
+      }
+    );
 
     return {
       submissionId: response.data.id,
@@ -386,7 +423,10 @@ export class ACXIntegration implements DistributionPlatform {
 export class SpotifyIntegration implements DistributionPlatform {
   platform = 'spotify' as const;
 
-  async submit(content: AudiobookContent, metadata: PlatformMetadata): Promise<SubmissionResult> {
+  async submit(
+    content: AudiobookContent,
+    metadata: PlatformMetadata
+  ): Promise<SubmissionResult> {
     // Spotify uses Anchor API for audiobook/podcast submissions
 
     // 1. Create show (if not exists)
@@ -426,7 +466,10 @@ export class SpotifyIntegration implements DistributionPlatform {
 export class AppleBooksIntegration implements DistributionPlatform {
   platform = 'apple' as const;
 
-  async submit(content: AudiobookContent, metadata: PlatformMetadata): Promise<SubmissionResult> {
+  async submit(
+    content: AudiobookContent,
+    metadata: PlatformMetadata
+  ): Promise<SubmissionResult> {
     // Apple uses Transporter API for content submission
 
     // 1. Generate ITMSP package (iTunes Package)
@@ -475,7 +518,10 @@ export class AppleBooksIntegration implements DistributionPlatform {
     await fs.writeFile(`${packageDir}/metadata.xml`, metadataXml);
 
     // Copy audio file
-    await fs.copyFile(content.audioUrl, `${packageDir}/${path.basename(content.audioUrl)}`);
+    await fs.copyFile(
+      content.audioUrl,
+      `${packageDir}/${path.basename(content.audioUrl)}`
+    );
 
     // Copy cover art
     await fs.copyFile(
@@ -512,9 +558,14 @@ export class MetadataMapper {
     // Platform-specific mappings
     if (platform === 'acx') {
       baseMetadata.acx = {
-        dealType: projectMetadata.distribution?.acx?.dealType || 'non-exclusive',
+        dealType:
+          projectMetadata.distribution?.acx?.dealType || 'non-exclusive',
         royaltyShare: projectMetadata.distribution?.acx?.royaltyShare || 40,
-        territories: projectMetadata.distribution?.acx?.territories || ['US', 'UK', 'CA'],
+        territories: projectMetadata.distribution?.acx?.territories || [
+          'US',
+          'UK',
+          'CA',
+        ],
       };
     }
 
@@ -653,9 +704,13 @@ function PlatformCard({ platform, submission, onSubmit }: Props) {
 
       {submission ? (
         <div className="mt-4 space-y-2">
-          <p className="text-sm">Submitted: {formatDate(submission.submittedAt)}</p>
+          <p className="text-sm">
+            Submitted: {formatDate(submission.submittedAt)}
+          </p>
           {submission.status === 'live' && (
-            <p className="text-sm text-green-600">Live: {formatDate(submission.liveAt)}</p>
+            <p className="text-sm text-green-600">
+              Live: {formatDate(submission.liveAt)}
+            </p>
           )}
           {submission.validationErrors.length > 0 && (
             <ul className="text-sm text-red-600">
@@ -700,10 +755,16 @@ export class DistributeToPlatformUseCase {
     }
 
     // 2. Convert format if needed
-    const convertedAudioUrl = await this.convertFormat(project.audioUrl, dto.platform);
+    const convertedAudioUrl = await this.convertFormat(
+      project.audioUrl,
+      dto.platform
+    );
 
     // 3. Map metadata
-    const platformMetadata = this.metadataMapper.map(project.metadata, dto.platform);
+    const platformMetadata = this.metadataMapper.map(
+      project.metadata,
+      dto.platform
+    );
 
     // 4. Submit to platform
     const result = await integration.submit(
@@ -758,7 +819,10 @@ interface DistributionAnalytics {
 
 // Fetch analytics from platforms (if API available)
 export class DistributionAnalyticsService {
-  async fetchAnalytics(submissionId: string, platform: string): Promise<DistributionAnalytics> {
+  async fetchAnalytics(
+    submissionId: string,
+    platform: string
+  ): Promise<DistributionAnalytics> {
     const integration = this.getIntegration(platform);
 
     // Note: Actual implementation depends on platform API availability
@@ -778,6 +842,7 @@ export class DistributionAnalyticsService {
 **Decision:** Direct API integrations (not third-party aggregators)
 
 **Rationale:**
+
 - Full control over submission process
 - No intermediary fees
 - Better error handling and status tracking
@@ -789,6 +854,7 @@ export class DistributionAnalyticsService {
 **Decision:** Use FFmpeg for all audio conversions
 
 **Rationale:**
+
 - Industry-standard, battle-tested
 - Supports all required formats (M4B, MP3, AAC)
 - Chapter markers and metadata embedding
@@ -798,6 +864,7 @@ export class DistributionAnalyticsService {
 **Decision:** Encrypt platform credentials using AES-256
 
 **Rationale:**
+
 - OAuth tokens and API keys are sensitive
 - Per-organization encryption keys
 - Rotation policy: 90 days

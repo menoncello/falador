@@ -12,6 +12,7 @@
 **Goal:** Establish foundational infrastructure and deliver a working CLI tool that converts plain text files to Brazilian Portuguese audio using KokoroTTS.
 
 **Value Delivered:**
+
 - Development team has working infrastructure (CI/CD, testing, deployment)
 - Early adopters can generate basic Portuguese audio from text files
 - Technical feasibility validated with real TTS generation
@@ -26,6 +27,7 @@
 ### Technology Stack
 
 **Core Technologies:**
+
 - **Runtime:** Bun 1.1.34
 - **Backend Framework:** Elysia 1.1.23
 - **Language:** TypeScript 5.7.2
@@ -42,15 +44,18 @@
 ### Component Boundaries
 
 **Packages:**
+
 - `core-domain`: Entities, interfaces, use cases (business logic)
 - `api-gateway`: Elysia REST API, auth, routing
 - `cli`: Bun CLI application
 - `job-worker`: BullMQ worker for async processing
 
 **Plugins:**
+
 - `audio-generation`: TTS gateway, KokoroTTS adapter
 
 **Infrastructure:**
+
 - `database`: Drizzle ORM, PostgreSQL repositories
 - `storage`: GCS adapter (Cloud Storage)
 - `queue`: Redis + BullMQ configuration
@@ -128,17 +133,20 @@ interface ApiKey {
 ### API Routes (Epic 1 Subset)
 
 **Authentication:**
+
 - `POST /auth/register` - Create user account
 - `POST /auth/login` - Email/password login
 - `GET /auth/me` - Get current user
 - `POST /auth/api-keys` - Generate API key
 
 **Projects:**
+
 - `GET /projects` - List user projects
 - `POST /projects` - Create project
 - `GET /projects/:id` - Get project details
 
 **Audio Generation:**
+
 - `POST /audio/generate` - Queue audio generation job
 - `GET /audio/jobs/:id` - Get job status
 - `GET /audio/jobs/:id/download` - Download generated audio
@@ -235,6 +243,7 @@ falador/
 ### Development Workflow
 
 **1. Initial Setup (Stories 1.1-1.3):**
+
 ```bash
 # Initialize project
 bun init
@@ -248,6 +257,7 @@ docker-compose up -d  # PostgreSQL, Redis
 ```
 
 **2. Database Setup (Story 1.4):**
+
 ```bash
 # Install Drizzle
 bun add drizzle-orm postgres
@@ -261,6 +271,7 @@ bun run db:migrate
 ```
 
 **3. Clean Architecture (Story 1.5):**
+
 ```typescript
 // Example: core-domain/src/entities/project.ts
 export class Project {
@@ -272,12 +283,7 @@ export class Project {
   ) {}
 
   static create(userId: string, title: string): Project {
-    return new Project(
-      crypto.randomUUID(),
-      userId,
-      title,
-      new Date()
-    );
+    return new Project(crypto.randomUUID(), userId, title, new Date());
   }
 }
 
@@ -291,22 +297,21 @@ export interface ProjectRepository {
 // Example: infrastructure/database/src/repositories/project-repository.ts
 @injectable()
 export class DrizzleProjectRepository implements ProjectRepository {
-  constructor(
-    @inject('Database') private db: Database
-  ) {}
+  constructor(@inject('Database') private db: Database) {}
 
   async create(project: Project): Promise<void> {
     await this.db.insert(projectsTable).values({
       id: project.id,
       userId: project.userId,
       title: project.title,
-      createdAt: project.createdAt
+      createdAt: project.createdAt,
     });
   }
 }
 ```
 
 **4. TTS Integration (Stories 1.7-1.9):**
+
 ```typescript
 // plugins/audio-generation/src/gateway/tts-gateway.ts
 export interface TTSEngine {
@@ -330,7 +335,7 @@ export class KokoroTTSAdapter implements TTSEngine {
       text,
       voice: voice.id,
       language: 'pt-BR',
-      sampleRate: 44100
+      sampleRate: 44100,
     });
 
     return audio;
@@ -339,6 +344,7 @@ export class KokoroTTSAdapter implements TTSEngine {
 ```
 
 **5. CLI Implementation (Stories 1.10-1.12):**
+
 ```typescript
 // packages/cli/src/commands/generate.ts
 import { Command } from 'commander';
@@ -356,7 +362,7 @@ export const generateCommand = new Command('generate')
     const apiClient = new FaladorAPIClient();
     const job = await apiClient.audio.generate({
       text,
-      voiceId: options.voice || 'default-pt-br'
+      voiceId: options.voice || 'default-pt-br',
     });
 
     // Poll for completion
@@ -380,6 +386,7 @@ export const generateCommand = new Command('generate')
 ### Unit Tests (Story 1.13)
 
 **Test Structure:**
+
 ```typescript
 // plugins/audio-generation/src/adapters/kokoro-tts-adapter.test.ts
 import { describe, test, expect, mock } from 'bun:test';
@@ -413,6 +420,7 @@ describe('KokoroTTSAdapter', () => {
 ### Integration Tests
 
 **API Integration:**
+
 ```typescript
 // packages/api-gateway/src/routes/audio.integration.test.ts
 import { describe, test, expect } from 'bun:test';
@@ -442,6 +450,7 @@ describe('Audio API Integration', () => {
 ### Mutation Testing (Story 1.2)
 
 **Stryker Configuration:**
+
 ```json
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
@@ -469,6 +478,7 @@ describe('Audio API Integration', () => {
 ### E2E Tests (Story 1.13)
 
 **CLI E2E Test:**
+
 ```typescript
 // packages/cli/tests/e2e/generate.e2e.test.ts
 import { describe, test, expect } from 'bun:test';
@@ -488,7 +498,7 @@ describe('CLI E2E: generate command', () => {
       'generate',
       'test-input.txt',
       '-o',
-      'test-output.mp3'
+      'test-output.mp3',
     ]);
 
     await proc.exited;
@@ -512,6 +522,7 @@ describe('CLI E2E: generate command', () => {
 ### Docker Configuration (Story 1.3)
 
 **Dockerfile (API Gateway):**
+
 ```dockerfile
 # Multi-stage build for Bun application
 FROM oven/bun:1.1.34 AS base
@@ -542,6 +553,7 @@ CMD ["bun", "run", "dist/index.js"]
 ```
 
 **docker-compose.yml (Local Dev):**
+
 ```yaml
 version: '3.8'
 
@@ -553,14 +565,14 @@ services:
       POSTGRES_PASSWORD: dev_password
       POSTGRES_DB: falador_dev
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
   redis:
     image: redis:7
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
 
@@ -569,7 +581,7 @@ services:
       context: .
       dockerfile: Dockerfile.api
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       DATABASE_URL: postgresql://falador:dev_password@postgres:5432/falador_dev
       REDIS_URL: redis://redis:6379
@@ -596,6 +608,7 @@ volumes:
 ### CI/CD (Story 1.2)
 
 **GitHub Actions (.github/workflows/ci.yml):**
+
 ```yaml
 name: CI - Epic 1
 
@@ -657,26 +670,31 @@ jobs:
 ## Story Breakdown Summary
 
 ### Track A: Infrastructure & DevOps
+
 - **Story 1.1**: Project foundation (TypeScript, Bun, Elysia, ESLint, Prettier)
 - **Story 1.2**: CI/CD pipeline (GitHub Actions, mutation testing)
 - **Story 1.3**: Docker containerization (local dev environment)
 
 ### Track B: Database & Core Architecture
+
 - **Story 1.4**: PostgreSQL setup (Drizzle ORM, migrations, schema)
 - **Story 1.5**: Clean Architecture structure (layers, DI container)
 - **Story 1.6**: Error handling & logging (pino, custom errors)
 
 ### Track C: TTS Engine Integration
+
 - **Story 1.7**: TTS Gateway interface (abstraction layer)
 - **Story 1.8**: KokoroTTS integration (adapter implementation)
 - **Story 1.9**: Audio file storage (GCS, file processing)
 
 ### Track D: CLI Interface
+
 - **Story 1.10**: CLI framework (Commander.js, command routing)
 - **Story 1.11**: Generate command (file input, API calls, download)
 - **Story 1.12**: Auth configuration (API key management)
 
 ### Synchronization: Integration & Testing
+
 - **Story 1.13**: E2E integration testing (full workflow validation)
 - **Story 1.14**: Documentation (README, API docs, guides)
 - **Story 1.15**: MVP release (npm publish, deployment)
@@ -686,6 +704,7 @@ jobs:
 ## Acceptance Criteria Checklist
 
 ### Functionality
+
 - [ ] User can install CLI via npm/homebrew
 - [ ] User can authenticate with API key
 - [ ] User can generate audio from plain text file
@@ -694,23 +713,27 @@ jobs:
 - [ ] Job status can be queried via CLI/API
 
 ### Quality
+
 - [ ] 80% code coverage (unit tests)
 - [ ] 80% mutation score (Stryker)
 - [ ] E2E tests pass for complete workflow
 - [ ] All ESLint rules pass (strict TypeScript)
 
 ### Performance
+
 - [ ] API response time <100ms (p95)
 - [ ] TTS generation at 2x real-time speed minimum
 - [ ] Database queries optimized with indexes
 
 ### DevOps
+
 - [ ] CI/CD pipeline green (all tests pass)
 - [ ] Docker images build successfully
 - [ ] Local dev environment works (docker-compose)
 - [ ] Deployment to Cloud Run succeeds
 
 ### Documentation
+
 - [ ] README with setup instructions
 - [ ] API documentation (Scalar/OpenAPI)
 - [ ] CLI help text for all commands

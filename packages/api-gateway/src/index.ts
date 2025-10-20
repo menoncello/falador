@@ -28,6 +28,17 @@ const app = new Elysia()
     return null;
   })
 
+  // Database reset endpoint (for testing only)
+  .delete('/api/test/reset', ({ set }) => {
+    if (process.env.NODE_ENV !== 'test') {
+      set.status = 403;
+      return { error: 'Database reset only available in test environment' };
+    }
+    db.clear();
+    set.status = 204;
+    return null;
+  })
+
   .listen(PORT);
 
 // Only log in development/non-test environments

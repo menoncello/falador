@@ -6,6 +6,7 @@
  */
 
 import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
+import jwt from 'jsonwebtoken';
 
 // Constants for cryptographic operations
 const SALT_BYTES = 16;
@@ -13,8 +14,12 @@ const HASH_LENGTH = 64;
 const PASSWORD_HASH_PARTS = 2;
 const ID_BYTES = 16;
 const API_KEY_BYTES = 32;
-const SIGNATURE_BYTES = 32;
 const TOKEN_EXPIRY_MS = 86_400_000; // 24 hours in milliseconds
+const MS_TO_SECONDS = 1000;
+
+// JWT Secret - In production, this should come from environment variables
+const JWT_SECRET =
+  process.env['JWT_SECRET'] || 'your-super-secret-jwt-key-change-in-production';
 
 export interface User {
   id: string;
@@ -58,7 +63,7 @@ interface Session {
 /**
  * In-memory database singleton
  */
-class Database {
+export class Database {
   private users: Map<string, User> = new Map();
   private projects: Map<string, Project> = new Map();
   private apiKeys: Map<string, ApiKey> = new Map();
@@ -102,18 +107,22 @@ class Database {
   }
 
   /**
-   * Generate JWT-like token
-   * @returns A JWT-like token string
+   * Generate properly signed JWT token
+   * @param userId - The user ID to include in the token
+   * @returns A cryptographically signed JWT token string
    */
-  generateToken(): string {
-    const header = Buffer.from(
-      JSON.stringify({ alg: 'HS256', typ: 'JWT' })
-    ).toString('base64url');
-    const payload = Buffer.from(
-      JSON.stringify({ iat: Date.now(), exp: Date.now() + TOKEN_EXPIRY_MS })
-    ).toString('base64url');
-    const signature = randomBytes(SIGNATURE_BYTES).toString('base64url');
-    return `${header}.${payload}.${signature}`;
+  generateToken(userId: string): string {
+    return jwt.sign(
+      {
+        userId,
+        iat: Math.floor(Date.now() / MS_TO_SECONDS),
+        exp:
+          Math.floor(Date.now() / MS_TO_SECONDS) +
+          TOKEN_EXPIRY_MS / MS_TO_SECONDS,
+      },
+      JWT_SECRET,
+      { algorithm: 'HS256' }
+    );
   }
 
   /**
@@ -338,28 +347,43 @@ class Database {
    * @returns The session token
    */
   createSession(userId: string): string {
-    const token = this.generateToken();
+    const token = this.generateToken(userId);
     const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MS).toISOString();
     this.sessions.set(token, { userId, token, expiresAt });
     return token;
   }
 
   /**
-   * Get session by token
-   * @param token - The session token
-   * @returns The session object if found and not expired, undefined otherwise
+   * Get session by JWT token
+   * @param token - The JWT session token
+   * @returns The session object if token is valid, undefined otherwise
    */
   getSession(token: string): Session | undefined {
-    const session = this.sessions.get(token);
-    if (!session) {
+    try {
+      // Verify JWT token
+      const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as {
+        userId: string;
+        exp?: number;
+      };
+
+      // Create a session object from JWT token
+      const session: Session = {
+        userId: decoded.userId,
+        token,
+        expiresAt: new Date((decoded.exp || 0) * MS_TO_SECONDS).toISOString(),
+      };
+
+      // Check if the user exists
+      const user = this.users.get(decoded.userId);
+      if (!user) {
+        return undefined;
+      }
+
+      return session;
+    } catch {
+      // Invalid token
       return undefined;
     }
-    // Check expiration
-    if (new Date(session.expiresAt) < new Date()) {
-      this.sessions.delete(token);
-      return undefined;
-    }
-    return session;
   }
 
   /**

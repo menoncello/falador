@@ -26,21 +26,21 @@ Create web-based user interface providing visual project management, audio previ
 ```typescript
 // Technology Choices (from solution-architecture.md)
 const stack = {
-  framework: 'Astro 5.14.5',          // Island architecture
-  uiLibrary: 'React 19.0.0',          // Interactive islands
-  styling: 'Tailwind CSS 4.0.30',     // Design system
+  framework: 'Astro 5.14.5', // Island architecture
+  uiLibrary: 'React 19.0.0', // Interactive islands
+  styling: 'Tailwind CSS 4.0.30', // Design system
   components: [
-    'Headless UI 2.2.3',              // Accessible components
-    'Radix UI 1.1.6',                 // Primitives
+    'Headless UI 2.2.3', // Accessible components
+    'Radix UI 1.1.6', // Primitives
   ],
-  stateManagement: 'Zustand 5.0.3',   // Lightweight, TypeScript-first
-  forms: 'React Hook Form 7.56.0',    // Form validation
-  validation: 'Valibot 1.1.0',        // Schema validation
-  fileUpload: '@uppy/core 4.8.0',     // File upload
-  audioPlayer: 'Howler.js 2.2.4',     // Audio playback
-  charts: 'Chart.js 4.4.7',           // Analytics visualization
-  icons: 'Lucide React 0.469.0',      // Icon library
-  testing: 'Playwright 1.56.1',       // E2E tests
+  stateManagement: 'Zustand 5.0.3', // Lightweight, TypeScript-first
+  forms: 'React Hook Form 7.56.0', // Form validation
+  validation: 'Valibot 1.1.0', // Schema validation
+  fileUpload: '@uppy/core 4.8.0', // File upload
+  audioPlayer: 'Howler.js 2.2.4', // Audio playback
+  charts: 'Chart.js 4.4.7', // Analytics visualization
+  icons: 'Lucide React 0.469.0', // Icon library
+  testing: 'Playwright 1.56.1', // E2E tests
 };
 ```
 
@@ -131,6 +131,7 @@ packages/web/
 ### Phase 1: Foundation & Authentication (Stories 4.1-4.3)
 
 **Story 4.1: Web Application Setup**
+
 - Astro project initialization
 - Tailwind CSS + Headless UI + Radix UI setup
 - Design system tokens (from ux-specification.md)
@@ -168,6 +169,7 @@ export default {
 ```
 
 **Story 4.2: Authentication UI**
+
 - Login form with email/password
 - Registration form with validation
 - Session management (Lucia Auth integration)
@@ -210,6 +212,7 @@ export function LoginForm() {
 ```
 
 **Story 4.3: User Profile Management**
+
 - Profile page with user info
 - Avatar upload
 - Password change
@@ -219,6 +222,7 @@ export function LoginForm() {
 ### Phase 2: Dashboard & Project Overview (Stories 4.4-4.7)
 
 **Story 4.4: Dashboard Overview**
+
 - Project cards grid
 - Quick stats (total projects, hours generated, voices created)
 - Recent activity feed
@@ -238,6 +242,7 @@ import StatsOverview from '@/components/dashboard/StatsOverview';
 ```
 
 **Story 4.5: Project Card Component**
+
 - Thumbnail/cover image
 - Project name, status, progress
 - Last modified timestamp
@@ -245,6 +250,7 @@ import StatsOverview from '@/components/dashboard/StatsOverview';
 - Status badge (Draft, Processing, Complete, Failed)
 
 **Story 4.6: Project Grid with Filtering**
+
 - Filter by status (All, Draft, Processing, Complete)
 - Search by project name
 - Sort by date, name, status
@@ -252,6 +258,7 @@ import StatsOverview from '@/components/dashboard/StatsOverview';
 - Empty state for new users
 
 **Story 4.7: Quick Actions & Shortcuts**
+
 - Keyboard shortcuts (Cmd+N for new project)
 - Command palette (Cmd+K)
 - Bulk operations (select multiple projects)
@@ -259,18 +266,20 @@ import StatsOverview from '@/components/dashboard/StatsOverview';
 ### Phase 3: Project Creation & Upload (Stories 4.8-4.10)
 
 **Story 4.8: Project Creation Wizard**
+
 ```typescript
 // Multi-step form
 const steps = [
-  'Basic Info',         // Name, description
-  'Upload File',        // Book file upload
-  'Voice Selection',    // Choose voice
-  'Settings',           // Audio settings
+  'Basic Info', // Name, description
+  'Upload File', // Book file upload
+  'Voice Selection', // Choose voice
+  'Settings', // Audio settings
   'Review & Create',
 ];
 ```
 
 **Story 4.9: File Upload Component**
+
 - Drag-and-drop interface (@uppy/core)
 - Upload progress indicator
 - File validation (type, size)
@@ -306,6 +315,7 @@ export function FileUploader({ onComplete }: Props) {
 ```
 
 **Story 4.10: Project Settings Form**
+
 - Voice selection (dropdown with previews)
 - Audio quality (Standard, High, Premium)
 - Output format (MP3, M4B)
@@ -315,6 +325,7 @@ export function FileUploader({ onComplete }: Props) {
 ### Phase 4: Project Details & Monitoring (Stories 4.11-4.13)
 
 **Story 4.11: Project Details Page**
+
 - Project header (name, status, progress)
 - Tabs: Overview, Chapters, Audio Files, Settings
 - Overview tab: stats, metadata, generation history
@@ -344,6 +355,7 @@ import AudioPlayer from '@/components/projects/AudioPlayer';
 ```
 
 **Story 4.12: Audio Player Component**
+
 - Waveform visualization
 - Play/pause, seek, volume
 - Playback speed control (0.5x - 2x)
@@ -380,6 +392,7 @@ export function AudioPlayer({ audioUrl, chapters }: Props) {
 ```
 
 **Story 4.13: Real-Time Job Monitoring**
+
 - WebSocket connection for live updates
 - Progress bar with ETA
 - Current processing step (Parsing, Generating, Processing)
@@ -389,6 +402,7 @@ export function AudioPlayer({ audioUrl, chapters }: Props) {
 ### Phase 5: Voice Library UI (Stories 4.14-4.16)
 
 **Story 4.14: Voice Gallery Component**
+
 - Grid layout with voice cards
 - Voice preview (play sample)
 - Voice metadata (quality score, language, gender)
@@ -396,6 +410,7 @@ export function AudioPlayer({ audioUrl, chapters }: Props) {
 - Create new voice button
 
 **Story 4.15: Voice Upload Modal**
+
 - Voice sample upload
 - Name and description form
 - Quality validation feedback
@@ -403,6 +418,7 @@ export function AudioPlayer({ audioUrl, chapters }: Props) {
 - Preview after training completes
 
 **Story 4.16: Voice Preview & Customization**
+
 - Voice settings sliders (pitch, speed, tone)
 - Preview text input
 - Generate preview button
@@ -411,6 +427,7 @@ export function AudioPlayer({ audioUrl, chapters }: Props) {
 ### Phase 6: Responsive Design & Mobile (Stories 4.17-4.18)
 
 **Story 4.17: Mobile-Responsive Layout**
+
 - Responsive sidebar (hamburger menu on mobile)
 - Touch-optimized interactions
 - Mobile-first CSS (Tailwind breakpoints)
@@ -418,6 +435,7 @@ export function AudioPlayer({ audioUrl, chapters }: Props) {
 - Progressive Web App (PWA) manifest
 
 **Story 4.18: E2E Testing with Playwright**
+
 - Login flow test
 - Project creation test
 - File upload test
@@ -679,17 +697,20 @@ export function Modal({ isOpen, onClose, title, children }: Props) {
 ## Testing Strategy
 
 ### Unit Tests (Vitest)
+
 - Component rendering
 - Event handlers
 - State management (Zustand stores)
 - Utility functions
 
 ### Integration Tests
+
 - API service calls
 - Form submissions
 - Authentication flows
 
 ### E2E Tests (Playwright)
+
 - User journeys (login → create project → upload → monitor)
 - Cross-browser testing (Chrome, Firefox, Safari)
 - Mobile viewport testing
@@ -741,6 +762,7 @@ NODE_ENV=production
 ## Dependencies
 
 **New Dependencies (Epic 4):**
+
 ```json
 {
   "dependencies": {
