@@ -1,4 +1,4 @@
-import { chromium, type FullConfig } from '@playwright/test';
+import { type FullConfig } from '@playwright/test';
 
 /**
  * Global setup for Playwright tests

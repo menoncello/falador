@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach } from 'bun:test';
 import { Database } from '../../../packages/api-gateway/src/database';
 
 // Helper function to check if project belongs to user
-function projectBelongsToUser(project: any, userId: string): boolean {
+function _projectBelongsToUser(project: any, userId: string): boolean {
   return project.userId === userId;
 }
 

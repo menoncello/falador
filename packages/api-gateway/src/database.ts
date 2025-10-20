@@ -6,7 +6,7 @@
  */
 
 import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
-import { sign, verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 // Constants for cryptographic operations
 const SALT_BYTES = 16;
@@ -112,7 +112,7 @@ export class Database {
    * @returns A cryptographically signed JWT token string
    */
   generateToken(userId: string): string {
-    return sign(
+    return jwt.sign(
       {
         userId,
         iat: Math.floor(Date.now() / MS_TO_SECONDS),
@@ -361,7 +361,7 @@ export class Database {
   getSession(token: string): Session | undefined {
     try {
       // Verify JWT token
-      const decoded = verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as {
+      const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as {
         userId: string;
         exp?: number;
       };
