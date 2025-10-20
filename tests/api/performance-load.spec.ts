@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { createTestUser, TEST_PASSWORDS } from '../../packages/api-gateway/src/test-factories';
+import {
+  createTestUser,
+  TEST_PASSWORDS,
+} from '../../packages/api-gateway/src/test-factories';
 
 /**
  * API Performance Tests
@@ -13,7 +16,9 @@ test.describe('API Performance - Load Testing', () => {
   const TARGET_RESPONSE_TIME = 100; // ms
 
   test.describe('Authentication Endpoints', () => {
-    test('POST /api/auth/login - responds within 100ms', async ({ request }) => {
+    test('POST /api/auth/login - responds within 100ms', async ({
+      request,
+    }) => {
       // Setup: Create a user first
       const userData = createTestUser({
         password: TEST_PASSWORDS.VALID,
@@ -35,7 +40,9 @@ test.describe('API Performance - Load Testing', () => {
       console.log(`Login response time: ${responseTime}ms`);
     });
 
-    test('POST /api/auth/register - responds within 100ms', async ({ request }) => {
+    test('POST /api/auth/register - responds within 100ms', async ({
+      request,
+    }) => {
       const userData = createTestUser({
         password: TEST_PASSWORDS.SECURE,
       });
@@ -51,7 +58,9 @@ test.describe('API Performance - Load Testing', () => {
       console.log(`Register response time: ${responseTime}ms`);
     });
 
-    test('GET /api/auth/me - responds within 100ms with valid token', async ({ request }) => {
+    test('GET /api/auth/me - responds within 100ms with valid token', async ({
+      request,
+    }) => {
       // Setup: Create and login user
       const userData = createTestUser({
         password: TEST_PASSWORDS.VALID,
@@ -70,7 +79,7 @@ test.describe('API Performance - Load Testing', () => {
       const startTime = Date.now();
       const response = await request.get(`${baseURL}/api/auth/me`, {
         headers: {
-          'Authorization': `Bearer ${loginResult.token}`,
+          Authorization: `Bearer ${loginResult.token}`,
         },
       });
       const responseTime = Date.now() - startTime;
@@ -97,7 +106,9 @@ test.describe('API Performance - Load Testing', () => {
       console.log(`Invalid login error response time: ${responseTime}ms`);
     });
 
-    test('Missing authorization error response within 100ms', async ({ request }) => {
+    test('Missing authorization error response within 100ms', async ({
+      request,
+    }) => {
       const startTime = Date.now();
       const response = await request.get(`${baseURL}/api/auth/me`);
       const responseTime = Date.now() - startTime;
@@ -121,7 +132,9 @@ test.describe('API Performance - Load Testing', () => {
   });
 
   test.describe('Health Check Performance', () => {
-    test('GET /health - responds within 50ms (should be faster)', async ({ request }) => {
+    test('GET /health - responds within 50ms (should be faster)', async ({
+      request,
+    }) => {
       const startTime = Date.now();
       const response = await request.get(`${baseURL}/health`);
       const responseTime = Date.now() - startTime;
@@ -133,7 +146,9 @@ test.describe('API Performance - Load Testing', () => {
   });
 
   test.describe('Concurrent Load Testing', () => {
-    test('Multiple concurrent login requests - all within 100ms', async ({ request }) => {
+    test('Multiple concurrent login requests - all within 100ms', async ({
+      request,
+    }) => {
       // Setup: Create a user
       const userData = createTestUser({
         password: TEST_PASSWORDS.VALID,
@@ -141,7 +156,7 @@ test.describe('API Performance - Load Testing', () => {
       await request.post(`${baseURL}/api/auth/register`, { data: userData });
 
       // Create 5 concurrent login requests
-      const concurrentRequests = Array(5).fill(null).map(async () => {
+      const createLoginRequest = async (): Promise<number> => {
         const startTime = Date.now();
         const response = await request.post(`${baseURL}/api/auth/login`, {
           data: {
@@ -154,19 +169,30 @@ test.describe('API Performance - Load Testing', () => {
         expect(response.status()).toBe(200);
         expect(responseTime).toBeLessThan(TARGET_RESPONSE_TIME);
         return responseTime;
-      });
+      };
 
+      const concurrentRequests = Array(5)
+        .fill(null)
+        .map(() => createLoginRequest());
       const responseTimes = await Promise.all(concurrentRequests);
-      const averageResponseTime = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
+      const averageResponseTime =
+        responseTimes.reduce((sum, time) => sum + time, 0) /
+        responseTimes.length;
 
-      console.log(`Concurrent login response times: ${responseTimes.join(', ')}ms`);
-      console.log(`Average concurrent login response time: ${averageResponseTime}ms`);
+      console.log(
+        `Concurrent login response times: ${responseTimes.join(', ')}ms`
+      );
+      console.log(
+        `Average concurrent login response time: ${averageResponseTime}ms`
+      );
       expect(averageResponseTime).toBeLessThan(TARGET_RESPONSE_TIME);
     });
 
-    test('Multiple concurrent registration requests - all within 100ms', async ({ request }) => {
+    test('Multiple concurrent registration requests - all within 100ms', async ({
+      request,
+    }) => {
       // Create 5 concurrent registration requests with unique data
-      const concurrentRequests = Array(5).fill(null).map(async (_, index) => {
+      const createRegistrationRequest = async (): Promise<number> => {
         const userData = createTestUser({
           password: TEST_PASSWORDS.VALID,
         });
@@ -180,13 +206,22 @@ test.describe('API Performance - Load Testing', () => {
         expect(response.status()).toBe(201);
         expect(responseTime).toBeLessThan(TARGET_RESPONSE_TIME);
         return responseTime;
-      });
+      };
 
+      const concurrentRequests = Array(5)
+        .fill(null)
+        .map(() => createRegistrationRequest());
       const responseTimes = await Promise.all(concurrentRequests);
-      const averageResponseTime = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
+      const averageResponseTime =
+        responseTimes.reduce((sum, time) => sum + time, 0) /
+        responseTimes.length;
 
-      console.log(`Concurrent registration response times: ${responseTimes.join(', ')}ms`);
-      console.log(`Average concurrent registration response time: ${averageResponseTime}ms`);
+      console.log(
+        `Concurrent registration response times: ${responseTimes.join(', ')}ms`
+      );
+      console.log(
+        `Average concurrent registration response time: ${averageResponseTime}ms`
+      );
       expect(averageResponseTime).toBeLessThan(TARGET_RESPONSE_TIME);
     });
   });
@@ -199,9 +234,8 @@ test.describe('API Performance - Load Testing', () => {
       });
       await request.post(`${baseURL}/api/auth/register`, { data: userData });
 
-      // Make 10 sequential login requests
-      const responseTimes = [];
-      for (let i = 0; i < 10; i++) {
+      // Create helper function for login requests
+      const performLogin = async (): Promise<number> => {
         const startTime = Date.now();
         const response = await request.post(`${baseURL}/api/auth/login`, {
           data: {
@@ -212,13 +246,23 @@ test.describe('API Performance - Load Testing', () => {
         const responseTime = Date.now() - startTime;
 
         expect(response.status()).toBe(200);
-        responseTimes.push(responseTime);
+        return responseTime;
+      };
+
+      // Make 10 sequential login requests
+      const responseTimes = [];
+      for (let i = 0; i < 10; i++) {
+        responseTimes.push(await performLogin());
       }
 
-      const averageResponseTime = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
+      const averageResponseTime =
+        responseTimes.reduce((sum, time) => sum + time, 0) /
+        responseTimes.length;
       const maxResponseTime = Math.max(...responseTimes);
 
-      console.log(`Sequential login response times: ${responseTimes.join(', ')}ms`);
+      console.log(
+        `Sequential login response times: ${responseTimes.join(', ')}ms`
+      );
       console.log(`Average sequential response time: ${averageResponseTime}ms`);
       console.log(`Max sequential response time: ${maxResponseTime}ms`);
 

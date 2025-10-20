@@ -1,9 +1,9 @@
-import { test, expect } from '../../support/fixtures';
 import { Database } from '../../../packages/api-gateway/src/database';
 import {
   createTestUser,
   TEST_PASSWORDS,
 } from '../../../packages/api-gateway/src/test-factories';
+import { test, expect } from '../../support/fixtures';
 
 test.describe('Auth Route Validation Tests', () => {
   let _db: Database;

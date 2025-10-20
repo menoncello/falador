@@ -6,6 +6,11 @@ function _projectBelongsToUser(project: any, userId: string): boolean {
   return project.userId === userId;
 }
 
+// Helper function to extract project IDs
+const extractProjectIds = (projectList: any[]): string[] => {
+  return projectList.map((p) => p.id);
+};
+
 describe('Database Utilities', () => {
   let db: Database;
 
@@ -19,7 +24,7 @@ describe('Database Utilities', () => {
       const user = db.createUser({
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       });
 
       // THEN: User should be created successfully
@@ -35,7 +40,7 @@ describe('Database Utilities', () => {
       const createdUser = db.createUser({
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       });
 
       // WHEN: Finding user by email
@@ -61,7 +66,7 @@ describe('Database Utilities', () => {
       const user = db.createUser({
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       });
 
       // WHEN: Creating a project
@@ -69,7 +74,7 @@ describe('Database Utilities', () => {
         title: 'Test Project',
         author: 'Test Author',
         language: 'en',
-        genre: 'Fiction'
+        genre: 'Fiction',
       });
 
       // THEN: Project should be created successfully
@@ -83,7 +88,7 @@ describe('Database Utilities', () => {
       const user = db.createUser({
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       });
 
       const project1 = db.createProject({ title: 'Project 1' });
@@ -94,8 +99,9 @@ describe('Database Utilities', () => {
 
       // THEN: Should return user's projects
       expect(projects).toHaveLength(2);
-      expect(projects.map(p => p.id)).toContain(project1.id);
-      expect(projects.map(p => p.id)).toContain(project2.id);
+      const projectIds = extractProjectIds(projects);
+      expect(projectIds).toContain(project1.id);
+      expect(projectIds).toContain(project2.id);
     });
   });
 });

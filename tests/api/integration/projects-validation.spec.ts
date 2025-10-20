@@ -1,5 +1,5 @@
-import { test, expect } from '../../support/fixtures';
 import { createTestProject } from '../../../packages/api-gateway/src/test-factories';
+import { test, expect } from '../../support/fixtures';
 
 test.describe('Projects Route Validation Tests', () => {
   test.describe('GET /api/projects - Authorization Error Validation', () => {

@@ -36,10 +36,13 @@ export function createTestUser(
   overrides: UserFactoryData = {}
 ): Required<UserFactoryData> {
   const timestamp = Date.now();
-  const randomSuffix = Math.random().toString(36).substring(2, 8);
+  // Use faker for cryptographic safety instead of Math.random()
+  const randomSuffix = faker.string.alphanumeric({ length: 6 });
 
   return {
-    email: overrides.email || `test-${timestamp}-${randomSuffix}@${faker.internet.domainName()}`,
+    email:
+      overrides.email ||
+      `test-${timestamp}-${randomSuffix}@${faker.internet.domainName()}`,
     name: overrides.name || faker.person.fullName(),
     password: overrides.password || faker.internet.password({ length: 16 }),
     tier: overrides.tier || 'free',

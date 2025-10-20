@@ -1,5 +1,8 @@
+import {
+  createTestUser,
+  TEST_PASSWORDS,
+} from '../../packages/api-gateway/src/test-factories';
 import { test, expect } from '../support/fixtures';
-import { createTestUser, TEST_PASSWORDS } from '../../packages/api-gateway/src/test-factories';
 
 /**
  * Authentication Mutation Testing Targets
@@ -9,8 +12,10 @@ import { createTestUser, TEST_PASSWORDS } from '../../packages/api-gateway/src/t
  */
 
 test.describe('Authentication Mutation Targets', () => {
-
-  test('POST /api/auth/login - invalid credentials returns consistent error structure', async ({ request, baseURL }) => {
+  test('POST /api/auth/login - invalid credentials returns consistent error structure', async ({
+    request,
+    baseURL,
+  }) => {
     // Network-first: Set up response interception before request
     const loginPromise = request.waitForResponse('**/api/auth/login');
 
@@ -31,7 +36,10 @@ test.describe('Authentication Mutation Targets', () => {
     expect(error.error.length).toBeGreaterThan(0);
   });
 
-  test('POST /api/auth/login - wrong password returns proper error', async ({ request, baseURL }) => {
+  test('POST /api/auth/login - wrong password returns proper error', async ({
+    request,
+    baseURL,
+  }) => {
     // Network-first: Set up response interception for user creation
     const registerPromise = request.waitForResponse('**/api/auth/register');
 
@@ -63,7 +71,10 @@ test.describe('Authentication Mutation Targets', () => {
     expect(error.error.length).toBeGreaterThan(0);
   });
 
-  test('POST /api/auth/login - malformed email handled by auth logic', async ({ request, baseURL }) => {
+  test('POST /api/auth/login - malformed email handled by auth logic', async ({
+    request,
+    baseURL,
+  }) => {
     // Network-first: Set up response interception before request
     const loginPromise = request.waitForResponse('**/api/auth/login');
 
@@ -84,13 +95,18 @@ test.describe('Authentication Mutation Targets', () => {
     expect(error.error.length).toBeGreaterThan(0);
   });
 
-  test('POST /api/auth/register - duplicate email check works correctly', async ({ request, baseURL }) => {
+  test('POST /api/auth/register - duplicate email check works correctly', async ({
+    request,
+    baseURL,
+  }) => {
     const userData = createTestUser({
       password: TEST_PASSWORDS.VALID,
     });
 
     // Network-first: Set up response interception for first registration
-    const firstRegisterPromise = request.waitForResponse('**/api/auth/register');
+    const firstRegisterPromise = request.waitForResponse(
+      '**/api/auth/register'
+    );
 
     // First registration should succeed
     const firstResponse = await request.post(`${baseURL}/api/auth/register`, {
@@ -101,7 +117,9 @@ test.describe('Authentication Mutation Targets', () => {
     expect(firstResponse.status()).toBe(201);
 
     // Network-first: Set up response interception for second registration
-    const secondRegisterPromise = request.waitForResponse('**/api/auth/register');
+    const secondRegisterPromise = request.waitForResponse(
+      '**/api/auth/register'
+    );
 
     // Second registration should fail
     const secondResponse = await request.post(`${baseURL}/api/auth/register`, {
@@ -117,11 +135,23 @@ test.describe('Authentication Mutation Targets', () => {
     expect(error.error.length).toBeGreaterThan(0);
   });
 
-  test('POST /api/auth/register - missing fields validation', async ({ request, baseURL }) => {
+  test('POST /api/auth/register - missing fields validation', async ({
+    request,
+    baseURL,
+  }) => {
     const testCases = [
-      { data: { name: 'Test User', password: TEST_PASSWORDS.VALID }, missing: 'email' },
-      { data: { email: 'test@example.com', password: TEST_PASSWORDS.VALID }, missing: 'name' },
-      { data: { email: 'test@example.com', name: 'Test User' }, missing: 'password' },
+      {
+        data: { name: 'Test User', password: TEST_PASSWORDS.VALID },
+        missing: 'email',
+      },
+      {
+        data: { email: 'test@example.com', password: TEST_PASSWORDS.VALID },
+        missing: 'name',
+      },
+      {
+        data: { email: 'test@example.com', name: 'Test User' },
+        missing: 'password',
+      },
     ];
 
     for (const testCase of testCases) {
@@ -143,7 +173,10 @@ test.describe('Authentication Mutation Targets', () => {
     }
   });
 
-  test('GET /api/auth/me - missing authorization header', async ({ request, baseURL }) => {
+  test('GET /api/auth/me - missing authorization header', async ({
+    request,
+    baseURL,
+  }) => {
     // Network-first: Set up response interception before request
     const mePromise = request.waitForResponse('**/api/auth/me');
 
@@ -158,12 +191,11 @@ test.describe('Authentication Mutation Targets', () => {
     expect(error.error.length).toBeGreaterThan(0);
   });
 
-  test('GET /api/auth/me - malformed authorization header', async ({ request, baseURL }) => {
-    const malformedTokens = [
-      'invalid-token',
-      'Bearer malformed',
-      '',
-    ];
+  test('GET /api/auth/me - malformed authorization header', async ({
+    request,
+    baseURL,
+  }) => {
+    const malformedTokens = ['invalid-token', 'Bearer malformed', ''];
 
     for (const token of malformedTokens) {
       // Network-first: Set up response interception before request
@@ -171,7 +203,7 @@ test.describe('Authentication Mutation Targets', () => {
 
       const response = await request.get(`${baseURL}/api/auth/me`, {
         headers: {
-          'Authorization': token,
+          Authorization: token,
         },
       });
 
@@ -185,7 +217,10 @@ test.describe('Authentication Mutation Targets', () => {
     }
   });
 
-  test('POST /api/auth/api-keys - unauthorized access blocked', async ({ request, baseURL }) => {
+  test('POST /api/auth/api-keys - unauthorized access blocked', async ({
+    request,
+    baseURL,
+  }) => {
     // Network-first: Set up response interception before request
     const apiKeysPromise = request.waitForResponse('**/api/auth/api-keys');
 
@@ -205,8 +240,10 @@ test.describe('Authentication Mutation Targets', () => {
     expect(error.error.length).toBeGreaterThan(0);
   });
 
-
-  test('Auth flow consistency - register and login sequence', async ({ request, baseURL }) => {
+  test('Auth flow consistency - register and login sequence', async ({
+    request,
+    baseURL,
+  }) => {
     const userData = createTestUser({
       password: TEST_PASSWORDS.SECURE,
     });
@@ -215,9 +252,12 @@ test.describe('Authentication Mutation Targets', () => {
     const registerPromise = request.waitForResponse('**/api/auth/register');
 
     // Register user
-    const registerResponse = await request.post(`${baseURL}/api/auth/register`, {
-      data: userData,
-    });
+    const registerResponse = await request.post(
+      `${baseURL}/api/auth/register`,
+      {
+        data: userData,
+      }
+    );
 
     await registerPromise; // Deterministic wait
 
@@ -250,7 +290,7 @@ test.describe('Authentication Mutation Targets', () => {
     // Use token to access protected endpoint
     const meResponse = await request.get(`${baseURL}/api/auth/me`, {
       headers: {
-        'Authorization': `Bearer ${loginResult.token}`,
+        Authorization: `Bearer ${loginResult.token}`,
       },
     });
 
@@ -262,7 +302,10 @@ test.describe('Authentication Mutation Targets', () => {
     expect(meResult.id).toBe(registerResult.id);
   });
 
-  test('Token validation - invalid JWT structure rejection', async ({ request, baseURL }) => {
+  test('Token validation - invalid JWT structure rejection', async ({
+    request,
+    baseURL,
+  }) => {
     // Test with various malformed JWT tokens
     const invalidTokens = [
       'not.a.jwt',
@@ -278,7 +321,7 @@ test.describe('Authentication Mutation Targets', () => {
 
       const response = await request.get(`${baseURL}/api/auth/me`, {
         headers: {
-          'Authorization': token,
+          Authorization: token,
         },
       });
 
