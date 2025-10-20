@@ -1,3 +1,4 @@
+import { createTestUser } from '../../packages/api-gateway/src/test-factories';
 import { test, expect } from '../support/fixtures';
 
 /**
@@ -27,12 +28,10 @@ test.describe('1.4-API-Auth: Authentication API', () => {
     test('1.4-API-001 [P0]: should create new user with valid data', async ({
       request,
     }) => {
-      // GIVEN: Valid user registration data
-      const userData = {
-        email: 'newuser@example.com',
-        name: 'New User',
+      // GIVEN: Valid user registration data using factory
+      const userData = createTestUser({
         password: TEST_MOCK_PASSWORD_SECURE,
-      };
+      });
 
       // WHEN: Creating user via API
       const response = await request.post('/api/auth/register', {
@@ -46,12 +45,8 @@ test.describe('1.4-API-Auth: Authentication API', () => {
     test('1.4-API-002 [P1]: should return created user object', async ({
       request,
     }) => {
-      // GIVEN: Valid user registration data
-      const userData = {
-        email: 'testuser@example.com',
-        name: 'Test User',
-        password: TEST_MOCK_PASSWORD_STANDARD,
-      };
+      // GIVEN: Valid user registration data using factory
+      const userData = createTestUser();
 
       // WHEN: Creating user via API
       const response = await request.post('/api/auth/register', {
@@ -72,9 +67,10 @@ test.describe('1.4-API-Auth: Authentication API', () => {
       request,
     }) => {
       // GIVEN: Registration data without email
+      const validUser = createTestUser();
       const userData = {
-        name: 'Test User',
-        password: TEST_MOCK_PASSWORD_STANDARD,
+        name: validUser.name,
+        password: validUser.password,
       };
 
       // WHEN: Attempting to create user
@@ -87,11 +83,15 @@ test.describe('1.4-API-Auth: Authentication API', () => {
     });
 
     test('1.4-API-004 [P1]: should reject registration with duplicate email', async ({
-      userFactory,
       request,
     }) => {
       // GIVEN: User already exists with email
-      const existingUser = await userFactory.createUser();
+      const existingUser = createTestUser();
+
+      // Create first user via API
+      await request.post('/api/auth/register', {
+        data: existingUser,
+      });
 
       // WHEN: Attempting to register with same email
       const response = await request.post('/api/auth/register', {

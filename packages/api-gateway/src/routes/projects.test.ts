@@ -310,7 +310,7 @@ describe('Project Routes', () => {
 
       expect(response.status).toBe(400);
       const data = (await response.json()) as { error: string };
-      expect(data.error).toContain('title');
+      expect(data.error).toBe('Missing required field: title');
     });
 
     it('should reject creating project without auth', async () => {
@@ -323,6 +323,8 @@ describe('Project Routes', () => {
       );
 
       expect(response.status).toBe(401);
+      const data = (await response.json()) as { error: string };
+      expect(data.error).toBe('Unauthorized');
     });
   });
 
@@ -384,6 +386,8 @@ describe('Project Routes', () => {
       );
 
       expect(response.status).toBe(401);
+      const data = (await response.json()) as { error: string };
+      expect(data.error).toBe('Unauthorized');
     });
   });
 
@@ -508,14 +512,24 @@ describe('Project Routes', () => {
       );
 
       expect(response.status).toBe(401);
+      const data = (await response.json()) as { error: string };
+      expect(data.error).toBe('Unauthorized');
     });
   });
 
   describe('DELETE /api/projects/:id', () => {
     it('should return 404 for non-existent project', async () => {
+      const user = db.createUser({
+        email: TEST_CREDENTIALS.EMAIL,
+        name: TEST_CREDENTIALS.NAME,
+        password: TEST_CREDENTIALS.PASSWORD,
+      });
+
+      const token = db.createSession(user.id);
       const response = await projectRoutes.handle(
         new Request('http://localhost/api/projects/nonexistent', {
           method: 'DELETE',
+          headers: { Authorization: `Bearer ${token}` },
         })
       );
 

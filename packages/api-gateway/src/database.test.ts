@@ -282,22 +282,19 @@ describe('Database', () => {
       expect(session).toBeUndefined();
     });
 
-    test('should return undefined for expired session', async () => {
+    test('should return undefined for invalid JWT token', () => {
       const user = db.createUser({
         email: TEST_CREDENTIALS.EMAIL,
         name: TEST_CREDENTIALS.NAME,
         password: TEST_CREDENTIALS.PASSWORD,
       });
 
-      const token = db.createSession(user.id);
+      const validToken = db.createSession(user.id);
 
-      // Get session and manually expire it
-      const session = db.getSession(token);
-      if (session) {
-        session.expiresAt = new Date(Date.now() - 1000).toISOString();
-      }
+      // Test with tampered token (invalid signature)
+      const tamperedToken = `${validToken.slice(0, -10)}tampered`;
 
-      const retrieved = db.getSession(token);
+      const retrieved = db.getSession(tamperedToken);
       expect(retrieved).toBeUndefined();
     });
 

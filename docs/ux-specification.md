@@ -9,10 +9,12 @@ _Generated on 2025-10-16 by Eduardo Menoncello_
 **Falador** is an enterprise-scale AI-directed TTS platform designed specifically for Brazilian Portuguese audiobook production. The platform addresses a critical market gap where current TTS solutions deliver only 3.8/5 quality while professional audiobook production requires 4.5/5 standards.
 
 **Target Market:**
+
 - Brazilian audiobook market: $340M opportunity, 28% CAGR
 - Primary segments: Technical publishers (20-500 books/month), Independent authors (voice cloning), Publishing houses (workflow integration)
 
 **Core Value Propositions:**
+
 - **Quality Excellence**: 4.5/5 Brazilian Portuguese narration quality (vs. 3.8/5 market average)
 - **Production Efficiency**: 48-hour production timeline (vs. 4-6 weeks traditional)
 - **Cost Reduction**: 80% savings ($75-200 vs. $1,600-6,000 per book)
@@ -20,6 +22,7 @@ _Generated on 2025-10-16 by Eduardo Menoncello_
 - **Voice Innovation**: Industry-leading voice cloning from 30-second samples
 
 **Platform Architecture:**
+
 - **CLI Interface**: Primary tool for technical users, batch processing, automation
 - **Web Dashboard**: Project management, voice cloning, quality review, team collaboration
 - **RESTful API**: Third-party integrations, webhook notifications, SDK support
@@ -36,17 +39,20 @@ This specification covers the complete user experience across three primary inte
 #### Persona 1: Alex Chen - Technical Publisher (Developer Segment)
 
 **Demographics:**
+
 - Role: Technical Publisher / DevOps Lead
 - Company: DevBooks Publishing (20-500 books/month)
 - Technical Level: Expert (CLI-first, scripting, automation)
 
 **Goals:**
+
 - Automate batch processing of programming books into audiobooks
 - Integrate audiobook production into CI/CD pipeline
 - Achieve 95%+ first-pass quality with minimal manual intervention
 - Monitor production progress programmatically
 
 **Pain Points:**
+
 - Manual audiobook production doesn't scale for large catalogs
 - Traditional TTS tools lack specialized technical terminology support
 - Quality inconsistency requires expensive human QA
@@ -55,6 +61,7 @@ This specification covers the complete user experience across three primary inte
 **User Journey Focus:** Journey 1 - Batch Audiobook Production (CLI-heavy)
 
 **Key Requirements:**
+
 - Comprehensive CLI with batch processing
 - Scriptable configuration (YAML/JSON)
 - Real-time status monitoring and logging
@@ -66,17 +73,20 @@ This specification covers the complete user experience across three primary inte
 #### Persona 2: Carlos Silva - Independent Author (Creative Segment)
 
 **Demographics:**
+
 - Role: Fiction Author (Fantasy trilogy series)
 - Context: First-time audiobook creator, budget-conscious
 - Technical Level: Intermediate (comfortable with web UIs, occasional CLI)
 
 **Goals:**
+
 - Create audiobooks using own voice for authentic reader connection
 - Maintain voice consistency across book series
 - Control pronunciation of character names and world-building terms
 - Achieve professional quality on indie budget
 
 **Pain Points:**
+
 - Professional narration costs $1,600-6,000 per book (prohibitive)
 - Loss of creative control with third-party narrators
 - Long production timelines (4-6 weeks) delay launches
@@ -85,6 +95,7 @@ This specification covers the complete user experience across three primary inte
 **User Journey Focus:** Journey 2 - Personal Voice Cloning for Fiction Series (Web UI-focused)
 
 **Key Requirements:**
+
 - Intuitive voice cloning wizard with guided workflow
 - Visual pronunciation editor with phonetic guidance
 - Preview capabilities before final generation
@@ -96,17 +107,20 @@ This specification covers the complete user experience across three primary inte
 #### Persona 3: Maria Santos - Publishing House Director (Enterprise Segment)
 
 **Demographics:**
+
 - Role: Digital Content Director
 - Company: Editora Brasileira (100-book backlist, 15 new titles/month)
 - Technical Level: Business user (manages technical teams, uses enterprise tools)
 
 **Goals:**
+
 - Convert entire backlist to audiobooks efficiently
 - Establish team workflows with approval gates
 - Integrate with existing publishing CMS and distribution platforms
 - Maintain brand consistency across catalog
 
 **Pain Points:**
+
 - Catalog conversion at traditional costs is financially unfeasible
 - Team coordination requires approval workflows and role management
 - Quality control at scale demands systematic QA processes
@@ -115,6 +129,7 @@ This specification covers the complete user experience across three primary inte
 **User Journey Focus:** Journey 3 - Catalog Conversion and Workflow Integration (Enterprise features)
 
 **Key Requirements:**
+
 - Team collaboration with role-based access (Content Manager, QA Editor, Audio Director)
 - Publisher brand voice creation and management
 - Approval workflow gates
@@ -128,41 +143,49 @@ This specification covers the complete user experience across three primary inte
 #### Primary Usability Objectives
 
 **1. Ease of Learning**
+
 - **For Technical Users (Alex):** CLI installation and first audiobook generation in <10 minutes
 - **For Creative Users (Carlos):** Voice cloning wizard completion without documentation in <15 minutes
 - **For Enterprise Users (Maria):** Team onboarding and first batch job in <1 hour with guided setup
 
 **Target Metrics:**
+
 - Time to first successful audiobook: <30 minutes (any user type)
 - Support ticket rate: <5% of new users require assistance
 - Tutorial completion rate: >80% for voice cloning wizard
 
 **2. Efficiency for Power Users**
+
 - **CLI Power Users:** Sub-second command execution, keyboard-driven workflows
 - **Batch Processing:** Single command handles 100+ books with progress monitoring
 - **Keyboard Shortcuts:** Web UI supports shortcuts for frequent actions (preview, approve, regenerate)
 
 **Target Metrics:**
+
 - CLI command response time: <100ms (95th percentile)
 - Batch job setup time: <5 minutes for 100 books
 - Web UI task completion 40% faster with keyboard shortcuts vs. mouse-only
 
 **3. Error Prevention and Recovery**
+
 - **Smart Defaults:** Pre-configured genre profiles, voice recommendations based on content type
 - **Validation:** Real-time format checking, audio sample quality validation before processing
 - **Graceful Degradation:** Partial batch failures don't block entire job; failed books flagged for retry
 
 **Target Metrics:**
+
 - User-caused errors: <2% of total operations
 - Successful error recovery without support: >85%
 - Clear error messages with actionable next steps: 100%
 
 **4. Accessibility**
+
 - **WCAG 2.1 AA Compliance:** All web interfaces keyboard navigable, screen reader compatible
 - **Color Blindness Support:** Status indicators use icons + color, no color-only information
 - **Internationalization:** Brazilian Portuguese as primary language, English support
 
 **Target Metrics:**
+
 - WCAG 2.1 AA automated testing: 100% pass rate
 - Screen reader compatibility: Full workflow completion possible
 - Keyboard-only navigation: All core features accessible
@@ -175,7 +198,7 @@ This specification covers the complete user experience across three primary inte
 
 **1. Developer-First Efficiency**
 
-*"Power users deserve powerful tools."*
+_"Power users deserve powerful tools."_
 
 - **CLI as First-Class Interface:** Terminal commands are not an afterthought—they receive equal design attention to GUI
 - **Automation-Native:** Every feature designed for scriptability and integration (APIs, webhooks, config files)
@@ -183,6 +206,7 @@ This specification covers the complete user experience across three primary inte
 - **Transparent Operations:** Users see exactly what's happening (logs, progress, quality scores) without mystery boxes
 
 **Application:**
+
 - CLI commands follow Unix philosophy (composable, single-purpose, pipeable)
 - Web UI provides "Show CLI Command" for every action (educational + automation path)
 - JSON output modes for all operations enable scripting
@@ -191,13 +215,14 @@ This specification covers the complete user experience across three primary inte
 
 **2. Progressive Disclosure**
 
-*"Simple tasks should be simple; complex tasks should be possible."*
+_"Simple tasks should be simple; complex tasks should be possible."_
 
 - **Layered Complexity:** Basic workflows (upload → generate → download) require 3 clicks; advanced features revealed contextually
 - **Just-In-Time Guidance:** Help appears when users need it (tooltips on hover, contextual tutorials on first use)
 - **Expert Mode Toggle:** Power users can hide guidance and collapse advanced panels
 
 **Application:**
+
 - Voice cloning starts with "Quick Start" (30-second sample + generate), advanced customization available in secondary panel
 - Batch processing wizard guides beginners; `--config` file path for experts
 - Pronunciation editor shows common corrections first, full phonetic controls available
@@ -206,13 +231,14 @@ This specification covers the complete user experience across three primary inte
 
 **3. Quality Transparency**
 
-*"Users trust what they can measure and understand."*
+_"Users trust what they can measure and understand."_
 
 - **Visible Metrics:** Quality scores (4.5/5 target), processing times, cost estimates shown proactively
 - **Preview Everything:** Sample audio, voice clones, chapter segments—never commit without hearing
 - **Confidence Indicators:** System communicates certainty (e.g., "89% pronunciation confidence—review recommended")
 
 **Application:**
+
 - Real-time quality scoring during generation with per-chapter breakdown
 - Waveform visualizations for audio review (not just playback)
 - Comparative previews (before/after pronunciation corrections)
@@ -221,13 +247,14 @@ This specification covers the complete user experience across three primary inte
 
 **4. Trust Through Control**
 
-*"Creative users need agency over their art."*
+_"Creative users need agency over their art."_
 
 - **Iterative Refinement:** Easy to regenerate chapters, adjust pronunciations, refine voice models—no penalties for experimentation
 - **Undo/Versioning:** Project versioning allows rollback to previous generations
 - **Ownership Clarity:** Users own voice clones and generated audio; platform rights explicitly stated
 
 **Application:**
+
 - "Regenerate Chapter" button always available, cost-transparent
 - Pronunciation dictionary persists across projects (build institutional knowledge)
 - Voice clones exportable for backup (user data portability)
@@ -236,13 +263,14 @@ This specification covers the complete user experience across three primary inte
 
 **5. Platform Complementarity**
 
-*"Different interfaces serve different workflows."*
+_"Different interfaces serve different workflows."_
 
 - **CLI for Automation:** Batch operations, CI/CD integration, scripted workflows
 - **Web for Collaboration:** Team workspaces, visual review, approval gates
 - **API for Integration:** Third-party tools, custom workflows, enterprise systems
 
 **Application:**
+
 - Same project accessible via CLI and Web (sync'd state)
 - API-first architecture ensures parity across interfaces
 - CLI users can monitor jobs in Web UI; Web users can copy CLI commands
@@ -452,16 +480,19 @@ When user is working on a specific project, show persistent floating action bar:
 #### Navigation Behaviors
 
 **1. Deep Linking:**
+
 - Every page has unique URL for bookmarking and sharing
 - Project URLs include project ID: `/projects/abc123`
 - Voice URLs include voice ID: `/voices/voice-xyz789`
 
 **2. State Preservation:**
+
 - Last viewed project remembered across sessions
 - Filter and sort preferences saved per-user
 - Breadcrumb trail preserved during multi-step wizards
 
 **3. Keyboard Navigation:**
+
 - `Cmd/Ctrl + K`: Global command palette (quick navigation)
 - `Cmd/Ctrl + P`: Quick project search
 - `Cmd/Ctrl + V`: Quick voice selection
@@ -469,6 +500,7 @@ When user is working on a specific project, show persistent floating action bar:
 - `Esc`: Close modals, cancel actions
 
 **4. Mobile Navigation Strategy:**
+
 - Bottom tab bar for primary sections (Dashboard, Projects, Voices, More)
 - Swipe gestures for tab switching
 - Pull-to-refresh on list views
@@ -479,12 +511,14 @@ When user is working on a specific project, show persistent floating action bar:
 #### Navigation Accessibility
 
 **Screen Reader Support:**
+
 - Skip navigation links for keyboard users
 - ARIA landmarks for main regions (`<nav>`, `<main>`, `<aside>`)
 - Clear focus indicators on interactive elements
 - Announced page title changes on route navigation
 
 **Keyboard-Only Navigation:**
+
 - All navigation items reachable via Tab key
 - Dropdown menus open with Enter/Space, navigate with Arrow keys
 - Command palette provides alternative to mouse-driven navigation
@@ -539,6 +573,7 @@ graph TD
 ```
 
 **Key Interactions:**
+
 - **CLI Commands:** Primary interface, zero GUI required
 - **Config Files:** YAML-based batch configuration for repeatability
 - **Progress Monitoring:** Real-time status with `--follow` flag
@@ -546,6 +581,7 @@ graph TD
 - **Automation:** Webhook integration enables lights-out operation
 
 **Edge Cases:**
+
 - Format validation failures → Provide specific error messages with conversion suggestions
 - API rate limiting → Queue management with retry logic
 - Partial batch failures → Continue processing remaining books, flag failures separately
@@ -608,6 +644,7 @@ graph TD
 ```
 
 **Key Interactions:**
+
 - **Guided Wizards:** Step-by-step voice cloning and project creation
 - **Real-Time Validation:** Audio quality checks before processing
 - **Preview-First:** Sample chapters before full commitment
@@ -615,6 +652,7 @@ graph TD
 - **Iterative Refinement:** Easy regeneration of specific chapters
 
 **Edge Cases:**
+
 - Poor audio sample quality → Provide specific feedback (background noise, volume too low)
 - Voice clone doesn't match expectations → Allow re-recording or parameter adjustment
 - Book parsing errors → Suggest format conversion or manual chapter marking
@@ -680,6 +718,7 @@ graph TD
 ```
 
 **Key Interactions:**
+
 - **Role-Based Workflows:** Different team members access different features
 - **Approval Gates:** Multi-stage review before distribution
 - **Batch Management:** Weekly rolling batches for manageable QA load
@@ -687,6 +726,7 @@ graph TD
 - **Webhook Automation:** System-to-system communication for distribution
 
 **Edge Cases:**
+
 - SSO authentication failures → Fallback to email/password with manual approval
 - CMS integration downtime → Manual upload as fallback
 - Approval conflicts → Escalation workflow to Director
@@ -740,6 +780,7 @@ graph TD
 ```
 
 **Key Interactions:**
+
 - **Clear Error Messages:** Specific problem identification with actionable suggestions
 - **Easy Support Access:** One-click ticket creation with context pre-filled
 - **Pronunciation Editor:** Visual interface with phonetic guidance
@@ -747,6 +788,7 @@ graph TD
 - **Quality Metrics:** Visible improvement from corrections (4.1 → 4.6)
 
 **Edge Cases:**
+
 - Support response exceeds SLA → Automated escalation to senior agent
 - File still can't be parsed → Offer manual chapter splitting tool
 - Pronunciation corrections don't improve quality → Offer voice model alternative
@@ -806,6 +848,7 @@ graph TD
 ```
 
 **Key Interactions:**
+
 - **API Documentation:** Interactive examples with code snippets
 - **SDK Support:** Pre-built libraries reduce integration time
 - **Webhook Automation:** Event-driven architecture for async operations
@@ -813,6 +856,7 @@ graph TD
 - **Monitoring Integration:** CloudWatch/Datadog compatibility
 
 **Edge Cases:**
+
 - API rate limiting → Queue management with exponential backoff
 - Webhook delivery failures → Polling fallback mechanism
 - Network timeout → Idempotent retry logic
@@ -848,6 +892,7 @@ graph TD
 **Rationale:**
 
 Given Falador's requirements for:
+
 - **Developer-first experience** (CLI users appreciate clean, functional web UI)
 - **Rapid development** (Level 4 project needs efficient component development)
 - **Customization flexibility** (Brand differentiation, unique audio visualizations)
@@ -935,15 +980,18 @@ border-radius:
 **Purpose:** Primary navigation across all pages
 
 **Variants:**
+
 - Desktop: Full horizontal navigation bar
 - Mobile: Hamburger menu with slide-out drawer
 
 **States:**
+
 - Default, Hover, Active (current page highlighted)
 - Dropdown open/closed
 - Search focused
 
 **Anatomy:**
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ [Logo] Dashboard Projects Voices Tools   [Search] [Avatar] │
@@ -951,6 +999,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Sticky positioning (always visible on scroll)
 - Command palette trigger (Cmd+K)
 - Notification badge on avatar for alerts
@@ -963,10 +1012,12 @@ border-radius:
 **Purpose:** Persistent access to active project controls
 
 **States:**
+
 - Collapsed (minimized icon), Expanded (full controls)
 - Processing (animated progress), Complete, Error
 
 **Anatomy:**
+
 ```
 ┌────────────────────────────────────────────────────────┐
 │ 🎧 Fantasy Novel - Book 1                              │
@@ -976,6 +1027,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Floating at bottom of viewport (doesn't block content)
 - Minimize button for distraction-free work
 - Real-time status updates via WebSocket
@@ -989,6 +1041,7 @@ border-radius:
 **Purpose:** Book/audio file uploads with validation
 
 **Variants:**
+
 - Default (empty state with icon and instructions)
 - Drag-over (highlighted border, blue background)
 - Uploading (progress bar with percentage)
@@ -996,9 +1049,11 @@ border-radius:
 - Error (error message with retry button)
 
 **States:**
+
 - Idle, Hover, Drag-over, Uploading, Complete, Error
 
 **Anatomy:**
+
 ```
 ┌─────────────────────────────────────────────┐
 │                  📁                         │
@@ -1009,6 +1064,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Format validation (show supported formats)
 - File size validation with clear limits
 - Multiple file upload for batch processing
@@ -1021,6 +1077,7 @@ border-radius:
 **Purpose:** Visual editor for phonetic corrections
 
 **Anatomy:**
+
 ```
 ┌──────────────────────────────────────────────────────┐
 │ Word: Drakonius                                      │
@@ -1036,6 +1093,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Real-time audio preview of correction
 - IPA (International Phonetic Alphabet) helper guide
 - Confidence score showing improvement
@@ -1050,13 +1108,16 @@ border-radius:
 **Purpose:** Quick overview of project status
 
 **Variants:**
+
 - Queued, Processing, Completed, Failed
 - Compact (list view), Expanded (grid view)
 
 **States:**
+
 - Default, Hover (show quick actions), Selected
 
 **Anatomy:**
+
 ```
 ┌────────────────────────────────────────┐
 │ 📖 Fantasy Novel - Book 1              │
@@ -1068,6 +1129,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Progress bar with percentage
 - Quick actions on hover
 - Status badge with color coding
@@ -1080,9 +1142,11 @@ border-radius:
 **Purpose:** Visual audio preview with playback controls
 
 **States:**
+
 - Loading (skeleton), Playing, Paused, Seeking
 
 **Anatomy:**
+
 ```
 ┌────────────────────────────────────────────────────┐
 │ Chapter 3: The Dragon's Lair                       │
@@ -1095,6 +1159,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Waveform visualization from audio analysis
 - Clickable waveform for scrubbing
 - Playback speed control (0.5x - 2.0x)
@@ -1108,9 +1173,11 @@ border-radius:
 **Purpose:** Display quality metrics with visual indicators
 
 **Variants:**
+
 - Passing (green, 4.5+/5), Warning (yellow, 4.0-4.4), Failing (red, <4.0)
 
 **Anatomy:**
+
 ```
 ┌─────────────────────────────────┐
 │ Overall Quality Score           │
@@ -1128,6 +1195,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Color-coded status (green/yellow/red)
 - Breakdown by quality dimension
 - Visual star rating for quick scanning
@@ -1140,12 +1208,14 @@ border-radius:
 **Purpose:** Monitor batch job progress across multiple books
 
 **Features:**
+
 - Sortable columns (status, quality, progress)
 - Filterable by status (All, Queued, Processing, Complete, Failed)
 - Bulk actions (Export all, Regenerate failed)
 - Pagination for large batches (100+ books)
 
 **Anatomy:**
+
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │ Batch Job: tech-books-march-2025  [●] Processing            │
@@ -1164,6 +1234,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Multi-select checkboxes for bulk actions
 - Inline status indicators with icons
 - Progress bars with live updates
@@ -1178,12 +1249,14 @@ border-radius:
 **Purpose:** Guided voice cloning workflow
 
 **Steps:**
+
 1. Record/Upload Sample
 2. Processing (loading state)
 3. Preview & Refine
 4. Save & Name
 
 **Anatomy (Step 1):**
+
 ```
 ┌──────────────────────────────────────────────────┐
 │ Clone Your Voice                                 │
@@ -1209,6 +1282,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Progress indicator with step labels
 - Inline tips and guidance
 - Sample script provided
@@ -1221,6 +1295,7 @@ border-radius:
 **Purpose:** Generate CLI commands from GUI actions
 
 **Anatomy:**
+
 ```
 ┌────────────────────────────────────────────────────┐
 │ CLI Equivalent                                     │
@@ -1238,6 +1313,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Auto-generated from GUI form inputs
 - Copy button with confirmation toast
 - Syntax highlighting for readability
@@ -1252,12 +1328,15 @@ border-radius:
 **Purpose:** Non-blocking status messages
 
 **Variants:**
+
 - Success (green), Info (blue), Warning (yellow), Error (red)
 
 **States:**
+
 - Entering (slide in), Visible, Exiting (slide out)
 
 **Anatomy:**
+
 ```
 ┌──────────────────────────────────────────┐
 │ ✓ Audiobook generation complete!         │
@@ -1267,6 +1346,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Auto-dismiss after 5 seconds (info/success)
 - Manual dismiss required (error/warning)
 - Action buttons for quick access
@@ -1279,12 +1359,14 @@ border-radius:
 **Purpose:** Guide users when no content exists
 
 **Variants:**
+
 - No projects yet
 - No voices cloned
 - Search returned no results
 - Batch job has no books
 
 **Anatomy:**
+
 ```
 ┌────────────────────────────────────┐
 │                                    │
@@ -1301,6 +1383,7 @@ border-radius:
 ```
 
 **Key Features:**
+
 - Friendly illustration/icon
 - Clear explanation of state
 - Primary action button
@@ -1346,6 +1429,7 @@ border-radius:
 ```
 
 **Each component documented with:**
+
 - Visual examples of all states
 - Props API reference
 - Accessibility notes
@@ -1362,24 +1446,24 @@ border-radius:
 
 ```css
 /* Primary - Brazilian Teal/Blue (Audio/Voice metaphor) */
---color-primary-50:  #e6f7f7;
+--color-primary-50: #e6f7f7;
 --color-primary-100: #b3e8e8;
 --color-primary-200: #80d9d9;
 --color-primary-300: #4dcaca;
 --color-primary-400: #1abbbb;
---color-primary-500: #00a8a8;  /* Primary brand color */
+--color-primary-500: #00a8a8; /* Primary brand color */
 --color-primary-600: #008888;
 --color-primary-700: #006868;
 --color-primary-800: #004848;
 --color-primary-900: #002828;
 
 /* Secondary - Warm Amber (Voice warmth, audio quality) */
---color-secondary-50:  #fff8e6;
+--color-secondary-50: #fff8e6;
 --color-secondary-100: #ffecb3;
 --color-secondary-200: #ffe080;
 --color-secondary-300: #ffd44d;
 --color-secondary-400: #ffc81a;
---color-secondary-500: #ffb800;  /* Secondary accent */
+--color-secondary-500: #ffb800; /* Secondary accent */
 --color-secondary-600: #e6a700;
 --color-secondary-700: #cc9600;
 --color-secondary-800: #b38500;
@@ -1390,22 +1474,22 @@ border-radius:
 
 ```css
 /* Success - Quality passing, completed operations */
---color-success-50:  #e8f5e9;
---color-success-500: #4caf50;  /* Quality ≥4.5/5 */
+--color-success-50: #e8f5e9;
+--color-success-500: #4caf50; /* Quality ≥4.5/5 */
 --color-success-700: #388e3c;
 
 /* Warning - Review needed, quality threshold near */
---color-warning-50:  #fff8e1;
---color-warning-500: #ffc107;  /* Quality 4.0-4.4/5 */
+--color-warning-50: #fff8e1;
+--color-warning-500: #ffc107; /* Quality 4.0-4.4/5 */
 --color-warning-700: #f57c00;
 
 /* Error - Failed generation, quality below threshold */
---color-error-50:  #ffebee;
---color-error-500: #f44336;  /* Quality <4.0/5 */
+--color-error-50: #ffebee;
+--color-error-500: #f44336; /* Quality <4.0/5 */
 --color-error-700: #d32f2f;
 
 /* Info - Informational states, processing */
---color-info-50:  #e3f2fd;
+--color-info-50: #e3f2fd;
 --color-info-500: #2196f3;
 --color-info-700: #1976d2;
 ```
@@ -1414,31 +1498,32 @@ border-radius:
 
 ```css
 /* Neutral - UI backgrounds, text, borders */
---color-neutral-50:  #fafafa;  /* Lightest background */
---color-neutral-100: #f5f5f5;  /* Card backgrounds */
---color-neutral-200: #eeeeee;  /* Borders, dividers */
---color-neutral-300: #e0e0e0;  /* Disabled backgrounds */
---color-neutral-400: #bdbdbd;  /* Placeholder text */
---color-neutral-500: #9e9e9e;  /* Icons, secondary text */
---color-neutral-600: #757575;  /* Body text (light mode) */
---color-neutral-700: #616161;  /* Headings */
---color-neutral-800: #424242;  /* Primary text */
---color-neutral-900: #212121;  /* Darkest text */
+--color-neutral-50: #fafafa; /* Lightest background */
+--color-neutral-100: #f5f5f5; /* Card backgrounds */
+--color-neutral-200: #eeeeee; /* Borders, dividers */
+--color-neutral-300: #e0e0e0; /* Disabled backgrounds */
+--color-neutral-400: #bdbdbd; /* Placeholder text */
+--color-neutral-500: #9e9e9e; /* Icons, secondary text */
+--color-neutral-600: #757575; /* Body text (light mode) */
+--color-neutral-700: #616161; /* Headings */
+--color-neutral-800: #424242; /* Primary text */
+--color-neutral-900: #212121; /* Darkest text */
 ```
 
 **Color Usage Guidelines**
 
-| Color | Primary Use | Examples |
-|-------|-------------|----------|
-| Primary (Teal) | Brand identity, primary actions, links | CTAs, active states, logo, navigation highlights |
-| Secondary (Amber) | Voice/audio elements, highlights | Quality badges, voice cards, audio waveforms |
-| Success (Green) | Positive feedback, quality passing | Quality ≥4.5/5, completed jobs, success toasts |
-| Warning (Yellow) | Caution, review needed | Quality 4.0-4.4/5, warnings, requires attention |
-| Error (Red) | Errors, failures, critical alerts | Failed jobs, validation errors, quality <4.0 |
-| Info (Blue) | Processing states, information | Currently processing, informational toasts |
-| Neutral | Text, backgrounds, UI structure | All text, cards, borders, backgrounds |
+| Color             | Primary Use                            | Examples                                         |
+| ----------------- | -------------------------------------- | ------------------------------------------------ |
+| Primary (Teal)    | Brand identity, primary actions, links | CTAs, active states, logo, navigation highlights |
+| Secondary (Amber) | Voice/audio elements, highlights       | Quality badges, voice cards, audio waveforms     |
+| Success (Green)   | Positive feedback, quality passing     | Quality ≥4.5/5, completed jobs, success toasts   |
+| Warning (Yellow)  | Caution, review needed                 | Quality 4.0-4.4/5, warnings, requires attention  |
+| Error (Red)       | Errors, failures, critical alerts      | Failed jobs, validation errors, quality <4.0     |
+| Info (Blue)       | Processing states, information         | Currently processing, informational toasts       |
+| Neutral           | Text, backgrounds, UI structure        | All text, cards, borders, backgrounds            |
 
 **Accessibility Notes:**
+
 - All color combinations meet WCAG AA contrast ratios (4.5:1 for text, 3:1 for large text)
 - Never use color alone to convey information (always pair with icons or text)
 - Status indicators use both color and icon (e.g., ✓ green for success, ⚠ yellow for warning)
@@ -1451,8 +1536,9 @@ border-radius:
 
 ```css
 /* Sans-serif - Primary UI font */
---font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-                    'Roboto', 'Helvetica Neue', Arial, sans-serif;
+--font-family-sans:
+  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+  'Helvetica Neue', Arial, sans-serif;
 
 /* Monospace - Code, CLI commands, technical content */
 --font-family-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
@@ -1464,6 +1550,7 @@ border-radius:
 **Font Selection Rationale:**
 
 **Inter (Sans-serif):**
+
 - Designed specifically for screen readability
 - Excellent clarity at small sizes (12px+)
 - Wide language support including Brazilian Portuguese characters (ã, ç, é, etc.)
@@ -1471,6 +1558,7 @@ border-radius:
 - Popular in developer tools (GitHub, Vercel, Linear)
 
 **JetBrains Mono (Monospace):**
+
 - Optimized for code readability
 - Clear distinction between similar characters (l, 1, I, O, 0)
 - Ligatures for common programming constructs
@@ -1482,52 +1570,76 @@ border-radius:
 
 ```css
 /* Font sizes - 1.25 modular scale (Major Third) */
---text-xs:   0.75rem;   /* 12px - Captions, labels */
---text-sm:   0.875rem;  /* 14px - Secondary text, metadata */
---text-base: 1rem;      /* 16px - Body text (default) */
---text-lg:   1.125rem;  /* 18px - Emphasized text */
---text-xl:   1.25rem;   /* 20px - Small headings */
---text-2xl:  1.5rem;    /* 24px - H3 */
---text-3xl:  1.875rem;  /* 30px - H2 */
---text-4xl:  2.25rem;   /* 36px - H1 */
---text-5xl:  3rem;      /* 48px - Hero headings */
+--text-xs: 0.75rem; /* 12px - Captions, labels */
+--text-sm: 0.875rem; /* 14px - Secondary text, metadata */
+--text-base: 1rem; /* 16px - Body text (default) */
+--text-lg: 1.125rem; /* 18px - Emphasized text */
+--text-xl: 1.25rem; /* 20px - Small headings */
+--text-2xl: 1.5rem; /* 24px - H3 */
+--text-3xl: 1.875rem; /* 30px - H2 */
+--text-4xl: 2.25rem; /* 36px - H1 */
+--text-5xl: 3rem; /* 48px - Hero headings */
 
 /* Font weights */
---font-weight-normal:  400;  /* Body text */
---font-weight-medium:  500;  /* Emphasized text, buttons */
+--font-weight-normal: 400; /* Body text */
+--font-weight-medium: 500; /* Emphasized text, buttons */
 --font-weight-semibold: 600; /* Subheadings, labels */
---font-weight-bold:    700;  /* Headings */
+--font-weight-bold: 700; /* Headings */
 
 /* Line heights */
---line-height-tight:  1.25;  /* Headings */
---line-height-normal: 1.5;   /* Body text */
+--line-height-tight: 1.25; /* Headings */
+--line-height-normal: 1.5; /* Body text */
 --line-height-relaxed: 1.75; /* Long-form content */
 
 /* Letter spacing */
---letter-spacing-tight:  -0.025em; /* Large headings */
---letter-spacing-normal: 0;        /* Body text */
---letter-spacing-wide:   0.025em;  /* Uppercase labels */
+--letter-spacing-tight: -0.025em; /* Large headings */
+--letter-spacing-normal: 0; /* Body text */
+--letter-spacing-wide: 0.025em; /* Uppercase labels */
 ```
 
 **Typography Usage Examples:**
 
 ```css
 /* Heading styles */
-h1 { font-size: var(--text-4xl); font-weight: var(--font-weight-bold); line-height: var(--line-height-tight); }
-h2 { font-size: var(--text-3xl); font-weight: var(--font-weight-bold); line-height: var(--line-height-tight); }
-h3 { font-size: var(--text-2xl); font-weight: var(--font-weight-semibold); line-height: var(--line-height-tight); }
+h1 {
+  font-size: var(--text-4xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+h2 {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+}
+h3 {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+}
 
 /* Body text */
-body { font-size: var(--text-base); font-weight: var(--font-weight-normal); line-height: var(--line-height-normal); }
+body {
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+}
 
 /* Small text (metadata, captions) */
-.caption { font-size: var(--text-sm); color: var(--color-neutral-600); }
+.caption {
+  font-size: var(--text-sm);
+  color: var(--color-neutral-600);
+}
 
 /* Code/CLI */
-code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
+code,
+pre {
+  font-family: var(--font-family-mono);
+  font-size: var(--text-sm);
+}
 ```
 
 **Responsive Typography:**
+
 - Base font size: 16px (desktop), 14px (mobile <768px)
 - Heading sizes scale down 15% on mobile
 - Line heights increase slightly on mobile for better readability
@@ -1540,39 +1652,39 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 
 ```css
 /* Spacing scale - 4px base unit with exponential growth */
---space-0:  0;
---space-1:  0.25rem;  /* 4px  - Tight spacing */
---space-2:  0.5rem;   /* 8px  - Icon padding */
---space-3:  0.75rem;  /* 12px - Small padding */
---space-4:  1rem;     /* 16px - Base spacing */
---space-5:  1.25rem;  /* 20px - Medium spacing */
---space-6:  1.5rem;   /* 24px - Large spacing */
---space-8:  2rem;     /* 32px - Section spacing */
---space-10: 2.5rem;   /* 40px - Component separation */
---space-12: 3rem;     /* 48px - Large gaps */
---space-16: 4rem;     /* 64px - Page sections */
---space-20: 5rem;     /* 80px - Hero sections */
---space-24: 6rem;     /* 96px - Major sections */
+--space-0: 0;
+--space-1: 0.25rem; /* 4px  - Tight spacing */
+--space-2: 0.5rem; /* 8px  - Icon padding */
+--space-3: 0.75rem; /* 12px - Small padding */
+--space-4: 1rem; /* 16px - Base spacing */
+--space-5: 1.25rem; /* 20px - Medium spacing */
+--space-6: 1.5rem; /* 24px - Large spacing */
+--space-8: 2rem; /* 32px - Section spacing */
+--space-10: 2.5rem; /* 40px - Component separation */
+--space-12: 3rem; /* 48px - Large gaps */
+--space-16: 4rem; /* 64px - Page sections */
+--space-20: 5rem; /* 80px - Hero sections */
+--space-24: 6rem; /* 96px - Major sections */
 ```
 
 **Layout Grid System**
 
 ```css
 /* Container widths */
---container-sm:  640px;   /* Small content (mobile) */
---container-md:  768px;   /* Medium content (tablet) */
---container-lg:  1024px;  /* Large content (desktop) */
---container-xl:  1280px;  /* Extra large (wide desktop) */
---container-2xl: 1536px;  /* Maximum width */
+--container-sm: 640px; /* Small content (mobile) */
+--container-md: 768px; /* Medium content (tablet) */
+--container-lg: 1024px; /* Large content (desktop) */
+--container-xl: 1280px; /* Extra large (wide desktop) */
+--container-2xl: 1536px; /* Maximum width */
 
 /* Default container */
 --container-max-width: var(--container-xl);
---container-padding:   var(--space-4); /* 16px padding on mobile */
+--container-padding: var(--space-4); /* 16px padding on mobile */
 --container-padding-lg: var(--space-8); /* 32px padding on desktop */
 
 /* Grid columns */
 --grid-columns: 12; /* 12-column grid system */
---grid-gap:     var(--space-6); /* 24px gap between columns */
+--grid-gap: var(--space-6); /* 24px gap between columns */
 ```
 
 **Border Radius**
@@ -1580,33 +1692,34 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```css
 /* Rounded corners - modern, friendly aesthetic */
 --radius-none: 0;
---radius-sm:   0.25rem;  /* 4px  - Small elements, badges */
---radius-base: 0.5rem;   /* 8px  - Buttons, inputs */
---radius-md:   0.75rem;  /* 12px - Cards */
---radius-lg:   1rem;     /* 16px - Modals, large cards */
---radius-xl:   1.5rem;   /* 24px - Hero elements */
---radius-full: 9999px;   /* Circular - Avatars, pills */
+--radius-sm: 0.25rem; /* 4px  - Small elements, badges */
+--radius-base: 0.5rem; /* 8px  - Buttons, inputs */
+--radius-md: 0.75rem; /* 12px - Cards */
+--radius-lg: 1rem; /* 16px - Modals, large cards */
+--radius-xl: 1.5rem; /* 24px - Hero elements */
+--radius-full: 9999px; /* Circular - Avatars, pills */
 ```
 
 **Shadows (Elevation System)**
 
 ```css
 /* Elevation through shadows - subtle depth */
---shadow-xs:  0 1px 2px 0 rgba(0, 0, 0, 0.05);                    /* Subtle */
---shadow-sm:  0 1px 3px 0 rgba(0, 0, 0, 0.1),
-              0 1px 2px -1px rgba(0, 0, 0, 0.1);                  /* Small elevation */
---shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
-               0 2px 4px -2px rgba(0, 0, 0, 0.1);                 /* Default cards */
---shadow-md:  0 10px 15px -3px rgba(0, 0, 0, 0.1),
-              0 4px 6px -4px rgba(0, 0, 0, 0.1);                  /* Elevated cards */
---shadow-lg:  0 20px 25px -5px rgba(0, 0, 0, 0.1),
-              0 8px 10px -6px rgba(0, 0, 0, 0.1);                 /* Modals, popovers */
---shadow-xl:  0 25px 50px -12px rgba(0, 0, 0, 0.25);              /* Dropdowns, mega-menus */
+--shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* Subtle */
+--shadow-sm:
+  0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); /* Small elevation */
+--shadow-base:
+  0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); /* Default cards */
+--shadow-md:
+  0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); /* Elevated cards */
+--shadow-lg:
+  0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); /* Modals, popovers */
+--shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25); /* Dropdowns, mega-menus */
 ```
 
 **Layout Patterns**
 
 **Page Layout:**
+
 ```
 ┌─────────────────────────────────────────┐
 │ Header (sticky, 64px height)            │
@@ -1624,17 +1737,20 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```
 
 **Dashboard Grid:**
+
 - 3-column grid on desktop (≥1024px)
 - 2-column grid on tablet (768px-1023px)
 - 1-column stack on mobile (<768px)
 - Gap: 24px between cards
 
 **Form Layouts:**
+
 - Single column forms on mobile
 - Two-column forms on desktop (labels left, fields right)
 - Full-width inputs with clear visual hierarchy
 
 **Whitespace Principles:**
+
 - **Micro:** 4-12px spacing within components (button padding, icon gaps)
 - **Macro:** 24-48px spacing between sections (visual breathing room)
 - **Generous whitespace** around CTAs and important actions
@@ -1650,22 +1766,22 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 
 ```css
 /* Breakpoint system - Tailwind CSS defaults */
---breakpoint-sm:  640px;   /* Small devices (landscape phones) */
---breakpoint-md:  768px;   /* Medium devices (tablets) */
---breakpoint-lg:  1024px;  /* Large devices (laptops, desktops) */
---breakpoint-xl:  1280px;  /* Extra large devices (large desktops) */
---breakpoint-2xl: 1536px;  /* Ultra-wide monitors */
+--breakpoint-sm: 640px; /* Small devices (landscape phones) */
+--breakpoint-md: 768px; /* Medium devices (tablets) */
+--breakpoint-lg: 1024px; /* Large devices (laptops, desktops) */
+--breakpoint-xl: 1280px; /* Extra large devices (large desktops) */
+--breakpoint-2xl: 1536px; /* Ultra-wide monitors */
 ```
 
 **Breakpoint Usage Strategy:**
 
-| Breakpoint | Device Type | Layout Strategy |
-|------------|-------------|-----------------|
-| **< 640px** (Mobile) | Phones (portrait) | Single column, bottom navigation, full-width cards |
-| **640px - 767px** (sm) | Phones (landscape), Small tablets | 2-column grids where appropriate, expandable sections |
-| **768px - 1023px** (md) | Tablets | 2-3 column layouts, side navigation visible, modals full-screen |
-| **1024px - 1279px** (lg) | Laptops, Small desktops | 3-4 column grids, persistent side nav, standard modals |
-| **1280px+** (xl) | Large desktops, Wide monitors | Multi-column dashboards, split-view interfaces |
+| Breakpoint               | Device Type                       | Layout Strategy                                                 |
+| ------------------------ | --------------------------------- | --------------------------------------------------------------- |
+| **< 640px** (Mobile)     | Phones (portrait)                 | Single column, bottom navigation, full-width cards              |
+| **640px - 767px** (sm)   | Phones (landscape), Small tablets | 2-column grids where appropriate, expandable sections           |
+| **768px - 1023px** (md)  | Tablets                           | 2-3 column layouts, side navigation visible, modals full-screen |
+| **1024px - 1279px** (lg) | Laptops, Small desktops           | 3-4 column grids, persistent side nav, standard modals          |
+| **1280px+** (xl)         | Large desktops, Wide monitors     | Multi-column dashboards, split-view interfaces                  |
 
 **Critical Breakpoints for Falador:**
 
@@ -1685,6 +1801,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 #### Navigation Adaptations
 
 **Desktop (≥1024px):**
+
 ```
 ┌────────────────────────────────────────────────────┐
 │ [Logo] Dashboard Projects Voices Tools [Search] [User] │
@@ -1692,6 +1809,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```
 
 **Tablet (768px-1023px):**
+
 ```
 ┌────────────────────────────────────────────────────┐
 │ [Logo] Dashboard Projects [≡More] [Search] [User] │
@@ -1699,6 +1817,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```
 
 **Mobile (<768px):**
+
 ```
 ┌────────────────────────────┐
 │ [≡] Falador          [User]│  ← Top bar
@@ -1719,6 +1838,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 **1. Dashboard Project Cards**
 
 **Desktop (≥1024px):** 3-column grid
+
 ```
 ┌──────┐ ┌──────┐ ┌──────┐
 │Card 1│ │Card 2│ │Card 3│
@@ -1729,6 +1849,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```
 
 **Tablet (768px-1023px):** 2-column grid
+
 ```
 ┌─────────┐ ┌─────────┐
 │ Card 1  │ │ Card 2  │
@@ -1739,6 +1860,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```
 
 **Mobile (<768px):** Single column stack
+
 ```
 ┌──────────────┐
 │   Card 1     │
@@ -1761,6 +1883,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 |------------|------------------|---------|
 
 **Mobile:** Card view with stacked information
+
 ```
 ┌────────────────────────────┐
 │ JavaScript Guide           │
@@ -1775,6 +1898,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 **3. Voice Clone Wizard**
 
 **Desktop:** Side-by-side layout (instructions left, preview right)
+
 ```
 ┌──────────────────┬──────────────────┐
 │ Step Instructions│  Voice Preview   │
@@ -1787,6 +1911,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```
 
 **Mobile:** Single column, sequential steps
+
 ```
 ┌────────────────────────────┐
 │ Step Instructions          │
@@ -1810,6 +1935,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 **4. Audio Waveform Player**
 
 **Desktop:** Full controls visible
+
 ```
 ┌──────────────────────────────────────────────┐
 │ Chapter 3: The Dragon's Lair                 │
@@ -1819,6 +1945,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```
 
 **Mobile:** Simplified controls, collapsible advanced
+
 ```
 ┌──────────────────────────────┐
 │ Chapter 3                    │
@@ -1833,6 +1960,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 #### Form Adaptations
 
 **Desktop Forms:** Two-column layout
+
 ```
 ┌────────────────────────────────────────┐
 │ Project Name:    [_________________]   │
@@ -1845,6 +1973,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```
 
 **Mobile Forms:** Single column, full-width inputs
+
 ```
 ┌──────────────────────────┐
 │ Project Name             │
@@ -1865,6 +1994,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 #### Modal Adaptations
 
 **Desktop:** Centered modal with backdrop
+
 ```
     ┌──────────────────────┐
     │ Modal Title      [×] │
@@ -1877,6 +2007,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```
 
 **Mobile:** Full-screen modal (slide-up animation)
+
 ```
 ┌────────────────────────────┐
 │ [×] Modal Title            │
@@ -1896,6 +2027,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 #### Touch Target Optimization
 
 **Mobile-Specific Adjustments:**
+
 - **Minimum touch target:** 44x44px (Apple HIG, WCAG guidelines)
 - **Spacing between targets:** Minimum 8px to prevent mis-taps
 - **Button heights:** 48px minimum on mobile (vs. 40px desktop)
@@ -1907,13 +2039,16 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 #### Performance Optimizations
 
 **Image Responsive Strategy:**
+
 ```html
 <!-- Project card thumbnails -->
 <img
   src="book-cover-400.jpg"
-  srcset="book-cover-400.jpg 400w,
-          book-cover-800.jpg 800w,
-          book-cover-1200.jpg 1200w"
+  srcset="
+    book-cover-400.jpg   400w,
+    book-cover-800.jpg   800w,
+    book-cover-1200.jpg 1200w
+  "
   sizes="(max-width: 768px) 100vw,
          (max-width: 1024px) 50vw,
          33vw"
@@ -1923,11 +2058,13 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 ```
 
 **Font Loading Strategy:**
+
 - System fonts shown immediately (no FOIT/FOUT)
 - Custom fonts (Inter, JetBrains Mono) loaded with `font-display: swap`
 - Variable font subsets for Brazilian Portuguese characters only
 
 **Mobile Performance Targets:**
+
 - **First Contentful Paint (FCP):** <1.8s
 - **Largest Contentful Paint (LCP):** <2.5s
 - **Time to Interactive (TTI):** <3.8s
@@ -1944,6 +2081,7 @@ code, pre { font-family: var(--font-family-mono); font-size: var(--text-sm); }
 Falador commits to meeting **Web Content Accessibility Guidelines (WCAG) 2.1 Level AA** standards across all web interfaces, ensuring the platform is usable by people with diverse abilities.
 
 **Compliance Scope:**
+
 - ✅ Web Dashboard (all pages and components)
 - ✅ Voice Cloning Wizard
 - ✅ Audio Review Interface
@@ -1953,6 +2091,7 @@ Falador commits to meeting **Web Content Accessibility Guidelines (WCAG) 2.1 Lev
 - ⚠️ Marketing/Public Website (WCAG 2.1 AAA target for higher visibility)
 
 **Legal/Regulatory Requirements:**
+
 - **Brazil (LBI - Lei Brasileira de Inclusão):** Accessibility for digital products
 - **GDPR Compliance:** Accessibility features support data privacy rights
 - **Future:** ADA (Americans with Disabilities Act) compliance for US market expansion
@@ -1964,32 +2103,36 @@ Falador commits to meeting **Web Content Accessibility Guidelines (WCAG) 2.1 Lev
 #### 7.2.1 Perceivable (Users can perceive the information)
 
 **Color Contrast (WCAG 1.4.3)**
+
 - **Text contrast:** Minimum 4.5:1 for normal text, 3:1 for large text (18pt+)
 - **UI elements:** 3:1 for interactive components (buttons, form borders)
 - **Status indicators:** Never rely on color alone (always include icons/text)
 
 **Examples:**
+
 ```css
 /* Good contrast (6.45:1) */
 color: #212121; /* Dark gray text */
-background: #FFFFFF; /* White background */
+background: #ffffff; /* White background */
 
 /* Good contrast for links (4.89:1) */
 color: #008888; /* Primary teal */
-background: #FFFFFF;
+background: #ffffff;
 
 /* Insufficient contrast - AVOID */
-color: #BDBDBD; /* Light gray */
-background: #FFFFFF; /* Only 1.83:1 - fails WCAG */
+color: #bdbdbd; /* Light gray */
+background: #ffffff; /* Only 1.83:1 - fails WCAG */
 ```
 
 **Alt Text for Images (WCAG 1.1.1)**
+
 - **Book covers:** `alt="Fantasy Novel Book 1 cover showing dragon over castle"`
 - **User avatars:** `alt="Carlos Silva profile picture"`
 - **Decorative images:** `alt=""` (empty alt for images that don't convey meaning)
 - **Waveform visualizations:** `alt="Audio waveform for Chapter 3, duration 12:45"`
 
 **Audio Transcripts (WCAG 1.2.1)**
+
 - **Voice samples:** Provide text transcript of sample script
 - **Audio previews:** Display chapter text alongside audio player
 - **Error sounds:** Visual indicators accompany any audio alerts
@@ -2002,18 +2145,19 @@ background: #FFFFFF; /* Only 1.83:1 - fails WCAG */
 
 All functionality accessible via keyboard without requiring specific timings:
 
-| Action | Keyboard Shortcut |
-|--------|-------------------|
-| Navigate forward | Tab |
-| Navigate backward | Shift + Tab |
-| Activate button/link | Enter or Space |
-| Close modal/dropdown | Escape |
-| Open command palette | Cmd/Ctrl + K |
-| Navigate dropdown items | Arrow Up/Down |
-| Select dropdown item | Enter |
-| Toggle checkbox | Space |
+| Action                  | Keyboard Shortcut |
+| ----------------------- | ----------------- |
+| Navigate forward        | Tab               |
+| Navigate backward       | Shift + Tab       |
+| Activate button/link    | Enter or Space    |
+| Close modal/dropdown    | Escape            |
+| Open command palette    | Cmd/Ctrl + K      |
+| Navigate dropdown items | Arrow Up/Down     |
+| Select dropdown item    | Enter             |
+| Toggle checkbox         | Space             |
 
 **Focus Indicators (WCAG 2.4.7)**
+
 - **Visible focus ring:** 2px solid outline, high contrast
 - **Color:** Primary teal (#00a8a8) or system default
 - **Offset:** 2px from element edge to prevent overlap
@@ -2042,15 +2186,15 @@ All functionality accessible via keyboard without requiring specific timings:
 ```
 
 **No Keyboard Traps (WCAG 2.1.2)**
+
 - Users can tab out of all components (modals, dropdowns, wizards)
 - Escape key closes overlays and returns focus to trigger element
 - Modal focus management: Trap focus within modal while open, restore on close
 
 **Skip Links**
+
 ```html
-<a href="#main-content" class="skip-to-main">
-  Skip to main content
-</a>
+<a href="#main-content" class="skip-to-main"> Skip to main content </a>
 ```
 
 ---
@@ -2058,6 +2202,7 @@ All functionality accessible via keyboard without requiring specific timings:
 #### 7.2.3 Understandable (Users can understand the interface)
 
 **Clear Labels (WCAG 2.4.6, 3.3.2)**
+
 - **Form inputs:** Always have associated `<label>` elements
 - **Buttons:** Descriptive text (not just icons)
 - **Links:** Meaningful link text (avoid "click here")
@@ -2068,10 +2213,12 @@ All functionality accessible via keyboard without requiring specific timings:
 <input id="project-name" type="text" required />
 
 <!-- Bad -->
-<input type="text" placeholder="Enter name" />  <!-- No label -->
+<input type="text" placeholder="Enter name" />
+<!-- No label -->
 ```
 
 **Error Identification (WCAG 3.3.1)**
+
 - **Inline errors:** Display error message adjacent to field
 - **Error summary:** List all errors at top of form
 - **Visual + text:** Red border + error icon + descriptive text
@@ -2087,6 +2234,7 @@ All functionality accessible via keyboard without requiring specific timings:
 ```
 
 **Consistent Navigation (WCAG 3.2.3)**
+
 - Navigation order remains consistent across all pages
 - Repeated components (header, footer) appear in same location
 - Breadcrumbs show current location in hierarchy
@@ -2132,11 +2280,13 @@ Use proper HTML elements instead of divs:
 </button>
 
 <!-- Progress indicators -->
-<div role="progressbar"
-     aria-valuenow="67"
-     aria-valuemin="0"
-     aria-valuemax="100"
-     aria-label="Audiobook generation progress">
+<div
+  role="progressbar"
+  aria-valuenow="67"
+  aria-valuemin="0"
+  aria-valuemax="100"
+  aria-label="Audiobook generation progress"
+>
   <div class="progress-bar" style="width: 67%"></div>
 </div>
 
@@ -2157,6 +2307,7 @@ Use proper HTML elements instead of divs:
 ```
 
 **Screen Reader Announcements:**
+
 - **Page changes:** Announce new page title
 - **Dynamic content:** Use `aria-live` regions for status updates
 - **Loading states:** Announce when async operations start/complete
@@ -2185,15 +2336,18 @@ Respect user's motion preferences:
 ```
 
 **Font Size Scaling**
+
 - Support browser zoom up to 200% without loss of functionality
 - Text reflows properly at larger sizes
 - No horizontal scrolling required
 
 **Language Declaration**
+
 ```html
-<html lang="pt-BR"> <!-- Brazilian Portuguese -->
+<html lang="pt-BR">
+  <!-- Brazilian Portuguese -->
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     ...
   </head>
 </html>
@@ -2204,17 +2358,20 @@ Respect user's motion preferences:
 ### 7.3 Testing and Validation
 
 **Automated Testing Tools:**
+
 - **axe DevTools:** Browser extension for WCAG testing
 - **Lighthouse:** Accessibility score in Chrome DevTools
 - **Pa11y:** CI/CD integration for automated accessibility checks
 
 **Manual Testing:**
+
 - **Keyboard-only navigation:** Complete all workflows without mouse
 - **Screen reader testing:** NVDA (Windows), JAWS (Windows), VoiceOver (macOS/iOS)
 - **Color blindness simulation:** Use Chrome DevTools to test color contrast
 - **Zoom testing:** Test at 200% browser zoom
 
 **Accessibility Checklist (Per Component):**
+
 - [ ] Color contrast meets WCAG AA (4.5:1 text, 3:1 UI)
 - [ ] All images have appropriate alt text
 - [ ] Keyboard navigation works (Tab, Enter, Escape)
@@ -2242,6 +2399,7 @@ Animations in Falador serve specific purposes, never purely decorative:
 4. **Guide Attention:** Direct focus to important changes (new notification)
 
 **Animation Personality:**
+
 - **Efficient:** Fast, purposeful (not playful or bouncy)
 - **Subtle:** Enhances without distracting
 - **Professional:** Matches developer-first aesthetic
@@ -2255,17 +2413,22 @@ Animations in Falador serve specific purposes, never purely decorative:
 
 ```css
 /* Duration standards */
---duration-instant:  50ms;   /* Instant feedback (hover) */
---duration-fast:     150ms;  /* Quick transitions (dropdown open) */
---duration-base:     250ms;  /* Standard transitions (fade in/out) */
---duration-slow:     350ms;  /* Complex animations (modal entry) */
---duration-slower:   500ms;  /* Emphasis animations (celebration) */
+--duration-instant: 50ms; /* Instant feedback (hover) */
+--duration-fast: 150ms; /* Quick transitions (dropdown open) */
+--duration-base: 250ms; /* Standard transitions (fade in/out) */
+--duration-slow: 350ms; /* Complex animations (modal entry) */
+--duration-slower: 500ms; /* Emphasis animations (celebration) */
 
 /* Easing functions */
---ease-in:      cubic-bezier(0.4, 0, 1, 1);       /* Accelerate */
---ease-out:     cubic-bezier(0, 0, 0.2, 1);       /* Decelerate (default) */
---ease-in-out:  cubic-bezier(0.4, 0, 0.2, 1);     /* Smooth start and end */
---ease-bounce:  cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Playful (use sparingly) */
+--ease-in: cubic-bezier(0.4, 0, 1, 1); /* Accelerate */
+--ease-out: cubic-bezier(0, 0, 0.2, 1); /* Decelerate (default) */
+--ease-in-out: cubic-bezier(0.4, 0, 0.2, 1); /* Smooth start and end */
+--ease-bounce: cubic-bezier(
+  0.68,
+  -0.55,
+  0.265,
+  1.55
+); /* Playful (use sparingly) */
 ```
 
 ---
@@ -2273,6 +2436,7 @@ Animations in Falador serve specific purposes, never purely decorative:
 #### Component Animations
 
 **1. Button Interactions**
+
 ```css
 .button {
   transition: all var(--duration-instant) var(--ease-out);
@@ -2290,6 +2454,7 @@ Animations in Falador serve specific purposes, never purely decorative:
 ```
 
 **2. Modal Entry/Exit**
+
 ```css
 /* Backdrop fade in */
 .modal-backdrop {
@@ -2297,8 +2462,12 @@ Animations in Falador serve specific purposes, never purely decorative:
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Modal scale + fade */
@@ -2319,6 +2488,7 @@ Animations in Falador serve specific purposes, never purely decorative:
 ```
 
 **3. Toast Notifications**
+
 ```css
 .toast {
   animation: slideInRight var(--duration-base) var(--ease-out);
@@ -2337,18 +2507,24 @@ Animations in Falador serve specific purposes, never purely decorative:
 ```
 
 **4. Loading Spinners**
+
 ```css
 .spinner {
   animation: rotate 1s linear infinite;
 }
 
 @keyframes rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 ```
 
 **5. Progress Bars**
+
 ```css
 .progress-bar {
   transition: width var(--duration-slow) var(--ease-out);
@@ -2360,35 +2536,55 @@ Animations in Falador serve specific purposes, never purely decorative:
 }
 
 @keyframes progress-indeterminate {
-  0% { left: -35%; right: 100%; }
-  60% { left: 100%; right: -90%; }
-  100% { left: 100%; right: -90%; }
+  0% {
+    left: -35%;
+    right: 100%;
+  }
+  60% {
+    left: 100%;
+    right: -90%;
+  }
+  100% {
+    left: 100%;
+    right: -90%;
+  }
 }
 ```
 
 **6. Micro-interactions**
 
 **Quality Badge Pulse (when quality improves):**
+
 ```css
 .quality-badge.improved {
   animation: pulse var(--duration-slow) var(--ease-out);
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 ```
 
 **Waveform Visualization (while playing):**
+
 ```css
 .waveform-bar {
   animation: waveform-pulse 0.5s ease-in-out infinite alternate;
 }
 
 @keyframes waveform-pulse {
-  from { transform: scaleY(0.8); }
-  to { transform: scaleY(1.0); }
+  from {
+    transform: scaleY(0.8);
+  }
+  to {
+    transform: scaleY(1);
+  }
 }
 ```
 
@@ -2401,6 +2597,7 @@ Animations in Falador serve specific purposes, never purely decorative:
 **Recommended Design Tool: Figma**
 
 **File Structure:**
+
 ```
 Falador-Design-System.fig
 ├── 📄 Cover Page (Project overview)
@@ -2422,6 +2619,7 @@ Falador-Design-System.fig
 ```
 
 **Design File Deliverables:**
+
 - **Component Library:** All UI components with variants and states (Storybook parity)
 - **Key Screens:** High-fidelity mockups of primary workflows
 - **Interactive Prototype:** Click-through demo of critical user journeys
@@ -2429,11 +2627,13 @@ Falador-Design-System.fig
 - **Responsive Views:** Desktop (1440px), Tablet (768px), Mobile (375px)
 
 **Design Handoff Tools:**
+
 - **Figma Dev Mode:** Developers inspect components, copy CSS
 - **Figma Tokens Plugin:** Export design tokens as JSON
 - **Figma to Code:** Generate React component scaffolding
 
 **Alternative Tools:**
+
 - **Sketch + Zeplin:** For teams using Sketch workflow
 - **Adobe XD:** If Adobe ecosystem required
 - **Framer:** For advanced prototyping and animations
@@ -2445,6 +2645,7 @@ Falador-Design-System.fig
 #### Screen 1: Dashboard (Homepage)
 
 **Layout Overview:**
+
 ```
 ┌────────────────────────────────────────────────────────────┐
 │ [Logo] Dashboard Projects Voices Tools    [Search] [User] │ ← Header (64px)
@@ -2475,6 +2676,7 @@ Falador-Design-System.fig
 ```
 
 **Key Elements:**
+
 - Persistent header with global navigation
 - Prominent CTA for new project creation
 - Quick actions for common tasks
@@ -2487,6 +2689,7 @@ Falador-Design-System.fig
 #### Screen 2: Project Detail - Audio Review
 
 **Layout Overview:**
+
 ```
 ┌────────────────────────────────────────────────────────────┐
 │ [Logo] Dashboard Projects Voices Tools    [Search] [User] │
@@ -2534,6 +2737,7 @@ Falador-Design-System.fig
 ```
 
 **Key Elements:**
+
 - Breadcrumb navigation showing hierarchy
 - Tab navigation for different project views
 - Chapter dropdown selector with quality badges
@@ -2547,6 +2751,7 @@ Falador-Design-System.fig
 #### Screen 3: Voice Clone Wizard (Step 1 of 4)
 
 **Layout Overview:**
+
 ```
 ┌────────────────────────────────────────────────────────────┐
 │ [Logo] Dashboard Projects Voices Tools    [Search] [User] │
@@ -2593,6 +2798,7 @@ Falador-Design-System.fig
 ```
 
 **Key Elements:**
+
 - Clear step indicator showing progress (1 of 4)
 - Two-column layout (instructions left, preview right)
 - Recording interface with timer and visual feedback
@@ -2673,6 +2879,7 @@ Falador-Design-System.fig
 #### Pre-Development Checklist
 
 **Design System**
+
 - [ ] All design tokens defined (colors, typography, spacing)
 - [ ] Component library complete with variants and states
 - [ ] Figma components match planned technical implementation
@@ -2680,6 +2887,7 @@ Falador-Design-System.fig
 - [ ] Icon library selected and documented (recommend: Heroicons)
 
 **Screen Designs**
+
 - [ ] All user flows documented with high-fidelity mockups
 - [ ] Responsive designs created (desktop, tablet, mobile)
 - [ ] Edge cases designed (empty states, errors, loading)
@@ -2687,6 +2895,7 @@ Falador-Design-System.fig
 - [ ] Micro-interactions and animations specified
 
 **Documentation**
+
 - [ ] Style guide published (colors, typography, components)
 - [ ] Usage guidelines for each component
 - [ ] Accessibility notes and requirements documented
@@ -2694,12 +2903,14 @@ Falador-Design-System.fig
 - [ ] Animation timing and easing functions specified
 
 **Assets**
+
 - [ ] All icons exported as SVG
 - [ ] Illustrations optimized and exported
 - [ ] Brand assets (logo, wordmark) in multiple formats
 - [ ] Image placeholder dimensions documented
 
 **Developer Enablement**
+
 - [ ] Figma files shared with development team (view access)
 - [ ] Figma Dev Mode enabled for CSS inspection
 - [ ] Design-to-code handoff session scheduled
@@ -2711,6 +2922,7 @@ Falador-Design-System.fig
 #### Implementation Quality Checklist
 
 **Visual Fidelity**
+
 - [ ] Colors match design system exactly (no eyeballing)
 - [ ] Typography sizes, weights, line heights correct
 - [ ] Spacing matches design system grid (4px increments)
@@ -2718,6 +2930,7 @@ Falador-Design-System.fig
 - [ ] Shadows and elevations implemented correctly
 
 **Component Accuracy**
+
 - [ ] All component states implemented (hover, focus, active, disabled)
 - [ ] Interactive elements have proper feedback
 - [ ] Animations match specified timing and easing
@@ -2725,6 +2938,7 @@ Falador-Design-System.fig
 - [ ] Error states and empty states match designs
 
 **Responsive Behavior**
+
 - [ ] Layouts adapt correctly at all breakpoints
 - [ ] Touch targets meet 44x44px minimum on mobile
 - [ ] Text remains readable at all screen sizes
@@ -2732,6 +2946,7 @@ Falador-Design-System.fig
 - [ ] Navigation adapts (top nav → hamburger → bottom tabs)
 
 **Accessibility**
+
 - [ ] Color contrast ratios meet WCAG AA (4.5:1 text, 3:1 UI)
 - [ ] All images have meaningful alt text
 - [ ] Forms have proper labels and error messages
@@ -2741,6 +2956,7 @@ Falador-Design-System.fig
 - [ ] Reduced motion preference respected
 
 **Performance**
+
 - [ ] Fonts load efficiently (font-display: swap)
 - [ ] Images lazy-loaded and optimized
 - [ ] Animations use CSS transforms (GPU-accelerated)
@@ -2752,6 +2968,7 @@ Falador-Design-System.fig
 #### Launch Readiness
 
 **Final Review**
+
 - [ ] Design QA session with designers and developers
 - [ ] Cross-browser testing (Chrome, Firefox, Safari, Edge)
 - [ ] Cross-device testing (desktop, tablet, mobile)
@@ -2759,6 +2976,7 @@ Falador-Design-System.fig
 - [ ] Performance benchmarks met
 
 **Post-Launch**
+
 - [ ] User feedback collection mechanism in place
 - [ ] Analytics tracking for UX metrics
 - [ ] Design iteration plan established
@@ -2769,6 +2987,7 @@ Falador-Design-System.fig
 **UX Specification Complete! 🎨**
 
 This comprehensive UX/UI specification provides:
+
 - ✅ User personas and design principles
 - ✅ Complete information architecture
 - ✅ 5 detailed user flows with Mermaid diagrams
@@ -2781,6 +3000,7 @@ This comprehensive UX/UI specification provides:
 - ✅ Implementation and handoff checklists
 
 **Next Recommended Steps:**
+
 1. Review this specification with stakeholders
 2. Begin Figma design file creation
 3. Schedule design review sessions with development team
@@ -2799,6 +3019,6 @@ This comprehensive UX/UI specification provides:
 
 ### Version History
 
-| Date     | Version | Changes               | Author        |
-| -------- | ------- | --------------------- | ------------- |
+| Date       | Version | Changes               | Author             |
+| ---------- | ------- | --------------------- | ------------------ |
 | 2025-10-16 | 1.0     | Initial specification | Eduardo Menoncello |
