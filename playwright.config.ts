@@ -82,6 +82,9 @@ const playwrightConfig = defineConfig({
     {
       name: 'api',
       testMatch: '**/api/**/*.spec.ts',
+      // Run API tests serially to avoid database state conflicts
+      fullyParallel: false,
+      workers: 1,
       use: {
         // API tests don't need a browser
       },
@@ -98,8 +101,16 @@ const playwrightConfig = defineConfig({
   // Output folder for test artifacts
   outputDir: 'test-results/artifacts',
 
+  // Web server configuration for API tests
+  webServer: {
+    command: 'cd packages/api-gateway && bun run dev',
+    port: 3000,
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+  },
+
   // Global setup/teardown (if needed)
-  // globalSetup: require.resolve('./tests/support/global-setup.ts'),
+  // globalSetup: './tests/support/global-setup.ts',
   // globalTeardown: require.resolve('./tests/support/global-teardown.ts'),
 });
 

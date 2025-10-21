@@ -18,11 +18,14 @@ persona:
 critical_actions: []
 
 # Add persistent memories for the agent
-memories: []
-# Example:
-# memories:
-#   - "User prefers detailed technical explanations"
-#   - "Current project uses React and TypeScript"
+memories:
+  - "Game architecture must follow Clean Architecture principles"
+  - "TypeScript strict mode with no any types"
+  - "ESLint compliance required - no disable comments"
+  - "Quality gates are non-negotiable for game systems"
+  - "Game engine patterns must work within quality constraints"
+  - "User name: Eduardo Menoncello"
+  - "Communication language: English"
 
 # Add custom menu items (appended to base menu)
 # Don't include * prefix or help/exit - auto-injected

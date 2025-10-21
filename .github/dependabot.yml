@@ -3,6 +3,7 @@
 
 version: 2
 updates:
+  # Root dependencies
   - package-ecosystem: 'bun'
     directory: '/'
     schedule:
@@ -19,6 +20,64 @@ updates:
       prefix: 'chore'
       prefix-development: 'chore'
       include: 'scope'
+    # Allow security updates anytime
+    groups:
+      security:
+        dependency-type: 'direct'
+        update-types:
+          - 'security'
+        applies-to: 'security-updates'
+        auto-merge: true
+        auto-merge-minimum: 'low'
+
+  # Individual package dependencies
+  - package-ecosystem: 'bun'
+    directory: '/packages/api-gateway'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 5
+    labels:
+      - 'dependencies'
+      - 'api-gateway'
+      - 'security'
+
+  - package-ecosystem: 'bun'
+    directory: '/packages/core-domain'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 5
+    labels:
+      - 'dependencies'
+      - 'core-domain'
+      - 'security'
+
+  - package-ecosystem: 'bun'
+    directory: '/packages/cli'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 5
+    labels:
+      - 'dependencies'
+      - 'cli'
+      - 'security'
+
+  - package-ecosystem: 'bun'
+    directory: '/packages/job-worker'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+    open-pull-requests-limit: 5
+    labels:
+      - 'dependencies'
+      - 'job-worker'
+      - 'security'
 
   # GitHub Actions workflows
   - package-ecosystem: 'github-actions'

@@ -1,0 +1,31 @@
+{
+  "name": "@falador/application",
+  "version": "0.0.1",
+  "description": "Application layer - Use cases and orchestration",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./use-cases/*": "./src/use-cases/*.ts"
+  },
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "dev": "bun --watch src/index.ts",
+    "test": "bun test src/",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@falador/core-domain": "workspace:*",
+    "tsyringe": "4.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "typescript": "5.9.3"
+  }
+}

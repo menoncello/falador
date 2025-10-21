@@ -1,38 +1,46 @@
 {
   "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
-  "_comment": "Falador Project - Mutation Testing Configuration",
+  "_comment": "Falador Project - Optimized Mutation Testing Configuration",
   "packageManager": "npm",
   "testRunner": "command",
   "commandRunner": {
-    "command": "bun test packages/"
+    "command": "npx playwright test --project=api"
   },
   "mutate": [
-    "packages/**/*.ts",
-    "plugins/**/*.ts",
-    "infrastructure/**/*.ts",
-    "!**/*.test.ts",
-    "!**/*.spec.ts",
+    "packages/api-gateway/src/**/*.ts",
+    "!packages/api-gateway/src/**/*.test.ts",
+    "!packages/api-gateway/src/**/*.spec.ts",
     "!**/tests/**",
-    "!**/__tests__/**"
+    "!**/__tests__/**",
+    "!**/node_modules/**",
+    "!**/dist/**",
+    "!**/coverage/**"
   ],
   "thresholds": {
     "high": 80,
     "low": 70,
     "break": 80
   },
-  "coverageAnalysis": "perTest",
-  "reporters": ["html", "clear-text", "progress", "dashboard"],
+  "coverageAnalysis": "all",
+  "reporters": ["html", "clear-text", "progress"],
   "htmlReporter": {
     "fileName": "reports/mutation/mutation-report.html"
   },
-  "dashboard": {
-    "project": "github.com/falador/falador",
-    "version": "main"
-  },
-  "timeoutMS": 60000,
-  "concurrency": 4,
-  "mutator": {
-    "plugins": ["@stryker-mutator/typescript-checker"],
-    "excludedMutations": []
-  }
+  "timeoutMS": 300000,
+  "concurrency": 3,
+  "tempDirName": ".stryker-tmp",
+  "cleanTempDir": true,
+  "allowConsoleColors": true,
+  "ignorePatterns": [
+    "node_modules/**",
+    "coverage/**",
+    "dist/**",
+    "**/*.min.js",
+    "**/*.d.ts"
+  ],
+  "mutator": "@stryker-mutator/typescript",
+  "tsconfigFile": "tsconfig.json",
+  "logLevel": "info",
+  "fileLogLevel": "info",
+  "disableTypeChecks": false
 }

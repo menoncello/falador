@@ -114,7 +114,16 @@
     <template-output file="{default_output_file}">change_log</template-output>
   </step>
 
-  <step n="8" goal="Validate, save, and optionally generate context">
+  <step n="8" goal="Validate code examples and save story">
+    <!-- CODE EXAMPLES VALIDATION -->
+    <action>Validate all code examples in the story document:
+      - Check TypeScript types in code examples (no 'any', proper typing)
+      - Validate ESLint compliance in code examples
+      - Check formatting in code examples
+      - Ensure examples don't contain eslint-disable or @ts-ignore
+    </action>
+    <check>If code examples have quality issues → Fix them before saving</check>
+
     <invoke-task>Validate against checklist at {installed_path}/checklist.md using bmad/core/tasks/validate-workflow.xml</invoke-task>
     <action>Save document unconditionally (non-interactive default). In interactive mode, allow user confirmation.</action>
     <check>If {{auto_run_context}} == true → <invoke-workflow path="{project-root}/bmad/bmm/workflows/4-implementation/story-context/workflow.yaml">Pass {{story_path}} = {default_output_file}</invoke-workflow></check>

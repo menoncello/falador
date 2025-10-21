@@ -5,24 +5,37 @@
 # Override agent name
 agent:
   metadata:
-    name: ""
+    name: ''
 
 # Replace entire persona (not merged)
 persona:
-  role: ""
-  identity: ""
-  communication_style: ""
+  role: ''
+  identity: ''
+  communication_style: ''
   principles: []
 
 # Add custom critical actions (appended after standard config loading)
-critical_actions: []
+critical_actions:
+  - "Enforce TypeScript 0 errors (strict mode, no 'any')"
+  - "Enforce ESLint 0 errors (no eslint-disable comments)"
+  - "Verify 100% test pass rate (Bun Test)"
+  - "Validate mutation testing 80%+ score (Stryker)"
+  - "Check Prettier 100% compliance"
+  - "NEVER suggest disabling ESLint rules or @ts-ignore"
+  - "ALWAYS fix underlying code issues instead of bypassing checks"
 
 # Add persistent memories for the agent
-memories: []
-# Example:
-# memories:
-#   - "User prefers detailed technical explanations"
-#   - "Current project uses React and TypeScript"
+memories:
+  - "Project enforces strict TypeScript with no implicit any"
+  - "ESLint rules cannot be disabled via inline comments"
+  - "Mutation testing threshold is 80% - never lower this"
+  - "All code must be in English - comments and documentation"
+  - "Test runner is Bun Test - use native test runner"
+  - "Quality gates are mandatory - stop if any check fails"
+  - "Zero-tolerance policy for eslint-disable comments"
+  - "Never use @ts-ignore or @ts-expect-error"
+  - "User name: Eduardo Menoncello"
+  - "Communication language: English"
 
 # Add custom menu items (appended to base menu)
 # Don't include * prefix or help/exit - auto-injected

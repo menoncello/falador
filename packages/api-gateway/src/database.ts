@@ -6,15 +6,8 @@
  */
 
 import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
-
-// Constants for cryptographic operations
-const SALT_BYTES = 16;
-const HASH_LENGTH = 64;
-const PASSWORD_HASH_PARTS = 2;
-const ID_BYTES = 16;
-const API_KEY_BYTES = 32;
-const SIGNATURE_BYTES = 32;
-const TOKEN_EXPIRY_MS = 86_400_000; // 24 hours in milliseconds
+import { injectable } from 'tsyringe';
+import { CONFIG } from './config';
 
 export interface User {
   id: string;
@@ -58,7 +51,8 @@ interface Session {
 /**
  * In-memory database singleton
  */
-class Database {
+@injectable()
+export class Database {
   private users: Map<string, User> = new Map();
   private projects: Map<string, Project> = new Map();
   private apiKeys: Map<string, ApiKey> = new Map();
@@ -70,8 +64,8 @@ class Database {
    * @returns The hashed password in format "salt:hash"
    */
   hashPassword(password: string): string {
-    const salt = randomBytes(SALT_BYTES).toString('hex');
-    const hash = scryptSync(password, salt, HASH_LENGTH).toString('hex');
+    const salt = randomBytes(CONFIG.SALT_BYTES).toString('hex');
+    const hash = scryptSync(password, salt, CONFIG.HASH_LENGTH).toString('hex');
     return `${salt}:${hash}`;
   }
 
@@ -83,12 +77,12 @@ class Database {
    */
   verifyPassword(password: string, storedHash: string): boolean {
     const parts = storedHash.split(':');
-    if (parts.length !== PASSWORD_HASH_PARTS || !parts[0] || !parts[1]) {
+    if (parts.length !== CONFIG.PASSWORD_HASH_PARTS || !parts[0] || !parts[1]) {
       return false;
     }
     const salt = parts[0];
     const hash = parts[1];
-    const hashToVerify = scryptSync(password, salt, HASH_LENGTH);
+    const hashToVerify = scryptSync(password, salt, CONFIG.HASH_LENGTH);
     const hashBuffer = Buffer.from(hash, 'hex');
     return timingSafeEqual(hashBuffer, hashToVerify);
   }
@@ -98,7 +92,7 @@ class Database {
    * @returns A random hex string ID
    */
   private generateId(): string {
-    return randomBytes(ID_BYTES).toString('hex');
+    return randomBytes(CONFIG.ID_BYTES).toString('hex');
   }
 
   /**
@@ -110,9 +104,12 @@ class Database {
       JSON.stringify({ alg: 'HS256', typ: 'JWT' })
     ).toString('base64url');
     const payload = Buffer.from(
-      JSON.stringify({ iat: Date.now(), exp: Date.now() + TOKEN_EXPIRY_MS })
+      JSON.stringify({
+        iat: Date.now(),
+        exp: Date.now() + CONFIG.TOKEN_EXPIRY_MS,
+      })
     ).toString('base64url');
-    const signature = randomBytes(SIGNATURE_BYTES).toString('base64url');
+    const signature = randomBytes(CONFIG.SIGNATURE_BYTES).toString('base64url');
     return `${header}.${payload}.${signature}`;
   }
 
@@ -121,7 +118,7 @@ class Database {
    * @returns A random base64url-encoded API key
    */
   generateApiKey(): string {
-    return randomBytes(API_KEY_BYTES).toString('base64url');
+    return randomBytes(CONFIG.API_KEY_BYTES).toString('base64url');
   }
 
   // User operations
@@ -339,7 +336,9 @@ class Database {
    */
   createSession(userId: string): string {
     const token = this.generateToken();
-    const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MS).toISOString();
+    const expiresAt = new Date(
+      Date.now() + CONFIG.TOKEN_EXPIRY_MS
+    ).toISOString();
     this.sessions.set(token, { userId, token, expiresAt });
     return token;
   }
@@ -386,6 +385,15 @@ class Database {
       return undefined;
     }
     return this.getUserById(key.userId);
+  }
+
+  /**
+   * Delete session by token
+   * @param token - The session token to delete
+   * @returns True if deleted, false if not found
+   */
+  deleteSession(token: string): boolean {
+    return this.sessions.delete(token);
   }
 
   /**

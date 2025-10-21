@@ -13,6 +13,7 @@
 **Goal:** Enable CLI to process real books in multiple formats (EPUB, PDF, Markdown) with automatic chapter detection, structure preservation, and batch generation capabilities.
 
 **Value Delivered:**
+
 - Technical publishers can process production books (EPUB, PDF, Markdown, HTML)
 - Chapter structure automatically detected and preserved
 - Batch processing enables high-volume workflows (25+ books simultaneously)
@@ -26,20 +27,22 @@
 
 ### Technology Stack (Epic 2 Additions)
 
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| epub2 | 3.0.2 | EPUB parsing, chapter extraction, TOC parsing |
-| pdf-parse | 1.1.1 | PDF text extraction, layout preservation |
-| marked | 14.1.3 | Markdown parsing, heading detection |
-| FFmpeg | 7.1.0 | Audio concatenation, M4B generation, metadata embedding |
+| Technology | Version | Purpose                                                 |
+| ---------- | ------- | ------------------------------------------------------- |
+| epub2      | 3.0.2   | EPUB parsing, chapter extraction, TOC parsing           |
+| pdf-parse  | 1.1.1   | PDF text extraction, layout preservation                |
+| marked     | 14.1.3  | Markdown parsing, heading detection                     |
+| FFmpeg     | 7.1.0   | Audio concatenation, M4B generation, metadata embedding |
 
 ### Component Boundaries
 
 **New Plugins:**
+
 - `file-processing`: EPUB/PDF/Markdown/HTML parsers with unified interface
 - `batch-processing`: Queue orchestration, job management
 
 **Extensions:**
+
 - `audio-generation` plugin: Multi-chapter support, concatenation
 
 ### Data Models (Epic 2 Extensions)
@@ -84,16 +87,19 @@ interface AudioGenerationJob {
 ### API Routes (Epic 2 Additions)
 
 **Batch Processing:**
+
 - `POST /batch` - Create batch job (multiple books)
 - `GET /batch/:id` - Get batch status
 - `GET /batch/:id/books` - List books in batch
 - `POST /batch/:id/cancel` - Cancel batch job
 
 **Projects (Extended):**
+
 - `POST /projects/:id/upload` - Now supports EPUB, PDF, MD, HTML
 - `GET /projects/:id/chapters` - List detected chapters
 
 **Audio (Extended):**
+
 - `POST /audio/concatenate` - Combine chapter audio files
 - `GET /audio/jobs/:id/chapters` - List chapter-level job status
 
@@ -193,11 +199,11 @@ import EPub from 'epub2';
 export class EPUBParser implements BookParser {
   readonly supportedExtension = '.epub';
 
-  constructor(
-    @inject('Logger') private logger: Logger
-  ) {}
+  constructor(@inject('Logger') private logger: Logger) {}
 
-  async parse(filePath: string): Promise<{ chapters: Chapter[]; metadata: BookMetadata }> {
+  async parse(
+    filePath: string
+  ): Promise<{ chapters: Chapter[]; metadata: BookMetadata }> {
     const epub = await EPub.createAsync(filePath);
 
     // Extract metadata
@@ -206,7 +212,7 @@ export class EPUBParser implements BookParser {
       author: epub.metadata.creator,
       language: epub.metadata.language,
       isbn: epub.metadata.ISBN,
-      publisher: epub.metadata.publisher
+      publisher: epub.metadata.publisher,
     };
 
     // Extract chapters from spine
@@ -222,14 +228,17 @@ export class EPUBParser implements BookParser {
         number: index + 1,
         title: item.title || `Chapter ${index + 1}`,
         content: plainText,
-        wordCount: plainText.split(/\s+/).length
+        wordCount: plainText.split(/\s+/).length,
       });
     }
 
-    this.logger.info({
-      file: filePath,
-      chapterCount: chapters.length
-    }, 'EPUB parsed successfully');
+    this.logger.info(
+      {
+        file: filePath,
+        chapterCount: chapters.length,
+      },
+      'EPUB parsed successfully'
+    );
 
     return { chapters, metadata };
   }
@@ -256,11 +265,11 @@ import pdfParse from 'pdf-parse';
 export class PDFParser implements BookParser {
   readonly supportedExtension = '.pdf';
 
-  constructor(
-    @inject('Logger') private logger: Logger
-  ) {}
+  constructor(@inject('Logger') private logger: Logger) {}
 
-  async parse(filePath: string): Promise<{ chapters: Chapter[]; metadata: BookMetadata }> {
+  async parse(
+    filePath: string
+  ): Promise<{ chapters: Chapter[]; metadata: BookMetadata }> {
     const dataBuffer = await Bun.file(filePath).arrayBuffer();
     const pdfData = await pdfParse(Buffer.from(dataBuffer));
 
@@ -275,28 +284,34 @@ export class PDFParser implements BookParser {
     const text = pdfData.text;
     const chapters = this.detectChapters(text);
 
-    this.logger.info({
-      file: filePath,
-      pages: pdfData.numpages,
-      chapterCount: chapters.length
-    }, 'PDF parsed successfully');
+    this.logger.info(
+      {
+        file: filePath,
+        pages: pdfData.numpages,
+        chapterCount: chapters.length,
+      },
+      'PDF parsed successfully'
+    );
 
     return { chapters, metadata };
   }
 
   private detectChapters(text: string): Chapter[] {
     // Heuristic: Look for "Chapter N" or "CHAPTER N" patterns
-    const chapterRegex = /(?:^|\n)(Chapter|CHAPTER)\s+(\d+|[IVXLCDM]+)[:\s]+(.*?)$/gm;
+    const chapterRegex =
+      /(?:^|\n)(Chapter|CHAPTER)\s+(\d+|[IVXLCDM]+)[:\s]+(.*?)$/gm;
     const matches = Array.from(text.matchAll(chapterRegex));
 
     if (matches.length === 0) {
       // No chapters detected, return entire book as single chapter
-      return [{
-        number: 1,
-        title: 'Full Document',
-        content: text,
-        wordCount: text.split(/\s+/).length
-      }];
+      return [
+        {
+          number: 1,
+          title: 'Full Document',
+          content: text,
+          wordCount: text.split(/\s+/).length,
+        },
+      ];
     }
 
     const chapters: Chapter[] = [];
@@ -314,7 +329,7 @@ export class PDFParser implements BookParser {
         number: i + 1,
         title: match[3].trim() || `Chapter ${i + 1}`,
         content: chapterText,
-        wordCount: chapterText.split(/\s+/).length
+        wordCount: chapterText.split(/\s+/).length,
       });
     }
 
@@ -333,11 +348,11 @@ import { marked } from 'marked';
 export class MarkdownParser implements BookParser {
   readonly supportedExtension = '.md';
 
-  constructor(
-    @inject('Logger') private logger: Logger
-  ) {}
+  constructor(@inject('Logger') private logger: Logger) {}
 
-  async parse(filePath: string): Promise<{ chapters: Chapter[]; metadata: BookMetadata }> {
+  async parse(
+    filePath: string
+  ): Promise<{ chapters: Chapter[]; metadata: BookMetadata }> {
     const markdown = await Bun.file(filePath).text();
 
     // Extract frontmatter metadata (YAML)
@@ -346,10 +361,13 @@ export class MarkdownParser implements BookParser {
     // Chapter detection via headings (# or ##)
     const chapters = this.detectChapters(markdown);
 
-    this.logger.info({
-      file: filePath,
-      chapterCount: chapters.length
-    }, 'Markdown parsed successfully');
+    this.logger.info(
+      {
+        file: filePath,
+        chapterCount: chapters.length,
+      },
+      'Markdown parsed successfully'
+    );
 
     return { chapters, metadata };
   }
@@ -364,7 +382,7 @@ export class MarkdownParser implements BookParser {
     const yaml = match[1];
     const metadata: BookMetadata = {};
 
-    yaml.split('\n').forEach(line => {
+    yaml.split('\n').forEach((line) => {
       const [key, ...valueParts] = line.split(':');
       const value = valueParts.join(':').trim();
 
@@ -393,7 +411,7 @@ export class MarkdownParser implements BookParser {
             number: chapterNumber,
             title: currentChapter.title,
             content: currentChapter.content.join('\n'),
-            wordCount: currentChapter.content.join(' ').split(/\s+/).length
+            wordCount: currentChapter.content.join(' ').split(/\s+/).length,
           });
         }
 
@@ -401,7 +419,7 @@ export class MarkdownParser implements BookParser {
         chapterNumber++;
         currentChapter = {
           title: headingMatch[2].trim(),
-          content: []
+          content: [],
         };
       } else if (currentChapter) {
         // Add to current chapter
@@ -415,16 +433,20 @@ export class MarkdownParser implements BookParser {
         number: chapterNumber,
         title: currentChapter.title,
         content: currentChapter.content.join('\n'),
-        wordCount: currentChapter.content.join(' ').split(/\s+/).length
+        wordCount: currentChapter.content.join(' ').split(/\s+/).length,
       });
     }
 
-    return chapters.length > 0 ? chapters : [{
-      number: 1,
-      title: 'Document',
-      content: markdown,
-      wordCount: markdown.split(/\s+/).length
-    }];
+    return chapters.length > 0
+      ? chapters
+      : [
+          {
+            number: 1,
+            title: 'Document',
+            content: markdown,
+            wordCount: markdown.split(/\s+/).length,
+          },
+        ];
   }
 }
 ```
@@ -438,9 +460,7 @@ export class ChapterSegmentationService {
   private readonly MIN_CHAPTER_WORDS = 500;
   private readonly MAX_CHAPTER_WORDS = 10000;
 
-  constructor(
-    @inject('Logger') private logger: Logger
-  ) {}
+  constructor(@inject('Logger') private logger: Logger) {}
 
   /**
    * Normalize chapters (merge short, split long)
@@ -449,10 +469,13 @@ export class ChapterSegmentationService {
     let normalized = this.mergeShortChapters(chapters);
     normalized = this.splitLongChapters(normalized);
 
-    this.logger.info({
-      original: chapters.length,
-      normalized: normalized.length
-    }, 'Chapters segmented');
+    this.logger.info(
+      {
+        original: chapters.length,
+        normalized: normalized.length,
+      },
+      'Chapters segmented'
+    );
 
     return normalized;
   }
@@ -468,7 +491,7 @@ export class ChapterSegmentationService {
           number: buffer.number,
           title: `${buffer.title} / ${chapter.title}`,
           content: `${buffer.content}\n\n${chapter.content}`,
-          wordCount: buffer.wordCount + chapter.wordCount
+          wordCount: buffer.wordCount + chapter.wordCount,
         };
       } else if (chapter.wordCount < this.MIN_CHAPTER_WORDS) {
         // Start new buffer
@@ -503,13 +526,16 @@ export class ChapterSegmentationService {
         for (const paragraph of paragraphs) {
           const paragraphWords = paragraph.split(/\s+/).length;
 
-          if (currentWordCount + paragraphWords > this.MAX_CHAPTER_WORDS && currentPart.length > 0) {
+          if (
+            currentWordCount + paragraphWords > this.MAX_CHAPTER_WORDS &&
+            currentPart.length > 0
+          ) {
             // Save current part
             split.push({
               number: chapter.number + (partNumber - 1) * 0.1,
               title: `${chapter.title} (Part ${partNumber})`,
               content: currentPart.join('\n\n'),
-              wordCount: currentWordCount
+              wordCount: currentWordCount,
             });
 
             // Start new part
@@ -526,9 +552,12 @@ export class ChapterSegmentationService {
         if (currentPart.length > 0) {
           split.push({
             number: chapter.number + (partNumber - 1) * 0.1,
-            title: partNumber > 1 ? `${chapter.title} (Part ${partNumber})` : chapter.title,
+            title:
+              partNumber > 1
+                ? `${chapter.title} (Part ${partNumber})`
+                : chapter.title,
             content: currentPart.join('\n\n'),
-            wordCount: currentWordCount
+            wordCount: currentWordCount,
           });
         }
       } else {
@@ -548,8 +577,9 @@ export class ChapterSegmentationService {
 import { Command } from 'commander';
 import YAML from 'yaml';
 
-export const batchCommand = new Command('batch')
-  .description('Batch process multiple books');
+export const batchCommand = new Command('batch').description(
+  'Batch process multiple books'
+);
 
 batchCommand
   .command('process')
@@ -564,7 +594,11 @@ batchCommand
       : {};
 
     // Scan directory
-    const files = await scanDirectory(options.inputDir, ['.epub', '.pdf', '.md']);
+    const files = await scanDirectory(options.inputDir, [
+      '.epub',
+      '.pdf',
+      '.md',
+    ]);
 
     console.log(`Found ${files.length} books to process`);
 
@@ -572,12 +606,12 @@ batchCommand
     const apiClient = new FaladorAPIClient();
     const batch = await apiClient.batch.create({
       name: `Batch ${new Date().toISOString()}`,
-      books: files.map(file => ({ path: file })),
+      books: files.map((file) => ({ path: file })),
       config: {
         voiceId: config.voiceId || 'default-pt-br',
         format: config.format || 'mp3',
-        quality: config.quality || 'high'
-      }
+        quality: config.quality || 'high',
+      },
     });
 
     console.log(`Batch job created: ${batch.id}`);
@@ -599,13 +633,19 @@ batchCommand
         console.clear();
         console.log(`Batch Job: ${batch.id}`);
         console.log(`Status: ${batch.status}`);
-        console.log(`Progress: ${batch.completedBooks}/${batch.totalBooks} books`);
+        console.log(
+          `Progress: ${batch.completedBooks}/${batch.totalBooks} books`
+        );
         console.log('\nBooks:');
 
         const books = await apiClient.batch.getBooks(jobId);
-        books.forEach(book => {
-          const status = book.status === 'completed' ? '✓' :
-                        book.status === 'failed' ? '✗' : '⋯';
+        books.forEach((book) => {
+          const status =
+            book.status === 'completed'
+              ? '✓'
+              : book.status === 'failed'
+                ? '✗'
+                : '⋯';
           console.log(`  ${status} ${book.title}`);
         });
 
@@ -613,7 +653,7 @@ batchCommand
           break;
         }
 
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise((resolve) => setTimeout(resolve, 5000));
       }
     } else {
       const batch = await apiClient.batch.get(jobId);
@@ -666,16 +706,19 @@ describe('Batch Processing Integration', () => {
     const user = await createTestUser();
     const apiKey = await createTestApiKey(user.id);
 
-    const response = await client.batch.post({
-      name: 'Test Batch',
-      books: [
-        { path: '/uploads/book1.epub' },
-        { path: '/uploads/book2.pdf' }
-      ],
-      config: { voiceId: 'pt-br-default' }
-    }, {
-      headers: { Authorization: `Bearer ${apiKey}` }
-    });
+    const response = await client.batch.post(
+      {
+        name: 'Test Batch',
+        books: [
+          { path: '/uploads/book1.epub' },
+          { path: '/uploads/book2.pdf' },
+        ],
+        config: { voiceId: 'pt-br-default' },
+      },
+      {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      }
+    );
 
     expect(response.status).toBe(200);
     expect(response.data.data.batchId).toBeDefined();
@@ -689,21 +732,25 @@ describe('Batch Processing Integration', () => {
 ## Story Breakdown Summary
 
 ### Track A: File Format Parsers (Independent)
+
 - **Story 2.1**: EPUB parser (epub2 library, chapter extraction, metadata)
 - **Story 2.2**: PDF parser (pdf-parse library, heuristic chapter detection)
 - **Story 2.3**: Markdown/HTML parser (marked library, heading-based chapters)
 
 ### Track B: Chapter Processing (Depends on Track A)
+
 - **Story 2.4**: Chapter segmentation (normalize, merge short, split long)
 - **Story 2.5**: Multi-chapter audio generation (parallel processing)
 - **Story 2.6**: Audio concatenation (FFmpeg, M4B format, chapter markers)
 
 ### Track C: Batch Processing (Depends on Track B)
+
 - **Story 2.7**: Batch processing command (queue management)
 - **Story 2.8**: Batch job monitoring (status tracking, progress)
 - **Story 2.9**: Configuration file support (YAML configs, profiles)
 
 ### Track D: Metadata (Parallel with Track A)
+
 - **Story 2.10**: Metadata management (extraction, storage, validation)
 
 ---
@@ -711,6 +758,7 @@ describe('Batch Processing Integration', () => {
 ## Acceptance Criteria Checklist
 
 ### Functionality
+
 - [ ] EPUB files parse with chapter detection
 - [ ] PDF files parse with heuristic chapter detection
 - [ ] Markdown files parse with heading-based chapters
@@ -721,12 +769,14 @@ describe('Batch Processing Integration', () => {
 - [ ] Batch status queryable via CLI and API
 
 ### Quality
+
 - [ ] Parser unit tests (all formats)
 - [ ] Chapter segmentation tests (edge cases)
 - [ ] Batch processing integration tests
 - [ ] 80% mutation score maintained
 
 ### Performance
+
 - [ ] Parallel chapter processing (configurable concurrency)
 - [ ] Batch processing doesn't block other users
 - [ ] Memory efficient (streaming for large files)

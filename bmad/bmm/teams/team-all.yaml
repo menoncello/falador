@@ -4,4 +4,4 @@ bundle:
   icon: 👥
   description: Includes every bmm system agent.
 agents:
-  - "*"
+  - '*'

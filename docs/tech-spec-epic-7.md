@@ -139,6 +139,7 @@ Respond with only the genre name.`;
 ```
 
 **Story 7.2: User Genre Override**
+
 - Manual genre selection
 - Sub-genre customization (thriller, romance, biography)
 - Genre profile editing (advanced users)
@@ -210,6 +211,7 @@ export class DialogueDetector {
 ```
 
 **Story 7.4: Character Voice Mapping**
+
 - Assign voices to detected characters
 - Voice consistency across chapters
 - Character voice gallery (voice selection per character)
@@ -220,7 +222,10 @@ export class DialogueDetector {
 
 ```typescript
 // infrastructure/adapters/sentiment-analyzer.adapter.ts
-import { ComprehendClient, DetectSentimentCommand } from '@aws-sdk/client-comprehend';
+import {
+  ComprehendClient,
+  DetectSentimentCommand,
+} from '@aws-sdk/client-comprehend';
 
 export class SentimentAnalyzer {
   private client = new ComprehendClient({ region: 'us-east-1' });
@@ -297,7 +302,10 @@ export class SSMLGenerator {
       calm: { pitch: 'medium', rate: '95%' },
     };
 
-    const prosody = emotionMap[emotion.emotion] || { pitch: 'medium', rate: '100%' };
+    const prosody = emotionMap[emotion.emotion] || {
+      pitch: 'medium',
+      rate: '100%',
+    };
 
     return `<prosody pitch="${prosody.pitch}" rate="${prosody.rate}">
       ${text}
@@ -344,7 +352,10 @@ export class PacingOptimizer {
     return pacingProfile;
   }
 
-  private calculateOptimalPacing(segment: TextSegment, baseWPM: number): number {
+  private calculateOptimalPacing(
+    segment: TextSegment,
+    baseWPM: number
+  ): number {
     // Adjust pacing based on content type
     if (segment.type === 'action') {
       return baseWPM * 1.15; // 15% faster for action
@@ -377,6 +388,7 @@ export class PacingOptimizer {
 ```
 
 **Story 7.8: Pause Insertion**
+
 - Natural pauses at punctuation
 - Longer pauses between paragraphs
 - No pause mid-word or mid-phrase
@@ -388,7 +400,10 @@ export class PacingOptimizer {
 ```typescript
 // application/services/ab-testing.service.ts
 export class ABTestingService {
-  async createTest(projectId: string, variants: DirectionVariant[]): Promise<ABTest> {
+  async createTest(
+    projectId: string,
+    variants: DirectionVariant[]
+  ): Promise<ABTest> {
     const test: ABTest = {
       id: randomUUID(),
       projectId,
@@ -414,7 +429,11 @@ export class ABTestingService {
     return test;
   }
 
-  async recordVote(testId: string, variantId: string, userId: string): Promise<void> {
+  async recordVote(
+    testId: string,
+    variantId: string,
+    userId: string
+  ): Promise<void> {
     await this.voteRepository.save({
       testId,
       variantId,
@@ -426,12 +445,17 @@ export class ABTestingService {
   async getWinner(testId: string): Promise<DirectionVariant> {
     const votes = await this.voteRepository.findByTestId(testId);
 
-    const voteCounts = votes.reduce((acc, vote) => {
-      acc[vote.variantId] = (acc[vote.variantId] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const voteCounts = votes.reduce(
+      (acc, vote) => {
+        acc[vote.variantId] = (acc[vote.variantId] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
 
-    const winnerId = Object.entries(voteCounts).sort(([, a], [, b]) => b - a)[0][0];
+    const winnerId = Object.entries(voteCounts).sort(
+      ([, a], [, b]) => b - a
+    )[0][0];
 
     const test = await this.testRepository.findById(testId);
     return test.variants.find((v) => v.id === winnerId)!;
@@ -440,6 +464,7 @@ export class ABTestingService {
 ```
 
 **Story 7.10: Quality Metrics Dashboard**
+
 - Compare AI-directed vs baseline quality scores
 - User ratings per chapter
 - Emotional accuracy metrics
@@ -460,7 +485,9 @@ export class GenerateWithAIDirectionUseCase {
     const genre = await this.genreClassifier.classify(chapter.content);
 
     // 2. Detect dialogue
-    const dialogueSegments = await this.dialogueDetector.detect(chapter.content);
+    const dialogueSegments = await this.dialogueDetector.detect(
+      chapter.content
+    );
 
     // 3. Analyze emotional tone
     const emotions = await this.sentimentAnalyzer.analyze(chapter.content);
@@ -500,6 +527,7 @@ export class GenerateWithAIDirectionUseCase {
 ```
 
 **Story 7.12: Direction Settings UI**
+
 - Enable/disable AI direction toggle
 - Genre override selector
 - Emotion intensity slider
@@ -515,6 +543,7 @@ export class GenerateWithAIDirectionUseCase {
 **Decision:** GPT-4o-mini for text analysis, AWS Comprehend for sentiment
 
 **Rationale:**
+
 - GPT-4o-mini: Cost-effective ($0.15/1M tokens), excellent for classification
 - AWS Comprehend: Native Portuguese support, real-time sentiment analysis
 - Hybrid approach balances cost and accuracy
@@ -526,6 +555,7 @@ export class GenerateWithAIDirectionUseCase {
 **Decision:** Generate SSML for AI-directed narration
 
 **Rationale:**
+
 - SSML provides fine-grained prosody control
 - TTS engines interpret SSML more accurately
 - Enables emotion, pacing, pitch adjustments
@@ -537,6 +567,7 @@ export class GenerateWithAIDirectionUseCase {
 **Decision:** Cache genre/dialogue/sentiment analysis results
 
 **Rationale:**
+
 - Analysis is deterministic (same text = same result)
 - Reduces AI API costs on regeneration
 - Cache key: `sha256(chapter.content)`
@@ -577,12 +608,12 @@ CREATE TABLE ab_test_votes (
 
 ### Cost Estimation
 
-| Component | Cost per 100k words |
-|-----------|---------------------|
-| Genre classification (GPT-4o-mini) | $0.005 |
-| Sentiment analysis (AWS Comprehend) | $0.01 |
-| Dialogue detection (rule-based) | $0 (compute) |
-| **Total** | **$0.015 per 100k words** |
+| Component                           | Cost per 100k words       |
+| ----------------------------------- | ------------------------- |
+| Genre classification (GPT-4o-mini)  | $0.005                    |
+| Sentiment analysis (AWS Comprehend) | $0.01                     |
+| Dialogue detection (rule-based)     | $0 (compute)              |
+| **Total**                           | **$0.015 per 100k words** |
 
 ### Performance Targets
 

@@ -13,8 +13,15 @@
     "lint": {
       "dependsOn": ["^lint"]
     },
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"]
+    },
     "typecheck": {
       "dependsOn": ["^typecheck"]
+    },
+    "format": {
+      "dependsOn": ["^format"],
+      "outputs": ["**/*.ts", "**/*.js", "**/*.json", "**/*.md", "**/*.yaml", "**/*.yml"]
     },
     "dev": {
       "cache": false,

@@ -5,16 +5,11 @@
 
 export const version = '0.0.1';
 
-// Domain entities will be defined here
-export interface Project {
-  id: string;
-  title: string;
-  userId: string;
-  createdAt: Date;
-}
+// Export domain entities
+export * from './entities/index.js';
 
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-}
+// Export domain interfaces
+export * from './interfaces/index.js';
+
+// Export DI container (when implemented)
+// export * from './di-container.js';

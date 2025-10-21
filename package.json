@@ -18,12 +18,15 @@
     "test:mutate:report": "stryker run --reporters html,dashboard",
     "turbo:mutate": "bun turbo run test:mutate",
     "turbo:mutate:report": "bun turbo run test:mutate:report",
-    "test:e2e": "playwright test",
+    "test:e2e": "node --experimental-vm-modules node_modules/.bin/playwright test",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report test-results/html",
     "test:api": "playwright test --project=api",
+    "test:performance": "k6 run tests/performance/auth-load-test.js",
+    "test:performance:smoke": "k6 run tests/performance/auth-smoke-test.js",
+    "test:performance:baseline": "k6 run tests/performance/auth-smoke-test.js --out json=performance-baseline.json",
     "quality-gates": "bun run typecheck && bun run lint && bun run format:check && bun test && bun run test:mutate",
     "prepare": "husky"
   },
@@ -35,6 +38,7 @@
     "@stryker-mutator/core": "^9.2.0",
     "@stryker-mutator/typescript-checker": "^9.2.0",
     "@types/bun": "^1.3.0",
+    "@types/node": "^24.8.1",
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",
     "c8": "10.1.3",
@@ -61,5 +65,8 @@
     "*.{json,md,yaml,yml}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.2.2"
   }
 }

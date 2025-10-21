@@ -71,11 +71,29 @@
     <action>Cover edge cases and error handling scenarios noted in the plan</action>
   </step>
 
-  <step n="4" goal="Run validations and tests">
+  <step n="4" goal="Run validations and tests (MANDATORY QUALITY GATES)">
     <action>Determine how to run tests for this repo (infer or use {{run_tests_command}} if provided)</action>
-    <action>Run all existing tests to ensure no regressions</action>
-    <action>Run the new tests to verify implementation correctness</action>
-    <action>Run linting and code quality checks if configured</action>
+
+    <!-- MANDATORY QUALITY GATES - Must all pass -->
+    <action>Run TypeScript compilation check: bun run typecheck (MUST have 0 errors)</action>
+    <check>If TypeScript errors > 0 → STOP and fix before continuing</check>
+
+    <action>Run ESLint validation: bun run lint (MUST have 0 errors, no eslint-disable comments)</action>
+    <check>If ESLint errors > 0 → STOP and fix before continuing</check>
+
+    <action>Run Prettier formatting check: bun run format:check (MUST have 100% compliance)</action>
+    <check>If Prettier issues found → STOP and fix before continuing</check>
+
+    <action>Run all existing tests: bun test (MUST have 100% pass rate)</action>
+    <check>If test failures → STOP and fix before continuing</check>
+
+    <action>Run mutation testing: bun run test:mutate (MUST have 80%+ score)</action>
+    <check>If mutation score < 80% → STOP and add more tests before continuing</check>
+
+    <critical>NEVER proceed with story completion if ANY quality gate fails</critical>
+    <critical>NEVER suggest disabling ESLint rules or lowering mutation thresholds</critical>
+    <critical>ALL quality gates must pass in sequence before marking tasks complete</critical>
+
     <action>Validate implementation meets ALL story acceptance criteria; if ACs include quantitative thresholds (e.g., test pass rate), ensure they are met before marking complete</action>
     <check>If regression tests fail → STOP and fix before continuing</check>
     <check>If new tests fail → STOP and fix before continuing</check>

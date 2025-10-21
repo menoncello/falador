@@ -120,10 +120,13 @@ export interface VoiceEngine {
    * @param options Training configuration
    * @returns Training job ID for status tracking
    */
-  trainVoice(audioPath: string, options: {
-    language: string;
-    modelVersion: string;
-  }): Promise<{
+  trainVoice(
+    audioPath: string,
+    options: {
+      language: string;
+      modelVersion: string;
+    }
+  ): Promise<{
     jobId: string;
     estimatedDuration: number; // seconds
   }>;
@@ -141,11 +144,15 @@ export interface VoiceEngine {
   /**
    * Generates audio using custom voice
    */
-  generateWithVoice(text: string, voiceModelUrl: string, settings: {
-    pitch: number;
-    speed: number;
-    tone: number;
-  }): Promise<AudioBuffer>;
+  generateWithVoice(
+    text: string,
+    voiceModelUrl: string,
+    settings: {
+      pitch: number;
+      speed: number;
+      tone: number;
+    }
+  ): Promise<AudioBuffer>;
 }
 ```
 
@@ -156,6 +163,7 @@ export interface VoiceEngine {
 ### Phase 1: Voice Upload & Validation (Stories 3.1-3.3)
 
 **Story 3.1: Voice Sample Upload Service**
+
 - Cloud Storage integration (GCS signed URLs)
 - File size limits: 1-10MB (30s-2min audio)
 - Supported formats: MP3, WAV, M4A
@@ -163,6 +171,7 @@ export interface VoiceEngine {
 - Upload progress tracking
 
 **Story 3.2: Voice Quality Validator**
+
 - Audio analysis using librosa or similar
 - Quality metrics calculation:
   - Duration check (30s ± 5s)
@@ -172,6 +181,7 @@ export interface VoiceEngine {
 - Rejection reasons with actionable feedback
 
 **Story 3.3: Voice Preview Generator**
+
 - Generate short preview audio (5-10s sample text)
 - Preview before committing to full training
 - Preview caching to avoid redundant generation
@@ -179,6 +189,7 @@ export interface VoiceEngine {
 ### Phase 2: Voice Training Pipeline (Stories 3.4-3.6)
 
 **Story 3.4: Voice Training Adapter Implementation**
+
 - Initial implementation: KokoroTTS fine-tuning
 - BullMQ job queue for training jobs
 - Training concurrency limits (2-3 parallel jobs)
@@ -186,12 +197,14 @@ export interface VoiceEngine {
 - Model versioning and storage
 
 **Story 3.5: Training Status Monitoring**
+
 - Real-time progress tracking via WebSockets
 - Training job status API endpoints
 - Failure retry logic (max 2 retries)
 - Training logs for debugging
 
 **Story 3.6: Model Storage & Versioning**
+
 - Cloud Storage bucket for trained models
 - Model metadata versioning
 - Model cleanup for deleted voices
@@ -200,6 +213,7 @@ export interface VoiceEngine {
 ### Phase 3: Voice Library Management (Stories 3.7-3.9)
 
 **Story 3.7: Voice CRUD API**
+
 ```typescript
 // API Routes
 POST   /api/v1/voices                 // Create voice (upload sample)
@@ -212,12 +226,14 @@ GET    /api/v1/voices/:id/status      // Get training status
 ```
 
 **Story 3.8: Voice Customization Controls**
+
 - Pitch adjustment (-1.0 to 1.0, step 0.1)
 - Speed adjustment (0.5x to 2.0x, step 0.1)
 - Tone adjustment (-1.0 to 1.0, step 0.1)
 - Settings preview before applying to full project
 
 **Story 3.9: Voice Metadata & Tagging**
+
 - User-defined tags for organization
 - Auto-detected metadata (gender, language)
 - Search and filter by tags
@@ -226,18 +242,21 @@ GET    /api/v1/voices/:id/status      // Get training status
 ### Phase 4: Multi-Voice Support (Stories 3.10-3.12)
 
 **Story 3.10: Project Voice Assignment**
+
 - Assign voices to projects
 - Multiple voices per project (narrator + characters)
 - Voice role definition (narrator vs character)
 - Character name mapping
 
 **Story 3.11: Character Voice Detection**
+
 - Text analysis to detect dialogue
 - Character attribution logic
 - Voice switching mid-chapter
 - Fallback to narrator voice for unattributed dialogue
 
 **Story 3.12: Voice Blending & Transitions**
+
 - Smooth transitions between voices
 - Cross-fade duration configuration
 - Silence insertion between speakers
@@ -245,6 +264,7 @@ GET    /api/v1/voices/:id/status      // Get training status
 ### Phase 5: CLI & Documentation (Stories 3.13-3.15)
 
 **Story 3.13: CLI Voice Management Commands**
+
 ```bash
 # Upload voice sample
 falador voice create --name "Author Voice" --sample voice.mp3
@@ -263,12 +283,14 @@ falador voice preview <voice-id> --text "Sample narration text"
 ```
 
 **Story 3.14: Voice Cloning Documentation**
+
 - User guide: Recording optimal samples
 - Quality requirements and tips
 - Troubleshooting common issues
 - Best practices for multi-voice projects
 
 **Story 3.15: Voice Cloning Examples & Templates**
+
 - Sample voice recordings (free tier)
 - Example multi-voice configurations
 - Demo projects showcasing voice cloning
@@ -282,11 +304,13 @@ falador voice preview <voice-id> --text "Sample narration text"
 **Decision:** Start with KokoroTTS fine-tuning, abstract behind VoiceEngine interface
 
 **Rationale:**
+
 - KokoroTTS already integrated (Epic 1)
 - Fine-tuning requires less infrastructure than training from scratch
 - Interface allows future migration to specialized voice cloning services (ElevenLabs, Resemble.ai)
 
 **Alternatives Considered:**
+
 - ElevenLabs API (high cost, vendor lock-in)
 - Coqui XTTS (complex setup, hardware requirements)
 
@@ -297,11 +321,13 @@ falador voice preview <voice-id> --text "Sample narration text"
 **Decision:** Store trained models in Cloud Storage, metadata in PostgreSQL
 
 **Rationale:**
+
 - Models are 50-200MB each (too large for database)
 - Cloud Storage provides versioning and lifecycle management
 - PostgreSQL stores searchable metadata
 
 **Implementation:**
+
 - Bucket: `falador-voice-models-{env}`
 - Path: `{user_id}/{voice_id}/model-v{version}.bin`
 - Lifecycle: Delete models when voice deleted (30-day grace period)
@@ -311,11 +337,13 @@ falador voice preview <voice-id> --text "Sample narration text"
 **Decision:** Require minimum quality score of 70/100 for training
 
 **Rationale:**
+
 - Poor quality samples produce unusable voices
 - Better to reject early than waste training resources
 - Actionable feedback helps users record better samples
 
 **Quality Metrics:**
+
 - Duration: 30s ± 5s (weight: 20%)
 - SNR: >20dB (weight: 30%)
 - Clarity: Spectral analysis (weight: 30%)
@@ -326,11 +354,13 @@ falador voice preview <voice-id> --text "Sample narration text"
 **Decision:** Max 3 concurrent training jobs across all users
 
 **Rationale:**
+
 - Voice training is CPU/GPU intensive
 - Prevents resource exhaustion
 - Queue ensures fairness (FIFO)
 
 **Implementation:**
+
 - BullMQ concurrency: 3
 - Queue priority: Pro users > Free users
 - Estimated wait time displayed in UI
@@ -390,18 +420,21 @@ CREATE INDEX idx_project_voices_voice_id ON project_voices(voice_id);
 ## Testing Strategy
 
 ### Unit Tests
+
 - Voice validation logic (quality metrics)
 - Voice settings calculations (pitch/speed/tone)
 - Voice model path generation
 - Voice metadata extraction
 
 ### Integration Tests
+
 - Complete voice upload → validation → training → generation flow
 - Multi-voice project configuration
 - Voice preview generation
 - Training job queue processing
 
 ### Manual Testing Checklist
+
 - [ ] Record 30s sample, upload, verify quality score
 - [ ] Train voice with valid sample, verify model generated
 - [ ] Generate audio with custom voice, verify quality
@@ -413,13 +446,13 @@ CREATE INDEX idx_project_voices_voice_id ON project_voices(voice_id);
 
 ## Performance Requirements
 
-| Metric | Target | Measurement |
-|--------|--------|-------------|
-| Voice validation time | <10s | Time from upload to quality result |
-| Voice training time | <5 minutes | 90th percentile |
-| Preview generation time | <15s | Single sentence preview |
-| Voice listing (100 voices) | <500ms | API response time |
-| Concurrent training jobs | 3 | System-wide limit |
+| Metric                     | Target     | Measurement                        |
+| -------------------------- | ---------- | ---------------------------------- |
+| Voice validation time      | <10s       | Time from upload to quality result |
+| Voice training time        | <5 minutes | 90th percentile                    |
+| Preview generation time    | <15s       | Single sentence preview            |
+| Voice listing (100 voices) | <500ms     | API response time                  |
+| Concurrent training jobs   | 3          | System-wide limit                  |
 
 ---
 
@@ -463,11 +496,13 @@ const metrics = {
 ## Dependencies
 
 **External Libraries:**
+
 - `librosa` or `@echogarden/audio-io` (audio analysis) - npm install @echogarden/audio-io@^2.4.0
 - `fluent-ffmpeg` (audio conversion) - already in solution-architecture.md
 - Voice training model (KokoroTTS fine-tuning scripts)
 
 **GCP Services:**
+
 - Cloud Storage (voice models, samples)
 - Cloud Run (training workers - GPU instances)
 - BullMQ/Redis (training job queue)

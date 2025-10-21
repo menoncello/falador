@@ -7,9 +7,18 @@
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:fix": "eslint . --fix",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "tsyringe": "^4.10.0",
+    "reflect-metadata": "^0.2.2"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/reflect-metadata": "^0.1.0"
   }
 }

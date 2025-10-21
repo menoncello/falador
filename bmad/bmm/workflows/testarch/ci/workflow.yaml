@@ -1,27 +1,27 @@
 # Test Architect workflow: ci
 name: testarch-ci
-description: "Scaffold CI/CD quality pipeline with test execution, burn-in loops, and artifact collection"
-author: "BMad"
+description: 'Scaffold CI/CD quality pipeline with test execution, burn-in loops, and artifact collection'
+author: 'BMad'
 
 # Critical variables from config
-config_source: "{project-root}/bmad/bmm/config.yaml"
-output_folder: "{config_source}:output_folder"
-user_name: "{config_source}:user_name"
-communication_language: "{config_source}:communication_language"
+config_source: '{project-root}/bmad/bmm/config.yaml'
+output_folder: '{config_source}:output_folder'
+user_name: '{config_source}:user_name'
+communication_language: '{config_source}:communication_language'
 date: system-generated
 
 # Workflow components
-installed_path: "{project-root}/bmad/bmm/workflows/testarch/ci"
-instructions: "{installed_path}/instructions.md"
-validation: "{installed_path}/checklist.md"
+installed_path: '{project-root}/bmad/bmm/workflows/testarch/ci'
+instructions: '{installed_path}/instructions.md'
+validation: '{installed_path}/checklist.md'
 
 # Variables and inputs
 variables:
-  ci_platform: "auto" # auto, github-actions, gitlab-ci, circle-ci, jenkins
-  test_framework: "" # Detected from framework workflow (playwright, cypress)
-  test_dir: "{project-root}/tests"
-  config_file: "" # Framework config file path
-  node_version_source: "{project-root}/.nvmrc" # Node version for CI
+  ci_platform: 'auto' # auto, github-actions, gitlab-ci, circle-ci, jenkins
+  test_framework: '' # Detected from framework workflow (playwright, cypress)
+  test_dir: '{project-root}/tests'
+  config_file: '' # Framework config file path
+  node_version_source: '{project-root}/.nvmrc' # Node version for CI
 
   # Execution configuration
   parallel_jobs: 4 # Number of parallel test shards
@@ -31,8 +31,8 @@ variables:
 
   # Artifact configuration
   artifact_retention_days: 30
-  upload_artifacts_on: "failure" # failure, always, never
-  artifact_types: "traces,screenshots,videos,html-report" # Comma-separated
+  upload_artifacts_on: 'failure' # failure, always, never
+  artifact_types: 'traces,screenshots,videos,html-report' # Comma-separated
 
   # Performance tuning
   cache_enabled: true # Enable dependency caching
@@ -42,7 +42,7 @@ variables:
 
   # Notification configuration
   notify_on_failure: false # Enable notifications (requires setup)
-  notification_channels: "" # slack, email, discord
+  notification_channels: '' # slack, email, discord
 
   # Output artifacts
   generate_ci_readme: true
@@ -56,7 +56,7 @@ variables:
   retry_count: 2
 
 # Output configuration
-default_output_file: "{project-root}/.github/workflows/test.yml" # GitHub Actions default
+default_output_file: '{project-root}/.github/workflows/test.yml' # GitHub Actions default
 
 # Required tools
 required_tools:
@@ -68,11 +68,11 @@ required_tools:
 
 # Recommended inputs
 recommended_inputs:
-  - framework_config: "Framework configuration (playwright.config.ts, cypress.config.ts)"
-  - package_json: "Project dependencies and scripts"
-  - nvmrc: ".nvmrc for Node version (optional, defaults to LTS)"
-  - existing_ci: "Existing CI configuration to update (optional)"
-  - git_info: "Git repository information for platform detection"
+  - framework_config: 'Framework configuration (playwright.config.ts, cypress.config.ts)'
+  - package_json: 'Project dependencies and scripts'
+  - nvmrc: '.nvmrc for Node version (optional, defaults to LTS)'
+  - existing_ci: 'Existing CI configuration to update (optional)'
+  - git_info: 'Git repository information for platform detection'
 
 tags:
   - qa

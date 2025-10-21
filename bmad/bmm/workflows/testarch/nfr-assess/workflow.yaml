@@ -1,26 +1,26 @@
 # Test Architect workflow: nfr-assess
 name: testarch-nfr
-description: "Assess non-functional requirements (performance, security, reliability, maintainability) before release with evidence-based validation"
-author: "BMad"
+description: 'Assess non-functional requirements (performance, security, reliability, maintainability) before release with evidence-based validation'
+author: 'BMad'
 
 # Critical variables from config
-config_source: "{project-root}/bmad/bmm/config.yaml"
-output_folder: "{config_source}:output_folder"
-user_name: "{config_source}:user_name"
-communication_language: "{config_source}:communication_language"
+config_source: '{project-root}/bmad/bmm/config.yaml'
+output_folder: '{config_source}:output_folder'
+user_name: '{config_source}:user_name'
+communication_language: '{config_source}:communication_language'
 date: system-generated
 
 # Workflow components
-installed_path: "{project-root}/bmad/bmm/workflows/testarch/nfr-assess"
-instructions: "{installed_path}/instructions.md"
-validation: "{installed_path}/checklist.md"
-template: "{installed_path}/nfr-report-template.md"
+installed_path: '{project-root}/bmad/bmm/workflows/testarch/nfr-assess'
+instructions: '{installed_path}/instructions.md'
+validation: '{installed_path}/checklist.md'
+template: '{installed_path}/nfr-report-template.md'
 
 # Variables and inputs
 variables:
   # Target specification
-  story_file: "" # Path to story markdown (optional)
-  feature_name: "" # Feature to assess (if no story file)
+  story_file: '' # Path to story markdown (optional)
+  feature_name: '' # Feature to assess (if no story file)
 
   # NFR categories to assess
   assess_performance: true # Response time, throughput, resource usage
@@ -29,12 +29,12 @@ variables:
   assess_maintainability: true # Code quality, test coverage, documentation
 
   # Custom NFR categories (comma-separated)
-  custom_nfr_categories: "" # e.g., "accessibility,internationalization,compliance"
+  custom_nfr_categories: '' # e.g., "accessibility,internationalization,compliance"
 
   # Evidence sources
-  test_results_dir: "{project-root}/test-results"
-  metrics_dir: "{project-root}/metrics"
-  logs_dir: "{project-root}/logs"
+  test_results_dir: '{project-root}/test-results'
+  metrics_dir: '{project-root}/metrics'
+  logs_dir: '{project-root}/logs'
   include_ci_results: true # Analyze CI/CD pipeline results
 
   # Thresholds (can be overridden)
@@ -56,7 +56,7 @@ variables:
   use_test_design: true # Load test-design.md for NFR test plan
 
   # Output configuration
-  output_file: "{output_folder}/nfr-assessment.md"
+  output_file: '{output_folder}/nfr-assessment.md'
   generate_gate_yaml: true # Create gate YAML snippet with NFR status
   generate_evidence_checklist: true # Create checklist of evidence gaps
   update_story_file: false # Add NFR section to story (optional)
@@ -72,7 +72,7 @@ variables:
   include_recommended_actions: true # Provide actionable remediation steps
 
 # Output configuration
-default_output_file: "{output_folder}/nfr-assessment.md"
+default_output_file: '{output_folder}/nfr-assessment.md'
 
 # Required tools
 required_tools:
@@ -84,12 +84,12 @@ required_tools:
 
 # Recommended inputs
 recommended_inputs:
-  - story: "Story markdown with NFR requirements (optional)"
-  - tech_spec: "Technical specification with NFR targets (recommended)"
-  - test_results: "Test execution results (performance, security, etc.)"
-  - metrics: "Application metrics (response times, error rates, etc.)"
-  - logs: "Application logs for reliability analysis"
-  - ci_results: "CI/CD pipeline results for burn-in validation"
+  - story: 'Story markdown with NFR requirements (optional)'
+  - tech_spec: 'Technical specification with NFR targets (recommended)'
+  - test_results: 'Test execution results (performance, security, etc.)'
+  - metrics: 'Application metrics (response times, error rates, etc.)'
+  - logs: 'Application logs for reliability analysis'
+  - ci_results: 'CI/CD pipeline results for burn-in validation'
 
 tags:
   - qa

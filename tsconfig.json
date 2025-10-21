@@ -21,12 +21,18 @@
     // Path aliases for clean architecture
     "baseUrl": ".",
     "paths": {
+      "@falador/core-domain/*": ["./packages/core-domain/src/*"],
+      "@falador/application/*": ["./packages/application/src/*"],
+      "@falador/infrastructure/*": ["./packages/infrastructure/src/*"],
+      "@falador/api-gateway/*": ["./packages/api-gateway/src/*"],
+      "@falador/cli/*": ["./packages/cli/src/*"],
+      "@falador/job-worker/*": ["./packages/job-worker/src/*"],
       "@core/*": ["./packages/core-domain/src/*"],
       "@api/*": ["./packages/api-gateway/src/*"],
       "@cli/*": ["./packages/cli/src/*"],
       "@worker/*": ["./packages/job-worker/src/*"],
       "@shared/*": ["./shared/*"],
-      "@infrastructure/*": ["./infrastructure/*"],
+      "@infrastructure/*": ["./packages/infrastructure/src/*"],
       "@plugins/*": ["./plugins/*"]
     },
 
@@ -50,7 +56,7 @@
     "noUnusedParameters": true,
 
     // Types
-    "types": ["@types/bun"]
+    "types": ["@types/bun", "@types/node"]
   },
   "include": [
     "packages/**/*",

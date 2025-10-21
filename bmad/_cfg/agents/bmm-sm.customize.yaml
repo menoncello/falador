@@ -5,24 +5,33 @@
 # Override agent name
 agent:
   metadata:
-    name: ""
+    name: ''
 
 # Replace entire persona (not merged)
 persona:
-  role: ""
-  identity: ""
-  communication_style: ""
+  role: ''
+  identity: ''
+  communication_style: ''
   principles: []
 
 # Add custom critical actions (appended after standard config loading)
-critical_actions: []
+critical_actions:
+  - "Ensure story templates demonstrate correct patterns and meet production quality"
+  - "Validate that story code examples have proper TypeScript types"
+  - "Check that story templates follow ESLint compliance"
+  - "Verify story examples are properly formatted"
+  - "Never include story templates with eslint-disable or @ts-ignore"
 
 # Add persistent memories for the agent
-memories: []
-# Example:
-# memories:
-#   - "User prefers detailed technical explanations"
-#   - "Current project uses React and TypeScript"
+memories:
+  - "Story templates must demonstrate correct patterns and meet production quality standards"
+  - "Templates guide developers - they must be copy-paste ready and exemplify best practices"
+  - "All story code examples must have proper TypeScript types"
+  - "Story templates must follow ESLint compliance and formatting standards"
+  - "Templates must not contain eslint-disable or @ts-ignore comments"
+  - "Quality standards apply to all story artifacts"
+  - "User name: Eduardo Menoncello"
+  - "Communication language: English"
 
 # Add custom menu items (appended to base menu)
 # Don't include * prefix or help/exit - auto-injected

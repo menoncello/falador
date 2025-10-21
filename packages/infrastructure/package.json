@@ -1,0 +1,35 @@
+{
+  "name": "@falador/infrastructure",
+  "version": "0.0.1",
+  "description": "Infrastructure layer - Database and external services",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./database/*": "./src/database/*.ts",
+    "./external/*": "./src/external/*.ts"
+  },
+  "scripts": {
+    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "dev": "bun --watch src/index.ts",
+    "test": "bun test src/",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "dependencies": {
+    "@falador/core-domain": "workspace:*",
+    "@falador/application": "workspace:*",
+    "tsyringe": "^4.8.0",
+    "drizzle-orm": "^0.44.6",
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "typescript": "5.9.3"
+  }
+}

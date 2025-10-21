@@ -338,7 +338,7 @@ Falador addresses this market opportunity through a premium AI-directed TTS plat
        text: courseContent,
        voice: 'educational-portuguese-female',
        format: 'mp3',
-       webhook: 'https://edutech.com/api/falador-webhook'
+       webhook: 'https://edutech.com/api/falador-webhook',
      });
      ```
    - System polls job status every 30 seconds until completion

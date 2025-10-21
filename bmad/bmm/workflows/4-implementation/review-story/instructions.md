@@ -75,6 +75,20 @@ What would you like to do?</ask>
     <action>For each changed file, skim for common issues appropriate to the stack: error handling, input validation, logging, dependency injection, thread-safety/async correctness, resource cleanup, performance anti-patterns.</action>
     <action>Perform security review: injection risks, authZ/authN handling, secret management, unsafe defaults, un-validated redirects, CORS misconfigured, dependency vulnerabilities (based on manifests).</action>
     <action>Check tests quality: assertions are meaningful, edge cases covered, deterministic behavior, proper fixtures, no flakiness patterns.</action>
+
+    <!-- QUALITY GATES VERIFICATION -->
+    <action>Verify that ALL quality gates were passed during development:
+      - TypeScript: 0 compilation errors
+      - ESLint: 0 errors with no eslint-disable comments
+      - Tests: 100% pass rate
+      - Mutation: 80%+ score
+      - Prettier: 100% compliance
+    </action>
+    <action>Scan code for eslint-disable comments and flag as quality violation if found</action>
+    <action>Scan code for @ts-ignore/@ts-expect-error and flag as quality violation if found</action>
+    <check>If quality gates were not all passed → Flag as High Severity finding</check>
+    <check>If eslint-disable or @ts-ignore comments found → Flag as High Severity finding</check>
+
     <action>Capture concrete, actionable suggestions with severity (High/Med/Low) and rationale. When possible, suggest specific code-level changes (filenames + line ranges) without rewriting large sections.</action>
   </step>
 

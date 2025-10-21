@@ -1,27 +1,27 @@
 # Test Architect workflow: test-review
 name: testarch-test-review
-description: "Review test quality using comprehensive knowledge base and best practices validation"
-author: "BMad"
+description: 'Review test quality using comprehensive knowledge base and best practices validation'
+author: 'BMad'
 
 # Critical variables from config
-config_source: "{project-root}/bmad/bmm/config.yaml"
-output_folder: "{config_source}:output_folder"
-user_name: "{config_source}:user_name"
-communication_language: "{config_source}:communication_language"
+config_source: '{project-root}/bmad/bmm/config.yaml'
+output_folder: '{config_source}:output_folder'
+user_name: '{config_source}:user_name'
+communication_language: '{config_source}:communication_language'
 date: system-generated
 
 # Workflow components
-installed_path: "{project-root}/bmad/bmm/workflows/testarch/test-review"
-instructions: "{installed_path}/instructions.md"
-validation: "{installed_path}/checklist.md"
-template: "{installed_path}/test-review-template.md"
+installed_path: '{project-root}/bmad/bmm/workflows/testarch/test-review'
+instructions: '{installed_path}/instructions.md'
+validation: '{installed_path}/checklist.md'
+template: '{installed_path}/test-review-template.md'
 
 # Variables and inputs
 variables:
   # Review target
-  test_file_path: "" # Explicit test file to review (if not provided, auto-discover)
-  test_dir: "{project-root}/tests"
-  review_scope: "single" # single (one file), directory (folder), suite (all tests)
+  test_file_path: '' # Explicit test file to review (if not provided, auto-discover)
+  test_dir: '{project-root}/tests'
+  review_scope: 'single' # single (one file), directory (folder), suite (all tests)
 
   # Review configuration
   quality_score_enabled: true # Calculate 0-100 quality score
@@ -50,7 +50,7 @@ variables:
   auto_discover_story: true # Find related story by test ID
 
   # Output configuration
-  output_file: "{output_folder}/test-review-{filename}.md"
+  output_file: '{output_folder}/test-review-{filename}.md'
   generate_inline_comments: false # Add TODO comments in test files
   generate_quality_badge: true # Create quality badge/score
   append_to_story: false # Add review section to story file
@@ -67,7 +67,7 @@ variables:
     - selective-testing.md # Duplicate coverage detection
 
 # Output configuration
-default_output_file: "{output_folder}/test-review.md"
+default_output_file: '{output_folder}/test-review.md'
 
 # Required tools
 required_tools:
@@ -79,10 +79,10 @@ required_tools:
 
 # Recommended inputs
 recommended_inputs:
-  - test_file: "Test file to review (single file mode)"
-  - test_dir: "Directory of tests to review (directory mode)"
-  - story: "Related story for acceptance criteria context (optional)"
-  - test_design: "Test design for priority context (optional)"
+  - test_file: 'Test file to review (single file mode)'
+  - test_dir: 'Directory of tests to review (directory mode)'
+  - story: 'Related story for acceptance criteria context (optional)'
+  - test_design: 'Test design for priority context (optional)'
 
 tags:
   - qa

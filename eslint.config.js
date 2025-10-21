@@ -15,6 +15,7 @@ export default [
       '**/*.d.ts',
       '**/reports/**',
       '**/.stryker-tmp/**',
+      '**/.session/**',
     ],
   },
   // Main TypeScript configuration
@@ -238,7 +239,7 @@ export default [
       'no-nested-ternary': 'off',
       'unicorn/no-nested-ternary': 'off',
       'unicorn/prefer-ternary': 'off',
-      'complexity': 'off',
+      complexity: 'off',
       '@typescript-eslint/array-type': 'off',
       'sonarjs/no-nested-conditional': 'off',
     },
