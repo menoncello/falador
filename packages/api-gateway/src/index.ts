@@ -5,8 +5,10 @@
 
 import { Elysia } from 'elysia';
 
+const API_PORT = 3000;
+
 const app = new Elysia()
   .get('/', () => ({ message: 'Falador API Gateway - Audio Book Generator' }))
-  .listen(3000);
+  .listen(API_PORT);
 
-export default app;
+export { app };

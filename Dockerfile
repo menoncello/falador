@@ -9,8 +9,10 @@ WORKDIR /app
 # Copy package files for the entire workspace
 COPY package.json bun.lockb ./
 COPY packages/api-gateway/package.json ./packages/api-gateway/
+COPY packages/application/package.json ./packages/application/
 COPY packages/cli/package.json ./packages/cli/
 COPY packages/core-domain/package.json ./packages/core-domain/
+COPY packages/infrastructure/package.json ./packages/infrastructure/
 COPY packages/job-worker/package.json ./packages/job-worker/
 
 # Install all dependencies for building
@@ -54,18 +56,18 @@ RUN addgroup --system --gid 1001 nodejs && \
 # Copy package files
 COPY package.json bun.lockb ./
 COPY packages/api-gateway/package.json ./packages/api-gateway/
+COPY packages/application/package.json ./packages/application/
+COPY packages/cli/package.json ./packages/cli/
+COPY packages/core-domain/package.json ./packages/core-domain/
+COPY packages/infrastructure/package.json ./packages/infrastructure/
 COPY packages/job-worker/package.json ./packages/job-worker/
 
 # Copy only production dependencies from deps stage
 COPY --from=deps --chown=bunuser:nodejs /app/node_modules ./node_modules
-COPY --from=deps --chown=bunuser:nodejs /app/packages/api-gateway/node_modules ./packages/api-gateway/
-COPY --from=deps --chown=bunuser:nodejs /app/packages/job-worker/node_modules ./packages/job-worker/
+COPY --from=deps --chown=bunuser:nodejs /app/packages/*/node_modules ./packages/*/
 
 # Copy built artifacts from builder stage
-COPY --from=builder --chown=bunuser:nodejs /app/packages/api-gateway/dist ./packages/api-gateway/dist
-COPY --from=builder --chown=bunuser:nodejs /app/packages/cli/dist ./packages/cli/dist
-COPY --from=builder --chown=bunuser:nodejs /app/packages/core-domain/dist ./packages/core-domain/dist
-COPY --from=builder --chown=bunuser:nodejs /app/packages/job-worker/dist ./packages/job-worker/dist
+COPY --from=builder --chown=bunuser:nodejs /app/packages/*/dist ./packages/*/
 
 # Switch to non-root user
 USER bunuser
