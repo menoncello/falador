@@ -38,17 +38,18 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV BUILDKIT_INLINE_CACHE=1
 
-# Copy all dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/packages/*/node_modules ./packages/*/node_modules
-
-# Copy package files for all packages
+# Copy package files first
+COPY package.json bun.lock ./
 COPY packages/api-gateway/package.json ./packages/api-gateway/
 COPY packages/application/package.json ./packages/application/
 COPY packages/cli/package.json ./packages/cli/
 COPY packages/core-domain/package.json ./packages/core-domain/
 COPY packages/infrastructure/package.json ./packages/infrastructure/
 COPY packages/job-worker/package.json ./packages/job-worker/
+
+# Copy all dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/packages/*/node_modules ./packages/*/node_modules
 
 # Copy source code
 COPY . .
