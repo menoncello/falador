@@ -34,6 +34,14 @@ ENV BUILDKIT_INLINE_CACHE=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/*/node_modules ./packages/*/node_modules
 
+# Copy package files for all packages
+COPY packages/api-gateway/package.json ./packages/api-gateway/
+COPY packages/application/package.json ./packages/application/
+COPY packages/cli/package.json ./packages/cli/
+COPY packages/core-domain/package.json ./packages/core-domain/
+COPY packages/infrastructure/package.json ./packages/infrastructure/
+COPY packages/job-worker/package.json ./packages/job-worker/
+
 # Copy source code
 COPY . .
 
