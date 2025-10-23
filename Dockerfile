@@ -54,6 +54,9 @@ COPY --from=deps /app/packages/*/node_modules ./packages/*/node_modules
 # Copy source code
 COPY . .
 
+# Install TypeScript for building
+RUN bun add -D typescript @types/node
+
 # Run type checking and build all packages
 RUN bun run typecheck
 RUN bun run build
