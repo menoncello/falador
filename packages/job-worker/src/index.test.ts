@@ -21,6 +21,7 @@ describe('Job Worker', () => {
       updatedAt: new Date(),
     };
 
-    await expect(processor.processJob(job)).resolves.not.toThrow();
+    const result = processor.processJob(job);
+    await expect(result).resolves.toBeUndefined();
   });
 });
