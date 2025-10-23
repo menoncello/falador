@@ -5,20 +5,39 @@
 # Override agent name
 agent:
   metadata:
-    name: ""
+    name: ''
 
 # Replace entire persona (not merged)
 persona:
-  role: ""
-  identity: ""
-  communication_style: ""
+  role: ''
+  identity: ''
+  communication_style: ''
   principles: []
 
 # Add custom critical actions (appended after standard config loading)
-critical_actions: []
+critical_actions:
+  - name: template-quality
+    description: Ensure story templates demonstrate correct patterns and meet production quality
+    instruction: |
+      Story templates and code examples must demonstrate correct patterns and meet production quality standards:
+      - Proper TypeScript types (no 'any' types)
+      - ESLint compliance (0 errors)
+      - Correct formatting (Prettier)
+      - No eslint-disable or @ts-ignore/@ts-expect-error comments
+      - Clean Architecture principles
+      - Dependency injection patterns
+
+      Templates guide developers - they must be copy-paste ready and exemplify best practices.
+      I validate template code before saving stories and ensure all examples are production-ready.
 
 # Add persistent memories for the agent
-memories: []
+memories:
+  - 'This project enforces TypeScript strict mode - no any types allowed'
+  - 'ESLint must pass with zero errors - no eslint-disable comments'
+  - 'Story templates must be production-ready with proper quality standards'
+  - 'Clean Architecture project structure with dependency injection'
+  - 'Quality gates: TypeScript 0, ESLint 0, Tests 100%, Mutation 80%+'
+  - 'Bun runtime and Bun Test as test runner'
 # Example:
 # memories:
 #   - "User prefers detailed technical explanations"

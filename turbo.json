@@ -10,8 +10,15 @@
       "dependsOn": ["build"],
       "cache": false
     },
+    "test:mutate": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
     "lint": {
       "dependsOn": ["^lint"]
+    },
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"]
     },
     "typecheck": {
       "dependsOn": ["^typecheck"]

@@ -1,41 +1,16 @@
-import { Elysia } from 'elysia';
-import { db } from './database';
-import { authRoutes } from './routes/auth';
-import { projectRoutes } from './routes/projects';
+/**
+ * API Gateway
+ * Main application entry point
+ */
 
-const PORT = 3000;
+import { Elysia } from 'elysia';
+
+const API_PORT = 3000;
 
 const app = new Elysia()
-  // Health check endpoint
-  .get('/health', () => ({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    service: 'falador-api-gateway',
-  }))
+  .get('/', () => ({ message: 'Falador API Gateway - Audio Book Generator' }));
 
-  // Mount route modules
-  .use(authRoutes)
-  .use(projectRoutes)
+// Function to start the server when needed
+export const startServer = (): unknown => app.listen(API_PORT);
 
-  // User cleanup endpoint (for testing)
-  .delete('/api/users/:id', ({ params, set }) => {
-    const deleted = db.deleteUser(params.id);
-    if (!deleted) {
-      set.status = 404;
-      return { error: 'User not found' };
-    }
-    set.status = 204;
-    return null;
-  })
-
-  .listen(PORT);
-
-// Only log in development/non-test environments
-if (process.env.NODE_ENV !== 'test') {
-  console.log(
-    `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-  );
-}
-
-export type App = typeof app;
-export { app };
+export { app, API_PORT };

@@ -7,6 +7,7 @@
     "packages/*"
   ],
   "scripts": {
+    "build": "bun turbo run build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -18,35 +19,52 @@
     "test:mutate:report": "stryker run --reporters html,dashboard",
     "turbo:mutate": "bun turbo run test:mutate",
     "turbo:mutate:report": "bun turbo run test:mutate:report",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --project=e2e",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report test-results/html",
     "test:api": "playwright test --project=api",
+    "test:all": "playwright test",
+    "test:setup": "./scripts/setup-test-db.sh",
+    "test:teardown": "./scripts/teardown-test-db.sh",
+    "test:full": "npm run test:setup && npm run test:all && npm run test:teardown",
+    "test:mock": "USE_MOCK_API=true bunx playwright test --project=api",
+    "test:mock:all": "USE_MOCK_API=true bunx playwright test",
+    "test:real": "USE_MOCK_API=false npm run test:setup && npm run test:api && npm run test:teardown",
     "quality-gates": "bun run typecheck && bun run lint && bun run format:check && bun test && bun run test:mutate",
+    "security:audit": "bun audit",
+    "security:scan": "./scripts/security-scan.sh",
+    "security:check": "bun run security:audit && bun run security:scan",
+    "load:test": "bun run start:test-server & bun run load:test:health && kill %1",
+    "load:test:health": "bun scripts/run-load-tests.ts health",
+    "load:test:auth": "bun run start:test-server & bun run load:test:auth && kill %1",
+    "load:test:projects": "bun run start:test-server & bun run load:test:projects && kill %1",
+    "load:test:all": "bun run start:test-server & bun run load:test:all && kill %1",
+    "start:test-server": "bun --watch packages/api-gateway/src/index.ts",
     "prepare": "husky"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.1.0",
     "@commitlint/config-conventional": "^20.0.0",
     "@faker-js/faker": "^10.1.0",
-    "@playwright/test": "^1.49.1",
+    "@playwright/test": "^1.56.1",
     "@stryker-mutator/core": "^9.2.0",
     "@stryker-mutator/typescript-checker": "^9.2.0",
     "@types/bun": "^1.3.0",
+    "@types/reflect-metadata": "^0.1.0",
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",
     "c8": "10.1.3",
-    "eslint": "^9.37.0",
+    "eslint": "^9.38.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^61.1.4",
     "eslint-plugin-sonarjs": "^3.0.5",
     "eslint-plugin-unicorn": "^61.0.2",
-    "husky": "^9.0.0",
+    "husky": "^9.1.7",
     "lint-staged": "^16.2.4",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.2",
     "turbo": "2.5.8",
     "yaml": "^2.8.1"
   },
@@ -61,5 +79,9 @@
     "*.{json,md,yaml,yml}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.10.0"
   }
 }

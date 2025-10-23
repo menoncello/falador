@@ -124,7 +124,8 @@ Implement automated quality scoring algorithm analyzing generated audio files.
 export class AnalyzeAudioQualityUseCase {
   constructor(
     @inject('AudioAnalyzer') private analyzer: AudioAnalyzer,
-    @inject('QualityScoreRepository') private repository: QualityScoreRepository,
+    @inject('QualityScoreRepository')
+    private repository: QualityScoreRepository,
     @inject('Logger') private logger: Logger
   ) {}
 
@@ -159,17 +160,17 @@ export class AnalyzeAudioQualityUseCase {
     const weights = {
       pronunciation: 0.35,
       naturalness: 0.25,
-      pacing: 0.20,
+      pacing: 0.2,
       clarity: 0.15,
       emotionalTone: 0.05,
     };
 
     return Math.round(
       metrics.pronunciation * weights.pronunciation +
-      metrics.naturalness * weights.naturalness +
-      metrics.pacing * weights.pacing +
-      metrics.clarity * weights.clarity +
-      metrics.emotionalTone * weights.emotionalTone
+        metrics.naturalness * weights.naturalness +
+        metrics.pacing * weights.pacing +
+        metrics.clarity * weights.clarity +
+        metrics.emotionalTone * weights.emotionalTone
     );
   }
 
@@ -244,7 +245,7 @@ export class AudioAnalyzerAdapter implements AudioAnalyzer {
 
     // Portuguese typical spectral centroid: 2000-3000 Hz
     const distance = Math.abs(spectralCentroid - 2500);
-    const score = Math.max(0, 100 - (distance / 10));
+    const score = Math.max(0, 100 - distance / 10);
 
     return Math.round(score);
   }
@@ -273,7 +274,7 @@ export class AudioAnalyzerAdapter implements AudioAnalyzer {
     }
 
     const distance = Math.abs(silencePercentage - 12.5);
-    const score = Math.max(0, 100 - (distance * 5));
+    const score = Math.max(0, 100 - distance * 5);
 
     return Math.round(score);
   }
@@ -326,7 +327,9 @@ export class GenerateQualityReportUseCase {
     return report;
   }
 
-  private getScoreStatus(score: number): 'excellent' | 'good' | 'fair' | 'poor' {
+  private getScoreStatus(
+    score: number
+  ): 'excellent' | 'good' | 'fair' | 'poor' {
     if (score >= 90) return 'excellent';
     if (score >= 75) return 'good';
     if (score >= 60) return 'fair';
@@ -336,14 +339,20 @@ export class GenerateQualityReportUseCase {
   private generateRecommendations(scores: QualityScore[]): string[] {
     const recommendations: string[] = [];
 
-    const avgPronunciation = this.average(scores.map((s) => s.metrics.pronunciation));
+    const avgPronunciation = this.average(
+      scores.map((s) => s.metrics.pronunciation)
+    );
     if (avgPronunciation < 70) {
-      recommendations.push('Consider adding pronunciation corrections for technical terms');
+      recommendations.push(
+        'Consider adding pronunciation corrections for technical terms'
+      );
     }
 
     const avgPacing = this.average(scores.map((s) => s.metrics.pacing));
     if (avgPacing < 70) {
-      recommendations.push('Adjust speed settings (current pacing may be too fast/slow)');
+      recommendations.push(
+        'Adjust speed settings (current pacing may be too fast/slow)'
+      );
     }
 
     return recommendations;
@@ -412,7 +421,9 @@ export class PronunciationDictionary {
 // presentation/controllers/pronunciation.controller.ts
 export class PronunciationController {
   @Post('/api/v1/pronunciation')
-  async createEntry(@Body() dto: CreatePronunciationEntryDTO): Promise<PronunciationEntry> {
+  async createEntry(
+    @Body() dto: CreatePronunciationEntryDTO
+  ): Promise<PronunciationEntry> {
     return this.createPronunciationEntryUseCase.execute(dto);
   }
 
@@ -442,13 +453,19 @@ export class PronunciationController {
   }
 
   @Post('/api/v1/pronunciation/import')
-  async importDictionary(@Body() dto: ImportDictionaryDTO): Promise<{ imported: number }> {
+  async importDictionary(
+    @Body() dto: ImportDictionaryDTO
+  ): Promise<{ imported: number }> {
     return this.importDictionaryUseCase.execute(dto);
   }
 
   @Get('/api/v1/pronunciation/export')
-  async exportDictionary(@Query('projectId') projectId: string): Promise<Buffer> {
-    const entries = await this.listPronunciationEntriesUseCase.execute({ projectId });
+  async exportDictionary(
+    @Query('projectId') projectId: string
+  ): Promise<Buffer> {
+    const entries = await this.listPronunciationEntriesUseCase.execute({
+      projectId,
+    });
     return this.exportAsJSON(entries);
   }
 }
@@ -462,7 +479,9 @@ Web interface for managing pronunciation corrections.
 // packages/web/src/components/quality/PhoneticEditor.tsx
 export function PhoneticEditor({ projectId }: Props) {
   const [entries, setEntries] = useState<PronunciationEntry[]>([]);
-  const [selectedEntry, setSelectedEntry] = useState<PronunciationEntry | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<PronunciationEntry | null>(
+    null
+  );
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -470,9 +489,7 @@ export function PhoneticEditor({ projectId }: Props) {
       <div className="border rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-4">Pronunciation Dictionary</h3>
 
-        <Button onClick={() => setShowAddModal(true)}>
-          Add Entry
-        </Button>
+        <Button onClick={() => setShowAddModal(true)}>Add Entry</Button>
 
         <div className="mt-4 space-y-2">
           {entries.map((entry) => (
@@ -523,7 +540,11 @@ function PronunciationForm({ entry, onSave, onPreview }: Props) {
 
       <div>
         <label>Pronunciation</label>
-        <input {...register('pronunciation')} className="input" placeholder="e.g., KokoroTTS → koh-koh-roh tee-tee-ess" />
+        <input
+          {...register('pronunciation')}
+          className="input"
+          placeholder="e.g., KokoroTTS → koh-koh-roh tee-tee-ess"
+        />
         <p className="text-xs text-gray-500 mt-1">
           Use phonetic spelling or SSML syntax
         </p>
@@ -531,7 +552,11 @@ function PronunciationForm({ entry, onSave, onPreview }: Props) {
 
       <div>
         <label>Context (optional)</label>
-        <input {...register('context')} className="input" placeholder="e.g., technical term, brand name" />
+        <input
+          {...register('context')}
+          className="input"
+          placeholder="e.g., technical term, brand name"
+        />
       </div>
 
       <div className="flex gap-2">
@@ -556,9 +581,17 @@ export class PronunciationSuggester {
     { pattern: /\bAPI\b/gi, suggestion: 'a-pê-i', reason: 'Acronym' },
     { pattern: /\bHTML\b/gi, suggestion: 'agá-tê-eme-éle', reason: 'Acronym' },
     { pattern: /\bSQL\b/gi, suggestion: 'essee-cu-éle', reason: 'Acronym' },
-    { pattern: /\bJavaScript\b/gi, suggestion: 'Java Script', reason: 'Brand name' },
+    {
+      pattern: /\bJavaScript\b/gi,
+      suggestion: 'Java Script',
+      reason: 'Brand name',
+    },
     // Brazilian tech terms
-    { pattern: /\bbugfix\b/gi, suggestion: 'bá-gui-fíxe', reason: 'English term' },
+    {
+      pattern: /\bbugfix\b/gi,
+      suggestion: 'bá-gui-fíxe',
+      reason: 'English term',
+    },
   ];
 
   async suggestCorrections(text: string): Promise<PronunciationSuggestion[]> {
@@ -589,8 +622,10 @@ export class PronunciationSuggester {
 // application/use-cases/regenerate-chapters.use-case.ts
 export class RegenerateChaptersUseCase {
   constructor(
-    @inject('AudioGenerationService') private audioService: AudioGenerationService,
-    @inject('PronunciationDictionary') private dictionary: PronunciationDictionaryService,
+    @inject('AudioGenerationService')
+    private audioService: AudioGenerationService,
+    @inject('PronunciationDictionary')
+    private dictionary: PronunciationDictionaryService,
     @inject('JobQueue') private jobQueue: JobQueue
   ) {}
 
@@ -678,7 +713,9 @@ Show differences between old and new audio generations.
 // packages/web/src/components/quality/RegenerationDiff.tsx
 export function RegenerationDiff({ chapterId }: Props) {
   const [versions, setVersions] = useState<AudioVersion[]>([]);
-  const [selectedVersions, setSelectedVersions] = useState<[number, number]>([0, 1]);
+  const [selectedVersions, setSelectedVersions] = useState<[number, number]>([
+    0, 1,
+  ]);
 
   return (
     <div className="space-y-4">
@@ -704,9 +741,13 @@ export function RegenerationDiff({ chapterId }: Props) {
       <div className="border rounded p-4 bg-blue-50">
         <h4>Changes Applied</h4>
         <ul className="list-disc ml-4">
-          {versions[selectedVersions[1]].changes.pronunciationUpdates.map((update) => (
-            <li key={update}>{update.word} → {update.pronunciation}</li>
-          ))}
+          {versions[selectedVersions[1]].changes.pronunciationUpdates.map(
+            (update) => (
+              <li key={update}>
+                {update.word} → {update.pronunciation}
+              </li>
+            )
+          )}
         </ul>
       </div>
     </div>
@@ -742,11 +783,13 @@ Provide user guides for quality improvement workflows.
 **Decision:** Use signal processing heuristics (v1.0), plan ML-based approach (v2.0)
 
 **Rationale:**
+
 - Heuristics (SNR, spectral analysis) provide immediate value
 - ML models require training data (transcripts + quality ratings)
 - Collect data during v1.0 to train v2.0 models
 
 **Migration Path:**
+
 - Month 8: Collect quality ratings from users (thumbs up/down per chapter)
 - Month 12: Train ML model on collected data
 - Month 14: Deploy ML-based quality scorer
@@ -756,11 +799,13 @@ Provide user guides for quality improvement workflows.
 **Decision:** Store phonetic spelling, support SSML subset
 
 **Rationale:**
+
 - Phonetic spelling easier for non-technical users
 - SSML provides advanced control (pitch, rate, volume)
 - TTS engine translates both formats
 
 **Format Examples:**
+
 ```
 Word: API
 Phonetic: a-pê-i
@@ -776,6 +821,7 @@ SSML: JavaScript (space for pause)
 **Decision:** Keep last 3 audio versions per chapter
 
 **Rationale:**
+
 - Version history enables rollback
 - Diff comparison shows quality improvements
 - Storage cost: 3x per chapter (acceptable for 10-30 chapters)

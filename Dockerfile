@@ -7,15 +7,27 @@ FROM oven/bun:1.3 AS deps
 WORKDIR /app
 
 # Copy package files for the entire workspace
-COPY package.json bun.lockb ./
-COPY packages/api-gateway/package.json ./packages/api-gateway/
-COPY packages/cli/package.json ./packages/cli/
-COPY packages/core-domain/package.json ./packages/core-domain/
-COPY packages/job-worker/package.json ./packages/job-worker/
+COPY package.json bun.lock ./
 
 # Install all dependencies for building
 # Ignore prepare scripts (husky) as they're only needed for local development
 RUN bun install --no-cache --ignore-scripts
+
+# Copy individual package files to ensure workspace dependencies are resolved
+COPY packages/api-gateway/package.json ./packages/api-gateway/
+COPY packages/application/package.json ./packages/application/
+COPY packages/cli/package.json ./packages/cli/
+COPY packages/core-domain/package.json ./packages/core-domain/
+COPY packages/infrastructure/package.json ./packages/infrastructure/
+COPY packages/job-worker/package.json ./packages/job-worker/
+
+# Install package-specific dependencies
+RUN bun install --no-cache --ignore-scripts --filter="@falador/api-gateway"
+RUN bun install --no-cache --ignore-scripts --filter="@falador/application"
+RUN bun install --no-cache --ignore-scripts --filter="@falador/cli"
+RUN bun install --no-cache --ignore-scripts --filter="@falador/core-domain"
+RUN bun install --no-cache --ignore-scripts --filter="@falador/infrastructure"
+RUN bun install --no-cache --ignore-scripts --filter="@falador/job-worker"
 
 # Stage 2: Builder
 # Build TypeScript code for all packages using Turborepo
@@ -26,12 +38,24 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV BUILDKIT_INLINE_CACHE=1
 
+# Copy package files first
+COPY package.json bun.lock ./
+COPY packages/api-gateway/package.json ./packages/api-gateway/
+COPY packages/application/package.json ./packages/application/
+COPY packages/cli/package.json ./packages/cli/
+COPY packages/core-domain/package.json ./packages/core-domain/
+COPY packages/infrastructure/package.json ./packages/infrastructure/
+COPY packages/job-worker/package.json ./packages/job-worker/
+
 # Copy all dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/packages/*/node_modules ./packages/*/node_modules
 
 # Copy source code
 COPY . .
+
+# Install TypeScript for building
+RUN bun add -D typescript @types/node
 
 # Run type checking and build all packages
 RUN bun run typecheck
@@ -52,20 +76,20 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 bunuser
 
 # Copy package files
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 COPY packages/api-gateway/package.json ./packages/api-gateway/
+COPY packages/application/package.json ./packages/application/
+COPY packages/cli/package.json ./packages/cli/
+COPY packages/core-domain/package.json ./packages/core-domain/
+COPY packages/infrastructure/package.json ./packages/infrastructure/
 COPY packages/job-worker/package.json ./packages/job-worker/
 
 # Copy only production dependencies from deps stage
 COPY --from=deps --chown=bunuser:nodejs /app/node_modules ./node_modules
-COPY --from=deps --chown=bunuser:nodejs /app/packages/api-gateway/node_modules ./packages/api-gateway/
-COPY --from=deps --chown=bunuser:nodejs /app/packages/job-worker/node_modules ./packages/job-worker/
+COPY --from=deps --chown=bunuser:nodejs /app/packages/*/node_modules ./packages/*/
 
 # Copy built artifacts from builder stage
-COPY --from=builder --chown=bunuser:nodejs /app/packages/api-gateway/dist ./packages/api-gateway/dist
-COPY --from=builder --chown=bunuser:nodejs /app/packages/cli/dist ./packages/cli/dist
-COPY --from=builder --chown=bunuser:nodejs /app/packages/core-domain/dist ./packages/core-domain/dist
-COPY --from=builder --chown=bunuser:nodejs /app/packages/job-worker/dist ./packages/job-worker/dist
+COPY --from=builder --chown=bunuser:nodejs /app/packages/*/dist ./packages/*/
 
 # Switch to non-root user
 USER bunuser
@@ -75,7 +99,7 @@ EXPOSE 3000
 
 # Health check for API Gateway
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD bun run --bun /app/packages/api-gateway/dist/index.js || exit 1
+  CMD bun run --bun -e "import('./packages/api-gateway/src/index.js').then(m => m.startServer())" || exit 1
 
 # Default command starts API Gateway (can be overridden for different services)
-CMD ["bun", "run", "--bun", "/app/packages/api-gateway/dist/index.js"]
+CMD ["bun", "run", "--bun", "-e", "import('./packages/api-gateway/src/index.js').then(m => m.startServer())"]

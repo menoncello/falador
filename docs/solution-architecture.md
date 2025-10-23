@@ -15,6 +15,7 @@ Falador is an enterprise-scale AI-directed TTS platform for Brazilian Portuguese
 **Interfaces:** CLI (Bun executable), Web Dashboard (Astro), REST API (Elysia)
 
 **Key Architectural Drivers:**
+
 - Clean Architecture with dependency injection (constructor-based)
 - Plugin-based extensibility (SOLID compliance)
 - Adapter pattern for TTS engines and external integrations
@@ -22,6 +23,7 @@ Falador is an enterprise-scale AI-directed TTS platform for Brazilian Portuguese
 - Multi-tenant with role-based access control
 
 **Scale Requirements:**
+
 - 99.9% uptime, 1,000+ concurrent requests
 - 10,000+ hours monthly audio generation by Year 3
 - Horizontal scaling via Cloud Run auto-scaling
@@ -31,55 +33,56 @@ Falador is an enterprise-scale AI-directed TTS platform for Brazilian Portuguese
 
 ### 1.1 Technology and Library Decision Table
 
-| Category | Technology | Version | Justification |
-|----------|------------|---------|---------------|
-| **Runtime** | Bun | 1.3.0 | Native TypeScript execution, 3x faster than Node.js, built-in test runner, native SQLite support, optimized for serverless |
-| **Backend Framework** | Elysia | 1.4.12 | TypeScript-first, Bun-optimized, 20x faster than Express, built-in validation, OpenAPI generation, 0.16ms overhead |
-| **Frontend Framework** | Astro | 5.14.5 | Island architecture, minimal JS shipped, optimal for content-heavy dashboard, React/Vue/Svelte interop |
-| **Language** | TypeScript | 5.9.3 | Strict type safety, excellent IDE support, team expertise, enforced via eslint.config.js |
-| **Database** | PostgreSQL | 17.4 | ACID compliance, JSON support, proven scalability, GCP Cloud SQL managed service |
-| **ORM/Query Builder** | Drizzle ORM | 0.44.6 | TypeScript-first, lightweight, type-safe queries, migration support, Bun-compatible |
-| **Queue System** | BullMQ | 5.61.0 | Redis-based, distributed job processing, retry logic, priority queues, webhook delivery |
-| **Cache** | Node LRU Cache | 12.0.0 | In-memory caching, TTL support, simple API, no external dependencies |
-| **Authentication** | Lucia Auth | 3.2.2 | Session-based auth, type-safe, framework-agnostic, CSRF protection, OAuth provider support |
-| **Validation** | Valibot | 1.1.0 | Schema validation, 10x smaller than Zod, tree-shakeable, Bun-optimized |
-| **Testing Framework** | Bun Test | Built-in | Native Bun test runner, fast execution, Jest-compatible API |
-| **Mutation Testing** | Stryker | 0.35.1 | 80% mutation score threshold (per CLAUDE.md), comprehensive test quality validation |
-| **API Documentation** | Scalar | 1.37.4 | OpenAPI-based, interactive docs, TypeScript SDK generation |
-| **CLI Framework** | Commander.js | 14.0.1 | Robust command routing, help generation, subcommands, option parsing |
-| **Audio Processing** | FFmpeg | 7.1.0 | Industry standard, format conversion, metadata embedding, chapter markers |
-| **TTS Engine** | KokoroTTS | Latest | Brazilian Portuguese optimization, voice cloning support, MIT license |
-| **File Parsing - EPUB** | epub2 | 3.0.2 | EPUB 2/3 support, chapter extraction, metadata parsing |
-| **File Parsing - PDF** | pdf-parse | 2.4.3 | Text extraction, layout preservation, metadata extraction |
-| **File Parsing - Markdown** | marked | 16.4.0 | CommonMark compliant, heading detection, frontmatter support |
-| **Logging** | pino | 10.0.0 | High-performance, structured logging, log levels, cloud-friendly JSON output |
-| **Environment Config** | dotenv | 16.5.0 | Environment variable management, .env file support |
-| **DI Container** | tsyringe | 4.8.0 | Lightweight dependency injection, decorator-based, constructor injection support |
-| **Cloud Storage** | @google-cloud/storage | 7.15.0 | GCS SDK, signed URLs, streaming uploads, lifecycle management |
-| **Cloud SQL** | @google-cloud/sql | Built-in | PostgreSQL connection pooling, IAM authentication |
-| **Redis Client** | ioredis | 5.8.1 | Redis connection, BullMQ requirement, cluster support, TypeScript types |
-| **Webhook Delivery** | svix | 1.48.0 | Webhook infrastructure, retry logic, signature verification, delivery tracking |
-| **Rate Limiting** | @elysiajs/rate-limit | 1.3.0 | Elysia plugin, memory/Redis storage, per-route limits, IP/user-based |
-| **CORS** | @elysiajs/cors | 1.4.0 | Elysia CORS plugin, configurable origins, credentials support |
-| **Static Files** | @elysiajs/static | 1.4.4 | Elysia static file serving, compression, caching headers |
-| **Linting** | ESLint | 9.37.0 | Code quality, TypeScript support, strict rules (see eslint.config.js) |
-| **Code Formatting** | Prettier | 3.5.3 | Consistent formatting, auto-fix, pre-commit hooks |
-| **Git Hooks** | Husky | 9.2.0 | Pre-commit linting, test execution, commit message validation |
-| **Monorepo Tools** | Turborepo | 2.5.8 | Build orchestration, caching, parallel task execution |
-| **Component Library** | Tailwind CSS | 4.1.14 | Utility-first CSS, responsive design, design system from UX spec |
-| **Headless UI** | @headlessui/react | 2.2.9 | Accessible components, React integration, keyboard navigation |
-| **Radix UI** | @radix-ui/themes | 3.2.1 | Low-level UI primitives, accessibility, composability |
-| **Icons** | lucide-react | 0.546.0 | Consistent icon set, tree-shakeable, TypeScript support |
-| **Audio Player** | Howler.js | 2.2.4 | Web audio playback, format support, streaming, waveform visualization |
-| **Charts/Visualization** | Chart.js | 4.4.7 | Quality metrics, usage analytics, responsive charts |
-| **E2E Testing** | Playwright | 1.56.1 | Cross-browser testing, headless execution, CI/CD integration |
-| **Code Coverage** | c8 | 10.1.3 | Coverage reporting, 80% minimum threshold |
-| **CI/CD** | GitHub Actions | N/A | Automated testing, deployment pipelines, matrix builds |
-| **Containerization** | Docker | 28.0.1 | Multi-stage builds, Cloud Run deployment, local dev environment |
-| **Error Tracking** | Sentry | 10.20.0 | Exception tracking, performance monitoring, release tracking (Epic 2+) |
-| **IaC (Future)** | Terraform | 1.11.3 | GCP infrastructure provisioning, state management |
+| Category                    | Technology            | Version  | Justification                                                                                                              |
+| --------------------------- | --------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------- |
+| **Runtime**                 | Bun                   | 1.3.0    | Native TypeScript execution, 3x faster than Node.js, built-in test runner, native SQLite support, optimized for serverless |
+| **Backend Framework**       | Elysia                | 1.4.12   | TypeScript-first, Bun-optimized, 20x faster than Express, built-in validation, OpenAPI generation, 0.16ms overhead         |
+| **Frontend Framework**      | Astro                 | 5.14.5   | Island architecture, minimal JS shipped, optimal for content-heavy dashboard, React/Vue/Svelte interop                     |
+| **Language**                | TypeScript            | 5.9.3    | Strict type safety, excellent IDE support, team expertise, enforced via eslint.config.js                                   |
+| **Database**                | PostgreSQL            | 17.4     | ACID compliance, JSON support, proven scalability, GCP Cloud SQL managed service                                           |
+| **ORM/Query Builder**       | Drizzle ORM           | 0.44.6   | TypeScript-first, lightweight, type-safe queries, migration support, Bun-compatible                                        |
+| **Queue System**            | BullMQ                | 5.61.0   | Redis-based, distributed job processing, retry logic, priority queues, webhook delivery                                    |
+| **Cache**                   | Node LRU Cache        | 12.0.0   | In-memory caching, TTL support, simple API, no external dependencies                                                       |
+| **Authentication**          | Lucia Auth            | 3.2.2    | Session-based auth, type-safe, framework-agnostic, CSRF protection, OAuth provider support                                 |
+| **Validation**              | Valibot               | 1.1.0    | Schema validation, 10x smaller than Zod, tree-shakeable, Bun-optimized                                                     |
+| **Testing Framework**       | Bun Test              | Built-in | Native Bun test runner, fast execution, Jest-compatible API                                                                |
+| **Mutation Testing**        | Stryker               | 0.35.1   | 80% mutation score threshold (per CLAUDE.md), comprehensive test quality validation                                        |
+| **API Documentation**       | Scalar                | 1.37.4   | OpenAPI-based, interactive docs, TypeScript SDK generation                                                                 |
+| **CLI Framework**           | Commander.js          | 14.0.1   | Robust command routing, help generation, subcommands, option parsing                                                       |
+| **Audio Processing**        | FFmpeg                | 7.1.0    | Industry standard, format conversion, metadata embedding, chapter markers                                                  |
+| **TTS Engine**              | KokoroTTS             | Latest   | Brazilian Portuguese optimization, voice cloning support, MIT license                                                      |
+| **File Parsing - EPUB**     | epub2                 | 3.0.2    | EPUB 2/3 support, chapter extraction, metadata parsing                                                                     |
+| **File Parsing - PDF**      | pdf-parse             | 2.4.3    | Text extraction, layout preservation, metadata extraction                                                                  |
+| **File Parsing - Markdown** | marked                | 16.4.0   | CommonMark compliant, heading detection, frontmatter support                                                               |
+| **Logging**                 | pino                  | 10.0.0   | High-performance, structured logging, log levels, cloud-friendly JSON output                                               |
+| **Environment Config**      | dotenv                | 16.5.0   | Environment variable management, .env file support                                                                         |
+| **DI Container**            | tsyringe              | 4.8.0    | Lightweight dependency injection, decorator-based, constructor injection support                                           |
+| **Cloud Storage**           | @google-cloud/storage | 7.15.0   | GCS SDK, signed URLs, streaming uploads, lifecycle management                                                              |
+| **Cloud SQL**               | @google-cloud/sql     | Built-in | PostgreSQL connection pooling, IAM authentication                                                                          |
+| **Redis Client**            | ioredis               | 5.8.1    | Redis connection, BullMQ requirement, cluster support, TypeScript types                                                    |
+| **Webhook Delivery**        | svix                  | 1.48.0   | Webhook infrastructure, retry logic, signature verification, delivery tracking                                             |
+| **Rate Limiting**           | @elysiajs/rate-limit  | 1.3.0    | Elysia plugin, memory/Redis storage, per-route limits, IP/user-based                                                       |
+| **CORS**                    | @elysiajs/cors        | 1.4.0    | Elysia CORS plugin, configurable origins, credentials support                                                              |
+| **Static Files**            | @elysiajs/static      | 1.4.4    | Elysia static file serving, compression, caching headers                                                                   |
+| **Linting**                 | ESLint                | 9.37.0   | Code quality, TypeScript support, strict rules (see eslint.config.js)                                                      |
+| **Code Formatting**         | Prettier              | 3.5.3    | Consistent formatting, auto-fix, pre-commit hooks                                                                          |
+| **Git Hooks**               | Husky                 | 9.2.0    | Pre-commit linting, test execution, commit message validation                                                              |
+| **Monorepo Tools**          | Turborepo             | 2.5.8    | Build orchestration, caching, parallel task execution                                                                      |
+| **Component Library**       | Tailwind CSS          | 4.1.14   | Utility-first CSS, responsive design, design system from UX spec                                                           |
+| **Headless UI**             | @headlessui/react     | 2.2.9    | Accessible components, React integration, keyboard navigation                                                              |
+| **Radix UI**                | @radix-ui/themes      | 3.2.1    | Low-level UI primitives, accessibility, composability                                                                      |
+| **Icons**                   | lucide-react          | 0.546.0  | Consistent icon set, tree-shakeable, TypeScript support                                                                    |
+| **Audio Player**            | Howler.js             | 2.2.4    | Web audio playback, format support, streaming, waveform visualization                                                      |
+| **Charts/Visualization**    | Chart.js              | 4.4.7    | Quality metrics, usage analytics, responsive charts                                                                        |
+| **E2E Testing**             | Playwright            | 1.56.1   | Cross-browser testing, headless execution, CI/CD integration                                                               |
+| **Code Coverage**           | c8                    | 10.1.3   | Coverage reporting, 80% minimum threshold                                                                                  |
+| **CI/CD**                   | GitHub Actions        | N/A      | Automated testing, deployment pipelines, matrix builds                                                                     |
+| **Containerization**        | Docker                | 28.0.1   | Multi-stage builds, Cloud Run deployment, local dev environment                                                            |
+| **Error Tracking**          | Sentry                | 10.20.0  | Exception tracking, performance monitoring, release tracking (Epic 2+)                                                     |
+| **IaC (Future)**            | Terraform             | 1.11.3   | GCP infrastructure provisioning, state management                                                                          |
 
 **Key Technology Principles:**
+
 - **Bun-native features prioritized**: Native test runner, SQLite, fast module resolution
 - **No `any` types**: Strict TypeScript enforcement via ESLint config
 - **Classes/interfaces over functions**: SOLID compliance, DI-friendly architecture
@@ -93,6 +96,7 @@ Falador is an enterprise-scale AI-directed TTS platform for Brazilian Portuguese
 **Modular Monolith with Plugin Architecture**
 
 **Core Principles:**
+
 - **Clean Architecture** (Domain → Application → Infrastructure → Presentation)
 - **Plugin-based extensibility** (SOLID Open/Closed Principle)
 - **Adapter pattern** for external systems (TTS engines, file parsers, platform integrations)
@@ -165,6 +169,7 @@ app.post('/api/audio/generate', async ({ body }) => {
 ```
 
 **Dependency Flow:**
+
 - **CLI/Web/API** → **Application Use Cases** → **Domain Services (Plugins)** → **Infrastructure Adapters**
 - All dependencies point inward toward domain core
 - No circular dependencies (enforced by ESLint import rules)
@@ -172,6 +177,7 @@ app.post('/api/audio/generate', async ({ body }) => {
 ### 2.2 Interface-Specific Architecture
 
 **CLI Application (Bun Executable):**
+
 - **Entry Point**: `packages/cli/src/index.ts`
 - **Command Structure**: `falador [command] [subcommand] [options]`
 - **File I/O**: Local file handling, config management (~/.falador/config)
@@ -180,6 +186,7 @@ app.post('/api/audio/generate', async ({ body }) => {
 - **Output**: Colored terminal output (chalk), progress bars, JSON mode for scripting
 
 **Web Dashboard (Astro):**
+
 - **Architecture**: Island architecture (partial hydration)
 - **Static Pages**: Landing, docs, pricing (pre-rendered at build time)
 - **Dynamic Islands**: Audio player, project dashboard, voice library (React components)
@@ -189,6 +196,7 @@ app.post('/api/audio/generate', async ({ body }) => {
 - **Deployment**: Static assets to GCS, served via Cloud CDN
 
 **REST API (Elysia):**
+
 - **Entry Point**: `packages/api-gateway/src/index.ts`
 - **OpenAPI**: Auto-generated via Elysia Eden plugin
 - **Authentication**: Lucia session-based + JWT for API keys
@@ -242,12 +250,14 @@ export class AudioGenerationWorker {
 ```
 
 **Job Lifecycle:**
+
 1. API receives request → Creates job → Returns job ID
 2. Client polls status endpoint OR receives webhook
 3. Worker processes job → Updates progress → Saves result
 4. Webhook notifies client on completion/failure
 
 **Retry Strategy:**
+
 - Exponential backoff: 1s, 5s, 30s, 5m, 30m
 - Max attempts: 5
 - Failed jobs moved to dead letter queue for manual inspection
@@ -394,6 +404,7 @@ interface TeamMember {
 ### 3.2 Indexes and Performance
 
 **Critical Indexes:**
+
 ```sql
 CREATE INDEX idx_projects_user_status ON projects(user_id, status);
 CREATE INDEX idx_jobs_project_status ON audio_generation_jobs(project_id, status);
@@ -404,6 +415,7 @@ CREATE INDEX idx_batch_jobs_user_status ON batch_jobs(user_id, status);
 ```
 
 **JSONB Indexes:**
+
 ```sql
 CREATE INDEX idx_projects_metadata_isbn ON projects USING GIN ((metadata->>'isbn'));
 CREATE INDEX idx_voices_metadata ON voices USING GIN (metadata);
@@ -412,6 +424,7 @@ CREATE INDEX idx_voices_metadata ON voices USING GIN (metadata);
 ### 3.3 Data Migration Strategy
 
 **Drizzle ORM Migrations:**
+
 - **Migration Files**: `infrastructure/database/migrations/`
 - **Versioning**: Timestamp-based (e.g., `20250117_create_users.sql`)
 - **Execution**: Automated in CI/CD, manual trigger for production
@@ -419,6 +432,7 @@ CREATE INDEX idx_voices_metadata ON voices USING GIN (metadata);
 - **Seed Data**: Separate seed scripts for development/staging
 
 **Migration Workflow:**
+
 ```bash
 # Generate migration from schema changes
 bun run db:generate
@@ -437,12 +451,14 @@ bun run db:rollback
 **Base URL:** `https://api.falador.ai/v1`
 
 **Authentication:**
+
 - **Session-based** (web dashboard): Lucia sessions, HTTP-only cookies
 - **API Key** (CLI, integrations): `Authorization: Bearer <api_key>` header
 
 **Versioning:** URL-based (`/v1/`) for breaking changes
 
 **Response Format:**
+
 ```typescript
 // Success response
 {
@@ -464,6 +480,7 @@ bun run db:rollback
 ### 4.2 API Routes
 
 **Authentication:**
+
 - `POST /auth/register` - Create user account
 - `POST /auth/login` - Email/password login
 - `POST /auth/logout` - Invalidate session
@@ -472,6 +489,7 @@ bun run db:rollback
 - `DELETE /auth/api-keys/:id` - Revoke API key
 
 **Projects:**
+
 - `GET /projects` - List user projects
 - `POST /projects` - Create project
 - `GET /projects/:id` - Get project details
@@ -480,6 +498,7 @@ bun run db:rollback
 - `POST /projects/:id/upload` - Upload book file
 
 **Audio Generation:**
+
 - `POST /audio/generate` - Queue audio generation job
 - `GET /audio/jobs/:id` - Get job status
 - `GET /audio/jobs/:id/download` - Download generated audio
@@ -487,6 +506,7 @@ bun run db:rollback
 - `DELETE /audio/jobs/:id` - Cancel job
 
 **Voices:**
+
 - `GET /voices` - List available voices
 - `POST /voices/clone` - Upload voice sample for cloning
 - `GET /voices/:id` - Get voice details
@@ -495,24 +515,28 @@ bun run db:rollback
 - `POST /voices/:id/preview` - Generate preview with voice
 
 **Batch Processing:**
+
 - `POST /batch` - Create batch job
 - `GET /batch/:id` - Get batch status
 - `GET /batch/:id/books` - List books in batch
 - `POST /batch/:id/cancel` - Cancel batch job
 
 **Quality & Pronunciation:**
+
 - `GET /pronunciation` - List pronunciation rules
 - `POST /pronunciation` - Add pronunciation rule
 - `DELETE /pronunciation/:id` - Remove rule
 - `GET /quality/score/:audioId` - Get quality score
 
 **Webhooks:**
+
 - `GET /webhooks` - List subscriptions
 - `POST /webhooks` - Create subscription
 - `PATCH /webhooks/:id` - Update subscription
 - `DELETE /webhooks/:id` - Delete subscription
 
 **Distribution (Future):**
+
 - `POST /distribution/acx` - Export to ACX
 - `POST /distribution/audible` - Export to Audible
 - `POST /distribution/spotify` - Export to Spotify
@@ -520,11 +544,13 @@ bun run db:rollback
 ### 4.3 Rate Limiting
 
 **Tier-based Limits:**
+
 - **Free**: 10 requests/minute, 100 requests/hour
 - **Pro**: 60 requests/minute, 1000 requests/hour
 - **Enterprise**: Custom limits (configurable)
 
 **Rate Limit Headers:**
+
 ```
 X-RateLimit-Limit: 60
 X-RateLimit-Remaining: 45
@@ -532,6 +558,7 @@ X-RateLimit-Reset: 1642780800
 ```
 
 **429 Response:**
+
 ```json
 {
   "success": false,
@@ -548,12 +575,14 @@ X-RateLimit-Reset: 1642780800
 ### 5.1 Auth Strategy
 
 **Lucia Auth Integration:**
+
 - Session-based for web dashboard
 - API key authentication for CLI/integrations
 - OAuth providers: Google (Month 6), GitHub (Month 7) - See ADR-011
 - CSRF protection via tokens
 
 **Password Security:**
+
 - bcrypt hashing (cost factor: 12)
 - Minimum 8 characters, complexity requirements
 - Password reset via email token (15-minute expiry)
@@ -564,6 +593,7 @@ X-RateLimit-Reset: 1642780800
 **Session Duration:** 30 days
 **Refresh Strategy:** Sliding window (extends on activity)
 **Cookie Configuration:**
+
 ```typescript
 {
   httpOnly: true,
@@ -577,11 +607,13 @@ X-RateLimit-Reset: 1642780800
 ### 5.3 API Key Management
 
 **Key Generation:**
+
 - Cryptographically secure random (32 bytes)
 - Prefix: `fal_` for easy identification
 - Storage: bcrypt hash only (key shown once at creation)
 
 **Scopes:**
+
 - `audio:read`, `audio:write` - Audio operations
 - `voice:read`, `voice:write` - Voice management
 - `project:read`, `project:write` - Project management
@@ -589,6 +621,7 @@ X-RateLimit-Reset: 1642780800
 - `webhook:write` - Webhook subscriptions
 
 **Key Rotation:**
+
 - Expiration dates (optional)
 - Manual revocation via dashboard/CLI
 - Audit log of key usage
@@ -596,6 +629,7 @@ X-RateLimit-Reset: 1642780800
 ### 5.4 Role-Based Access Control (Enterprise)
 
 **Roles:**
+
 - **Owner**: Full access, billing, team management
 - **Admin**: User management, project settings, RBAC
 - **Editor**: Create/edit projects, generate audio
@@ -617,6 +651,7 @@ X-RateLimit-Reset: 1642780800
 ### 6.1 Plugin Architecture
 
 **Audio Generation Plugin:**
+
 - **TTS Gateway Interface**: Abstract TTS operations
 - **KokoroTTS Adapter**: Primary implementation (Brazilian Portuguese)
 - **Future Adapters**: ElevenLabs, Google Cloud TTS, AWS Polly, Azure Speech
@@ -624,6 +659,7 @@ X-RateLimit-Reset: 1642780800
 - **Quality Validation**: Post-generation scoring
 
 **File Processing Plugin:**
+
 - **EPUB Parser**: epub2 library, chapter extraction, TOC parsing
 - **PDF Parser**: pdf-parse library, text extraction, layout preservation
 - **Markdown Parser**: marked library, heading-based chapter detection
@@ -631,34 +667,40 @@ X-RateLimit-Reset: 1642780800
 - **Unified Interface**: `BookParser` interface for all formats
 
 **Voice Cloning Plugin:**
+
 - **Sample Validation**: Duration, quality, background noise detection
 - **Training Pipeline**: Voice model generation (KokoroTTS fine-tuning)
 - **Quality Assessment**: Automated scoring, user preview
 - **Voice Library**: CRUD operations, metadata management
 
 **Batch Processing Plugin:**
+
 - **Queue Orchestration**: BullMQ job scheduling
 - **Concurrency Control**: Configurable parallel processing
 - **Progress Tracking**: Per-book status, overall batch progress
 - **Error Handling**: Partial failure recovery, retry logic
 
 **Quality Assessment Plugin:**
+
 - **Scoring Algorithm**: Audio quality metrics (0-5 scale)
 - **Pronunciation Service**: Dictionary management, phonetic mapping
 - **Regeneration Workflow**: Selective chapter regeneration
 
 **AI Direction Plugin:**
+
 - **Text Analysis**: Genre detection, sentiment analysis
 - **Narration Optimization**: Tone, pacing, emotional expression
 - **Genre Profiles**: Configurable direction templates (fiction, non-fiction, technical)
 
 **Webhook Plugin:**
+
 - **Event Publishing**: Audio completion, batch status, errors
 - **Delivery Queue**: BullMQ-based retry logic
 - **Signature Verification**: HMAC-SHA256 signatures (svix library)
 - **Subscription Management**: CRUD operations, event filtering
 
 **Distribution Plugin (Future):**
+
 - **ACX Adapter**: Metadata mapping, file requirements, API integration
 - **Audible Adapter**: Format conversion, ISBN validation
 - **Spotify Adapter**: API upload, metadata synchronization
@@ -666,12 +708,14 @@ X-RateLimit-Reset: 1642780800
 ### 6.2 Major Modules
 
 **CLI Application:**
+
 - **Commands**: `auth`, `generate`, `batch`, `voice`, `config`
 - **Configuration**: YAML/JSON config files, environment variables
 - **Progress Display**: Real-time progress bars, ETA calculation
 - **Error Handling**: User-friendly messages, exit codes
 
 **Web Dashboard:**
+
 - **Landing Pages**: Marketing, pricing, docs (static)
 - **Dashboard**: Project overview, recent activity, quick actions
 - **Project Workspace**: Upload, configure, monitor, download
@@ -680,6 +724,7 @@ X-RateLimit-Reset: 1642780800
 - **Settings**: User profile, API keys, team management (enterprise)
 
 **API Gateway:**
+
 - **Request Validation**: Valibot schemas on all routes
 - **Authentication Middleware**: Session/API key verification
 - **Rate Limiting Middleware**: Tier-based limits
@@ -687,6 +732,7 @@ X-RateLimit-Reset: 1642780800
 - **Logging**: Structured request/response logging (pino)
 
 **Job Worker:**
+
 - **Audio Generation Worker**: TTS processing, storage upload
 - **Voice Training Worker**: Model training, quality validation
 - **Batch Processing Worker**: Book processing orchestration
@@ -695,6 +741,7 @@ X-RateLimit-Reset: 1642780800
 ### 6.3 Third-Party Integrations
 
 **GCP Services:**
+
 - **Cloud Run**: API Gateway, Job Worker deployment
 - **Cloud SQL**: PostgreSQL managed database
 - **Cloud Storage**: Audio files, voice models, user uploads
@@ -702,12 +749,14 @@ X-RateLimit-Reset: 1642780800
 - **Cloud Pub/Sub**: Migration from BullMQ at scale (See ADR-012 for trigger criteria and migration plan)
 
 **External APIs:**
+
 - **KokoroTTS**: Primary TTS engine
 - **FFmpeg**: Audio processing, format conversion
 - **Svix**: Webhook delivery infrastructure
 - **OAuth Providers** (Future): Google, GitHub authentication
 
 **Development Tools:**
+
 - **GitHub Actions**: CI/CD pipelines
 - **Docker**: Containerization, local development
 - **Turborepo**: Monorepo build orchestration
@@ -718,24 +767,28 @@ X-RateLimit-Reset: 1642780800
 ### 7.1 Hosting Platform
 
 **GCP Cloud Run:**
+
 - **API Gateway**: Auto-scaling 0-100 instances, CPU: 2, Memory: 4GB
 - **Job Worker**: Dedicated instances for long-running jobs, CPU: 4, Memory: 8GB
 - **Scaling Strategy**: CPU-based (target 80% utilization)
 - **Cold Start Mitigation**: Minimum 1 instance for API Gateway
 
 **Cloud SQL:**
+
 - **Instance Type**: db-n1-standard-2 (2 vCPU, 7.5GB RAM)
 - **Storage**: 100GB SSD, auto-resize enabled
 - **Backups**: Daily automated backups, 7-day retention
 - **High Availability**: Multi-zone replication (production)
 
 **Cloud Storage:**
+
 - **Bucket Structure**: `{env}-falador-audio`, `{env}-falador-voices`, `{env}-falador-uploads`
 - **Lifecycle Policy**: Delete uploads after 30 days, archive audio after 90 days
 - **CDN**: Cloud CDN for audio file delivery
 - **Signed URLs**: Temporary access for large file uploads/downloads
 
 **Redis (Cloud Memorystore):**
+
 - **Instance Type**: Basic tier (dev), Standard tier (production)
 - **Memory**: 5GB (production)
 - **Persistence**: Enabled (RDB snapshots)
@@ -743,11 +796,13 @@ X-RateLimit-Reset: 1642780800
 ### 7.2 Environment Configuration
 
 **Environments:**
+
 - **Development**: Local Docker Compose
 - **Staging**: GCP Cloud Run (us-central1)
 - **Production**: GCP Cloud Run (us-east1)
 
 **Environment Variables:**
+
 ```env
 # Database
 DATABASE_URL=postgresql://user:pass@host:5432/db
@@ -775,6 +830,7 @@ LOG_LEVEL=info
 ### 7.3 CI/CD Pipeline
 
 **GitHub Actions Workflow:**
+
 ```yaml
 # .github/workflows/deploy.yml
 on:
@@ -800,6 +856,7 @@ jobs:
 ```
 
 **Deployment Strategy:**
+
 - **Blue/Green Deployment**: Zero-downtime deployments
 - **Rollback**: Automated on health check failure
 - **Database Migrations**: Run before new revision deployment
@@ -808,6 +865,7 @@ jobs:
 ## 8. Architecture Decision Records
 
 **ADR-001: Why Modular Monolith over Microservices?**
+
 - **Context**: Enterprise-scale platform with multiple interfaces (CLI, Web, API)
 - **Decision**: Modular monolith with plugin architecture
 - **Rationale**:
@@ -819,6 +877,7 @@ jobs:
 - **Consequences**: Single deployment unit, shared database, requires discipline in module boundaries
 
 **ADR-002: Why Bun over Node.js?**
+
 - **Context**: TypeScript runtime for backend services
 - **Decision**: Bun 1.1.34
 - **Rationale**:
@@ -830,6 +889,7 @@ jobs:
 - **Consequences**: Smaller ecosystem, requires team upskilling, excellent documentation available
 
 **ADR-003: Why Elysia over Express/Fastify?**
+
 - **Context**: Backend API framework
 - **Decision**: Elysia 1.1.23
 - **Rationale**:
@@ -841,6 +901,7 @@ jobs:
 - **Consequences**: Smaller community, migration complexity if Bun adoption fails
 
 **ADR-004: Why Astro over Next.js/Nuxt?**
+
 - **Context**: Web dashboard framework
 - **Decision**: Astro 4.16.18
 - **Rationale**:
@@ -852,6 +913,7 @@ jobs:
 - **Consequences**: Less real-time features, requires React for complex interactions
 
 **ADR-005: Why PostgreSQL over MongoDB?**
+
 - **Context**: Primary database for user data, projects, jobs
 - **Decision**: PostgreSQL 16.6
 - **Rationale**:
@@ -863,6 +925,7 @@ jobs:
 - **Consequences**: Schema migrations required, less flexible than NoSQL
 
 **ADR-006: Why Redis + BullMQ over Cloud Tasks?**
+
 - **Context**: Job queue for async processing
 - **Decision**: Redis + BullMQ
 - **Rationale**:
@@ -873,6 +936,7 @@ jobs:
 - **Consequences**: Self-managed Redis (Cloud Memorystore), additional infrastructure complexity
 
 **ADR-007: Why Adapter Pattern for TTS Engines?**
+
 - **Context**: TTS vendor lock-in risk
 - **Decision**: TTS Gateway with vendor-specific adapters
 - **Rationale**:
@@ -883,6 +947,7 @@ jobs:
 - **Consequences**: Additional abstraction layer, consistent interface design required
 
 **ADR-008: Why Constructor Injection over Property Injection?**
+
 - **Context**: Dependency injection pattern
 - **Decision**: Constructor-only injection
 - **Rationale**:
@@ -893,6 +958,7 @@ jobs:
 - **Consequences**: Verbose constructors for complex classes, requires DI container
 
 **ADR-009: Why 80% Mutation Score Threshold?**
+
 - **Context**: Test quality standards
 - **Decision**: Stryker mutation testing with 80% threshold
 - **Rationale**:
@@ -903,6 +969,7 @@ jobs:
 - **Consequences**: Slower CI/CD, requires discipline in test writing
 
 **ADR-010: Why Monorepo over Polyrepo?**
+
 - **Context**: Repository structure for multi-package project
 - **Decision**: Monorepo with Turborepo
 - **Rationale**:
@@ -914,6 +981,7 @@ jobs:
 - **Consequences**: Larger repository, requires monorepo tooling
 
 **ADR-011: OAuth Provider Integration Timeline**
+
 - **Context**: User authentication expansion with social login
 - **Decision**: Defer OAuth integration to Epic 4 completion (post-MVP)
 - **Timeline**:
@@ -939,6 +1007,7 @@ jobs:
 - **Consequences**: MVP users create traditional accounts, can link OAuth later
 
 **ADR-012: Queue Migration Strategy - BullMQ to Cloud Pub/Sub**
+
 - **Context**: Job queue scalability and operational overhead
 - **Decision**: Start with Redis + BullMQ, migrate to Cloud Pub/Sub at scale trigger
 - **Migration Trigger Criteria**:
@@ -976,6 +1045,7 @@ jobs:
 - **Consequences**: Migration effort required at scale, but interface abstraction minimizes risk
 
 **ADR-013: Error Tracking and Monitoring Strategy**
+
 - **Context**: Production error tracking and observability
 - **Decision**: Implement Sentry integration in Epic 2 completion (Month 4 post-launch)
 - **Timeline**:
@@ -999,6 +1069,7 @@ jobs:
      - Alerts: Slack/email notifications for critical errors
      - Cron monitoring: Job worker health checks
 - **Configuration**:
+
   ```typescript
   // infrastructure/logger/sentry-integration.ts
   import * as Sentry from '@sentry/bun';
@@ -1010,7 +1081,7 @@ jobs:
     tracesSampleRate: 0.1, // 10% of transactions
     integrations: [
       new Sentry.Integrations.Http({ tracing: true }),
-      new Sentry.Integrations.BullMQ()
+      new Sentry.Integrations.BullMQ(),
     ],
     beforeSend(event) {
       // Filter sensitive data from error reports
@@ -1019,9 +1090,10 @@ jobs:
         delete event.request.headers?.authorization;
       }
       return event;
-    }
+    },
   });
   ```
+
 - **Technology Stack Addition**:
   | Category | Technology | Version | Justification |
   |----------|------------|---------|---------------|
@@ -1042,6 +1114,7 @@ jobs:
 ### 9.1 Development Workflow
 
 **Local Development:**
+
 ```bash
 # Clone repository
 git clone https://github.com/falador/falador.git
@@ -1065,6 +1138,7 @@ bun run dev
 ```
 
 **Testing:**
+
 ```bash
 # Run all tests
 bun run test
@@ -1083,6 +1157,7 @@ bun run test:coverage
 ```
 
 **Linting:**
+
 ```bash
 # Lint all packages
 bun run lint
@@ -1097,6 +1172,7 @@ bun run typecheck
 ### 9.2 File Organization
 
 **Package Structure:**
+
 ```
 packages/core-domain/
   src/
@@ -1143,28 +1219,34 @@ plugins/audio-generation/
 ### 9.3 Naming Conventions
 
 **Files:**
+
 - **Kebab-case**: `audio-generation-service.ts`
 - **Test files**: `audio-generation-service.test.ts`
 - **Interfaces**: `i-tts-engine.ts` (enforced by ESLint to NOT use `I` prefix in type name)
 
 **Classes:**
+
 - **PascalCase**: `AudioGenerationService`
 - **Interfaces**: `TTSEngine` (no `I` prefix per ESLint config)
 - **Types**: `AudioConfig`, `VoiceSettings`
 
 **Functions:**
+
 - **camelCase**: `generateAudio`, `validateVoice`
 - **Pure functions**: `calculateDuration`, `formatTimestamp`
 
 **Constants:**
+
 - **UPPER_SNAKE_CASE**: `MAX_FILE_SIZE`, `DEFAULT_VOICE_ID`
 
 **Database:**
+
 - **snake_case**: `audio_generation_jobs`, `created_at`
 
 ### 9.4 Best Practices
 
 **Dependency Injection:**
+
 ```typescript
 // ✅ Good: Constructor injection
 @injectable()
@@ -1183,6 +1265,7 @@ export class AudioGenerationService {
 ```
 
 **Error Handling:**
+
 ```typescript
 // ✅ Good: Custom error classes
 export class VoiceNotFoundError extends Error {
@@ -1197,6 +1280,7 @@ throw new Error('Voice not found'); // Avoid
 ```
 
 **Logging:**
+
 ```typescript
 // ✅ Good: Structured logging
 logger.info({ userId, projectId, duration }, 'Audio generation completed');
@@ -1206,6 +1290,7 @@ logger.info('Audio generation completed for user ' + userId); // Avoid
 ```
 
 **Async/Await:**
+
 ```typescript
 // ✅ Good: Explicit error handling
 try {
@@ -1220,6 +1305,7 @@ const audio = await ttsEngine.generate(text, voice); // No try/catch
 ```
 
 **Type Safety:**
+
 ```typescript
 // ✅ Good: Explicit return types
 export function calculateDuration(audioBuffer: Buffer): number {
@@ -1227,7 +1313,8 @@ export function calculateDuration(audioBuffer: Buffer): number {
 }
 
 // ❌ Bad: Inferred return type
-export function calculateDuration(audioBuffer: Buffer) { // Missing return type
+export function calculateDuration(audioBuffer: Buffer) {
+  // Missing return type
   // Implementation
 }
 ```
@@ -1487,6 +1574,7 @@ falador/
 **Coverage Target:** 80% line coverage (enforced via c8)
 
 **Example:**
+
 ```typescript
 // audio-generation-service.test.ts
 import { describe, test, expect, mock } from 'bun:test';
@@ -1495,10 +1583,14 @@ import { AudioGenerationService } from './audio-generation-service';
 describe('AudioGenerationService', () => {
   test('should generate audio successfully', async () => {
     const mockTTS = {
-      generate: mock(() => Promise.resolve(Buffer.from('audio')))
+      generate: mock(() => Promise.resolve(Buffer.from('audio'))),
     };
 
-    const service = new AudioGenerationService(mockTTS, mockStorage, mockLogger);
+    const service = new AudioGenerationService(
+      mockTTS,
+      mockStorage,
+      mockLogger
+    );
     const result = await service.generate('Hello world', voiceConfig);
 
     expect(mockTTS.generate).toHaveBeenCalledWith('Hello world', voiceConfig);
@@ -1514,6 +1606,7 @@ describe('AudioGenerationService', () => {
 **Scope:** API routes, database repositories, plugin integration
 
 **Example:**
+
 ```typescript
 // audio-routes.integration.test.ts
 import { describe, test, expect } from 'bun:test';
@@ -1525,7 +1618,7 @@ describe('Audio API Integration', () => {
     const client = treaty(app);
     const response = await client.audio.generate.post({
       text: 'Test audio',
-      voiceId: 'voice-123'
+      voiceId: 'voice-123',
     });
 
     expect(response.status).toBe(200);
@@ -1541,6 +1634,7 @@ describe('Audio API Integration', () => {
 **Configuration:** `stryker.config.json`
 
 **Mutators Enabled:**
+
 - Arithmetic operators
 - Boolean literals
 - Conditional expressions
@@ -1556,6 +1650,7 @@ describe('Audio API Integration', () => {
 **Scope:** Critical user flows
 
 **Test Scenarios:**
+
 - User registration and login
 - Voice cloning workflow (upload sample, preview, generate)
 - Audio generation (upload book, configure, generate, download)
@@ -1563,6 +1658,7 @@ describe('Audio API Integration', () => {
 - API key management (create, use, revoke)
 
 **Example:**
+
 ```typescript
 // voice-cloning.e2e.test.ts
 import { test, expect } from '@playwright/test';
@@ -1576,8 +1672,12 @@ test('voice cloning flow', async ({ page }) => {
   await page.click('button:has-text("Upload")');
 
   // Wait for training
-  await expect(page.locator('.status')).toContainText('Training', { timeout: 60000 });
-  await expect(page.locator('.status')).toContainText('Ready', { timeout: 180000 });
+  await expect(page.locator('.status')).toContainText('Training', {
+    timeout: 60000,
+  });
+  await expect(page.locator('.status')).toContainText('Ready', {
+    timeout: 180000,
+  });
 
   // Preview
   await page.click('button:has-text("Preview")');
@@ -1588,12 +1688,14 @@ test('voice cloning flow', async ({ page }) => {
 ### 11.5 Coverage Goals
 
 **Targets:**
+
 - **Line Coverage**: 80% minimum (c8)
 - **Branch Coverage**: 75% minimum
 - **Function Coverage**: 85% minimum
 - **Mutation Score**: 80% minimum (Stryker)
 
 **Exclusions:**
+
 - Generated code (migrations, OpenAPI schemas)
 - Type definitions
 - Test files
@@ -1747,21 +1849,25 @@ jobs:
 ### 12.3 Monitoring and Observability
 
 **Logging:**
+
 - **Structured JSON logs** via pino
 - **Log aggregation**: GCP Cloud Logging
 - **Retention**: 30 days (development), 90 days (production)
 
 **Metrics:**
+
 - **Cloud Run metrics**: Request count, latency, error rate, instance count
 - **Database metrics**: Connection pool, query duration, slow queries
 - **Queue metrics**: Job throughput, queue length, processing time
 
 **Alerting:**
+
 - **Error rate > 5%**: Immediate notification
 - **Latency p95 > 1s**: Warning notification
 - **Queue depth > 1000**: Investigate scaling
 
 **Error Tracking:**
+
 - **Sentry integration**: Exception tracking, breadcrumbs, release tracking
   - **Timeline**: Epic 2 completion (Month 4) for backend, Epic 4 (Month 6) for frontend
   - **Implementation**: See ADR-013 for complete integration plan
@@ -1772,47 +1878,57 @@ jobs:
 ### 13.1 Security Measures
 
 **Data Encryption:**
+
 - **In Transit**: TLS 1.3 for all HTTP traffic
 - **At Rest**: AES-256 for Cloud Storage, Cloud SQL encrypted by default
 
 **Authentication:**
+
 - **Password Security**: bcrypt (cost factor 12), minimum 8 characters
 - **Session Security**: HTTP-only cookies, SameSite=Lax, secure flag
 - **API Keys**: bcrypt hashed, prefix `fal_` for identification
 
 **Input Validation:**
+
 - **Valibot schemas** on all API routes
 - **SQL injection prevention**: Drizzle ORM parameterized queries
 - **XSS prevention**: Astro auto-escapes templates, React sanitizes inputs
 
 **Rate Limiting:**
+
 - **Tier-based limits**: Free (10/min), Pro (60/min), Enterprise (custom)
 - **DDoS mitigation**: Cloud Armor (future)
 
 **CORS:**
+
 - **Allowed origins**: Configurable whitelist
 - **Credentials**: Enabled for dashboard domain only
 
 **Webhook Security:**
+
 - **HMAC-SHA256 signatures**: Verify webhook payloads
 - **Replay attack prevention**: Timestamp validation (5-minute window)
 
 **Secrets Management:**
+
 - **Environment variables**: Never committed to version control
 - **GCP Secret Manager** (future): Centralized secret storage
 
 ### 13.2 Compliance
 
 **GDPR:**
+
 - **User consent**: Explicit consent for data processing
 - **Data portability**: Export user data via API
 - **Right to deletion**: Cascade delete user data
 
 **CCPA:**
+
 - **Data disclosure**: Privacy policy explains data usage
 - **Opt-out**: Users can opt out of data sale (N/A - no data sale)
 
 **Audit Logging:**
+
 - **User actions**: Project creation, audio generation, API key usage
 - **Admin actions**: User management, team changes
 - **Retention**: 1 year
@@ -1824,11 +1940,13 @@ jobs:
 **DEFERRED TO SPECIALIST AGENT**
 
 Complexity Assessment: **Simple**
+
 - Basic unit/integration/E2E testing with Bun Test and Playwright
 - Mutation testing with Stryker (80% threshold)
 - Standard coverage goals (80% line coverage)
 
 **Inline Coverage:**
+
 - Test infrastructure established in CI/CD
 - Coverage thresholds enforced
 - Mutation testing configured
@@ -1840,11 +1958,13 @@ Complexity Assessment: **Simple**
 **DEFERRED TO SPECIALIST AGENT**
 
 Complexity Assessment: **Simple**
+
 - Cloud Run serverless (no Kubernetes complexity)
 - Standard CI/CD with GitHub Actions
 - Managed services (Cloud SQL, Cloud Storage, Cloud Memorystore)
 
 **Inline Coverage:**
+
 - Docker containerization configured
 - CI/CD pipelines defined
 - Deployment strategy documented
@@ -1856,17 +1976,20 @@ Complexity Assessment: **Simple**
 **DEFERRED TO SPECIALIST AGENT**
 
 Complexity Assessment: **Moderate**
+
 - Standard auth (Lucia session-based, API keys)
 - GDPR/CCPA compliance required
 - Webhook signature verification
 - No HIPAA/PCI/SOC2 requirements
 
 **Inline Coverage:**
+
 - Basic security measures documented
 - Encryption, validation, rate limiting covered
 - Audit logging planned
 
 **Recommendation:** Security specialist agent **optional**. Consider engaging for:
+
 - Penetration testing plan
 - Security audit checklist
 - Advanced threat modeling

@@ -44,8 +44,14 @@ const playwrightConfig = defineConfig({
 
   // Shared settings for all tests
   use: {
-    // Base URL for API tests
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    // Base URL for API tests - use dedicated test environment
+    baseURL: process.env.TEST_API_URL || process.env.BASE_URL || 'http://localhost:3001',
+
+    // Add test environment headers for isolation
+    extraHTTPHeaders: {
+      'x-test-environment': 'true',
+      'x-test-run-id': process.env.TEST_RUN_ID || `test-${Date.now()}`,
+    },
 
     // Collect trace on failure for debugging
     trace: 'retain-on-failure',

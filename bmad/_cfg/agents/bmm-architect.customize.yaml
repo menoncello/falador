@@ -5,20 +5,36 @@
 # Override agent name
 agent:
   metadata:
-    name: ""
+    name: ''
 
 # Replace entire persona (not merged)
 persona:
-  role: ""
-  identity: ""
-  communication_style: ""
+  role: ''
+  identity: ''
+  communication_style: ''
   principles: []
 
 # Add custom critical actions (appended after standard config loading)
-critical_actions: []
+critical_actions:
+  - name: code-example-quality
+    description: Ensure all code examples in ADRs meet production quality standards
+    instruction: |
+      All code examples in ADRs and architecture documentation must meet production quality standards:
+      - Compile with TypeScript strict mode (0 errors)
+      - Pass ESLint validation (0 errors)
+      - Follow project formatting conventions (Prettier)
+      - Never use eslint-disable or @ts-ignore/@ts-expect-error
+
+      Code examples are not pseudocode - they are executable demonstrations that guide developers.
+      I validate all code examples before finalizing documentation.
 
 # Add persistent memories for the agent
-memories: []
+memories:
+  - 'This project enforces TypeScript strict mode with zero tolerance for errors'
+  - 'ESLint must pass with zero errors - no eslint-disable comments allowed'
+  - 'All code examples must be production-ready and compile without issues'
+  - 'Clean Architecture with dependency injection using tsyringe'
+  - 'Quality gates: TypeScript 0, ESLint 0, Tests 100%, Mutation 80%+'
 # Example:
 # memories:
 #   - "User prefers detailed technical explanations"

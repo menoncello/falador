@@ -55,6 +55,7 @@ I want a properly configured project repository with TypeScript, Bun, and Elysia
 So that the team can begin development with consistent tooling and standards.
 
 **Acceptance Criteria:**
+
 1. Repository initialized with TypeScript 5.x, Bun runtime, and Elysia framework
 2. Package.json configured with core dependencies and dev dependencies
 3. ESLint and Prettier configured for code quality and formatting
@@ -75,6 +76,7 @@ I want automated testing and deployment pipelines,
 So that code quality is maintained and deployments are reliable.
 
 **Acceptance Criteria:**
+
 1. GitHub Actions (or equivalent) workflow configured for CI
 2. Automated testing runs on every pull request
 3. Code coverage reporting integrated (80% minimum target)
@@ -95,6 +97,7 @@ I want containerized development and deployment environments,
 So that the application runs consistently across all environments.
 
 **Acceptance Criteria:**
+
 1. Dockerfile created for application with multi-stage build
 2. Docker-compose.yml configured for local development (app + PostgreSQL)
 3. Development database initialization scripts included
@@ -117,6 +120,7 @@ I want a PostgreSQL database with initial schema for core entities,
 So that the application can persist projects, jobs, and audio files.
 
 **Acceptance Criteria:**
+
 1. PostgreSQL connection configured using environment variables
 2. Database migration system configured (e.g., Prisma, TypeORM, or Knex)
 3. Initial schema created for: users, projects, audio_generation_jobs, audio_files
@@ -137,6 +141,7 @@ I want a Clean Architecture folder structure with dependency injection,
 So that the codebase is maintainable, testable, and follows best practices.
 
 **Acceptance Criteria:**
+
 1. Folder structure created: domain/, application/, infrastructure/, presentation/
 2. Domain layer: Core entities and business logic interfaces defined
 3. Application layer: Use case interfaces defined
@@ -157,6 +162,7 @@ I want centralized error handling and logging,
 So that issues can be diagnosed quickly and user-facing errors are clear.
 
 **Acceptance Criteria:**
+
 1. Logging library configured (Winston or Pino)
 2. Log levels properly configured (debug, info, warn, error)
 3. Structured logging format for easy parsing
@@ -179,6 +185,7 @@ I want an abstraction layer for TTS engines,
 So that we can swap TTS models without changing application code.
 
 **Acceptance Criteria:**
+
 1. TTS Gateway interface defined with methods: generate(text, options), getVoices(), getLanguages()
 2. Gateway abstraction supports multiple TTS providers via strategy pattern
 3. Configuration system for selecting active TTS provider
@@ -199,6 +206,7 @@ I want KokoroTTS integrated as the primary TTS engine,
 So that we can generate Brazilian Portuguese audio.
 
 **Acceptance Criteria:**
+
 1. KokoroTTS library installed and configured
 2. Brazilian Portuguese language model loaded
 3. Integration with TTS Gateway interface (Story 1.7)
@@ -219,6 +227,7 @@ I want to save generated audio files to storage,
 So that users can download and access their audiobooks.
 
 **Acceptance Criteria:**
+
 1. Audio buffer converted to MP3 format using FFmpeg or equivalent
 2. Audio files saved to local filesystem with unique identifiers
 3. File naming convention: project_id + timestamp + format
@@ -241,6 +250,7 @@ I want a CLI framework with command routing,
 So that users can execute commands via terminal.
 
 **Acceptance Criteria:**
+
 1. CLI library integrated (Commander.js or Yargs)
 2. Main CLI entry point configured with --help and --version flags
 3. Command structure: falador [command] [options]
@@ -261,6 +271,7 @@ I want to run `falador generate input.txt --output audio.mp3`,
 So that I can convert text files to Portuguese audio.
 
 **Acceptance Criteria:**
+
 1. Command syntax: `falador generate <input-file> [--output <file>]`
 2. Input file validation (exists, readable, supported format)
 3. Text content read from input file
@@ -281,6 +292,7 @@ I want to configure the CLI with authentication credentials,
 So that my usage is tracked and I can access the service.
 
 **Acceptance Criteria:**
+
 1. Command: `falador auth login --api-key <key>`
 2. API key stored securely in user's home directory (~/.falador/config)
 3. API key validated against backend service
@@ -307,6 +319,7 @@ I want comprehensive integration tests for the complete CLI workflow,
 So that the MVP functionality is validated before release.
 
 **Acceptance Criteria:**
+
 1. Integration test: Install CLI globally and verify commands available
 2. Integration test: Authenticate with valid API key
 3. Integration test: Generate audio from sample text file
@@ -327,6 +340,7 @@ I want comprehensive documentation for CLI usage and development,
 So that I can quickly understand and use the tool.
 
 **Acceptance Criteria:**
+
 1. README.md includes installation instructions (npm/homebrew)
 2. CLI usage guide with examples for all commands
 3. Developer setup guide for contributors
@@ -347,6 +361,7 @@ I want the Epic 1 MVP packaged and deployed to staging,
 So that early adopters can start testing.
 
 **Acceptance Criteria:**
+
 1. CLI package published to npm registry (beta/alpha tag)
 2. Staging environment deployed with backend API (if applicable)
 3. Release notes created for v0.1.0-beta
@@ -367,6 +382,7 @@ So that early adopters can start testing.
 **Integration Phase:** Stories 1.13-1.15 require synchronization
 
 **Team Assignment Recommendation:**
+
 - **Team A (Infrastructure):** Stories 1.1, 1.2, 1.3 → Support 1.13-1.15
 - **Team B (Database/Architecture):** Stories 1.4, 1.5, 1.6 → Support 1.13-1.15
 - **Team C (TTS Engine):** Stories 1.7, 1.8, 1.9 → Support 1.13-1.15
@@ -404,6 +420,7 @@ I want to convert EPUB files to audiobooks with automatic chapter detection,
 So that I can process professionally formatted ebooks.
 
 **Acceptance Criteria:**
+
 1. EPUB file parsing library integrated (e.g., epub.js, epubjs)
 2. EPUB file structure analyzed (OPF manifest, spine, NCX/nav)
 3. Chapter titles extracted from table of contents (NCX or nav.xhtml)
@@ -424,6 +441,7 @@ I want to convert PDF files to audiobooks,
 So that I can process documents and books distributed as PDFs.
 
 **Acceptance Criteria:**
+
 1. PDF parsing library integrated (e.g., pdf-parse, pdfjs)
 2. Text extraction from PDF with layout preservation
 3. Chapter detection heuristics (heading styles, page breaks, TOC analysis)
@@ -444,6 +462,7 @@ I want to convert Markdown and HTML files to audiobooks,
 So that I can process technical documentation and web content.
 
 **Acceptance Criteria:**
+
 1. Markdown parsing library integrated (e.g., marked, markdown-it)
 2. Markdown headings (H1, H2) used for chapter detection
 3. Code blocks and inline code preserved or flagged for pronunciation
@@ -466,6 +485,7 @@ I want a unified chapter segmentation service across all file formats,
 So that chapter processing is consistent regardless of input format.
 
 **Acceptance Criteria:**
+
 1. Chapter interface defined: { title, content, order, metadata }
 2. Segmentation service accepts parsed book and returns chapter array
 3. Chapter numbering and ordering logic
@@ -486,6 +506,7 @@ I want each chapter generated as a separate audio file,
 So that listeners can navigate books chapter-by-chapter.
 
 **Acceptance Criteria:**
+
 1. Batch audio generation for all chapters in a book
 2. Chapter audio files named: `{book_title}_chapter_{number}_{title}.mp3`
 3. Parallel processing of multiple chapters (configurable concurrency)
@@ -506,6 +527,7 @@ I want a single combined audio file for the entire book,
 So that I can listen continuously without managing multiple files.
 
 **Acceptance Criteria:**
+
 1. FFmpeg-based audio concatenation service
 2. Chapter audio files combined in correct order
 3. Optional silence insertion between chapters (configurable duration)
@@ -528,6 +550,7 @@ I want to run `falador batch process --input-dir ./books/`,
 So that I can convert multiple books in a single operation.
 
 **Acceptance Criteria:**
+
 1. Command: `falador batch process --input-dir <dir> [--output-dir <dir>]`
 2. Recursive directory scanning for supported file formats
 3. File type detection and appropriate parser selection
@@ -548,6 +571,7 @@ I want to monitor ongoing batch jobs,
 So that I can track progress and identify issues.
 
 **Acceptance Criteria:**
+
 1. Command: `falador batch status --job-id <id>` shows detailed status
 2. Status display: total books, completed, in-progress, failed, queued
 3. Per-book status: title, format, progress %, ETA, status
@@ -568,6 +592,7 @@ I want to define batch job parameters in a YAML configuration file,
 So that I can reuse complex configurations and automate workflows.
 
 **Acceptance Criteria:**
+
 1. YAML configuration schema documented
 2. Configuration includes: input paths, output settings, voice options, quality settings
 3. Command: `falador batch process --config batch-config.yaml`
@@ -590,6 +615,7 @@ I want extracted metadata automatically applied to audiobooks,
 So that files are properly tagged for distribution platforms.
 
 **Acceptance Criteria:**
+
 1. Metadata extraction from all supported formats (EPUB, PDF, Markdown frontmatter)
 2. Metadata schema: title, author, narrator, publisher, language, genre, year, ISBN
 3. Metadata storage in database linked to projects
@@ -610,6 +636,7 @@ So that files are properly tagged for distribution platforms.
 **Integration:** Stories 2.4-2.6 synchronize after Track A completes
 
 **Team Assignment Recommendation:**
+
 - **Team A:** Stories 2.1, 2.2, 2.3 (File parsers - can work independently)
 - **Team B:** Stories 2.4, 2.5, 2.6 (Chapter processing - depends on Track A)
 - **Team C:** Stories 2.7, 2.8, 2.9 (Batch processing - depends on Track B)
@@ -799,6 +826,7 @@ Enable direct export to major audiobook platforms (ACX, Audible, Spotify) with a
 ## Overall Epic Summary
 
 **Epic Breakdown:**
+
 - Epic 1: 15 stories (COMPLETED - detailed above)
 - Epic 2: 10 stories (COMPLETED - detailed above)
 - Epic 3: 12-15 stories (Voice Cloning)
@@ -812,12 +840,14 @@ Enable direct export to major audiobook platforms (ACX, Audible, Spotify) with a
 **Total Estimated Stories:** 100-117 stories across 9 epics
 
 **Development Approach:**
+
 - Epics 1-2 establish MVP foundation (25 stories)
 - Epics 3-4 deliver competitive differentiation (27-33 stories)
 - Epics 5-7 achieve quality and developer ecosystem goals (28-34 stories)
 - Epics 8-9 capture enterprise market (20-25 stories)
 
 **Parallelization Success Factors:**
+
 - Clear API contracts between teams
 - Shared component library and design system
 - Regular integration testing

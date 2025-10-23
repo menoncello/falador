@@ -1,16 +1,24 @@
-import { describe, expect, test } from 'bun:test';
-import { main, version } from './index';
+/**
+ * CLI Module Tests
+ */
 
-describe('1.1-UNIT-CLI: CLI', () => {
-  test('1.1-UNIT-CLI-001 [P2]: should export version', () => {
-    expect(version).toBe('0.0.1');
+import { CLI } from './index';
+
+describe('CLI Module', () => {
+  it('should create CLI instance', () => {
+    const cli = new CLI();
+    expect(cli).toBeInstanceOf(CLI);
   });
 
-  test('1.1-UNIT-CLI-002 [P1]: should export main function', () => {
-    expect(typeof main).toBe('function');
-  });
+  it('should run CLI without errors', async () => {
+    const cli = new CLI();
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
 
-  test('1.1-UNIT-CLI-003 [P1]: main should not throw', () => {
-    expect(() => main()).not.toThrow();
+    await cli.run(['test', 'args']);
+
+    expect(consoleSpy).toHaveBeenCalledWith('Falador CLI - Audio Book Generator');
+    expect(consoleSpy).toHaveBeenCalledWith('Arguments:', ['test', 'args']);
+
+    consoleSpy.mockRestore();
   });
 });

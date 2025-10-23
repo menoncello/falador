@@ -7,11 +7,12 @@
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
 
     // Bundler mode
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
+    "verbatimModuleSyntax": false,
     "noEmit": false,
     "declaration": true,
     "declarationMap": true,
@@ -21,12 +22,20 @@
     // Path aliases for clean architecture
     "baseUrl": ".",
     "paths": {
+      "@falador/core-domain": ["./packages/core-domain/src"],
+      "@falador/core-domain/*": ["./packages/core-domain/src/*"],
+      "@falador/application": ["./packages/application/src"],
+      "@falador/application/*": ["./packages/application/src/*"],
+      "@falador/infrastructure": ["./packages/infrastructure/src"],
+      "@falador/infrastructure/*": ["./packages/infrastructure/src/*"],
+      "@falador/infrastructure/container": [
+        "./packages/infrastructure/src/container"
+      ],
       "@core/*": ["./packages/core-domain/src/*"],
       "@api/*": ["./packages/api-gateway/src/*"],
       "@cli/*": ["./packages/cli/src/*"],
       "@worker/*": ["./packages/job-worker/src/*"],
       "@shared/*": ["./shared/*"],
-      "@infrastructure/*": ["./infrastructure/*"],
       "@plugins/*": ["./plugins/*"]
     },
 

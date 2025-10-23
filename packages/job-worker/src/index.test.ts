@@ -1,22 +1,56 @@
-import { describe, expect, test } from 'bun:test';
-import { processJob, version } from './index';
+/**
+ * Job Worker Module Tests
+ */
 
-describe('1.1-UNIT-Worker: Job Worker', () => {
-  test('1.1-UNIT-WRK-001 [P2]: should export version', () => {
-    expect(version).toBe('0.0.1');
+import { Job, JobProcessor } from './index';
+
+describe('Job Worker', () => {
+  it('should create a job processor', () => {
+    const processor = new JobProcessor();
+    expect(processor).toBeInstanceOf(JobProcessor);
   });
 
-  test('1.1-UNIT-WRK-002 [P1]: should export processJob function', () => {
-    expect(typeof processJob).toBe('function');
-  });
-
-  test('1.1-UNIT-WRK-003 [P1]: processJob should handle basic job', async () => {
-    const job = {
-      id: 'test-job-1',
-      type: 'test' as const,
-      data: {},
+  it('should process jobs', async () => {
+    const processor = new JobProcessor();
+    const job: Job = {
+      id: 'test-job',
+      type: 'test',
+      payload: { data: 'test' },
+      status: 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
-    await expect(processJob(job)).resolves.toBeUndefined();
+    // Mock console.log to verify it's called with correct parameters
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+    const result = processor.processJob(job);
+    await expect(result).resolves.toBeUndefined();
+
+    // Verify that console.log was called with the correct message
+    expect(consoleSpy).toHaveBeenCalledWith('Processing job test-job of type test');
+
+    consoleSpy.mockRestore();
+  });
+
+  it('should log job details correctly', async () => {
+    const processor = new JobProcessor();
+    const job: Job = {
+      id: 'special-job-123',
+      type: 'email-sender',
+      payload: { recipient: 'test@example.com' },
+      status: 'pending',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+    await processor.processJob(job);
+
+    // Verify the exact log message format
+    expect(consoleSpy).toHaveBeenCalledWith('Processing job special-job-123 of type email-sender');
+
+    consoleSpy.mockRestore();
   });
 });

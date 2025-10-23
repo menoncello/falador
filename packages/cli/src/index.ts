@@ -1,22 +1,18 @@
 /**
- * Falador CLI
- * Command-line interface for audiobook generation
+ * CLI Module
+ * Command line interface for the application
  */
-
-export const version = '0.0.1';
 
 /**
- * Main CLI entry point
+ * CLI class for handling command line operations
  */
-export function main(): void {
-  const version = '0.0.1';
-  const message = 'Coming soon...';
-
-  console.log(`Falador CLI v${version}`);
-  console.log(message);
-}
-
-// Run CLI if executed directly
-if (import.meta.main) {
-  main();
+export class CLI {
+  /**
+   * Run the CLI with provided arguments
+   * @param args Command line arguments
+   */
+  async run(args: string[]): Promise<void> {
+    console.log('Falador CLI - Audio Book Generator');
+    console.log('Arguments:', args);
+  }
 }

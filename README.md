@@ -14,6 +14,7 @@
 Falador is a premium AI-directed TTS (Text-to-Speech) platform specifically engineered for Brazilian Portuguese audiobook production. It combines KokoroTTS foundation with Portuguese language optimization, CLI-first developer experience, voice cloning capabilities, and publisher workflow integration.
 
 **Key Benefits:**
+
 - 🎯 **4.5/5 Voice Quality** - Professional-grade Brazilian Portuguese narration
 - ⚡ **10x Faster Production** - 48 hours vs. 4-6 weeks traditional timeline
 - 💰 **80% Cost Reduction** - $75-200 vs. $1,600-6,000 per book
@@ -80,12 +81,14 @@ falador batch process --input-dir ./books/ --output-dir ./audiobooks/
 ## 📚 Documentation
 
 ### Core Documentation
+
 - [**Solution Architecture**](docs/solution-architecture.md) - Complete technical architecture (1,888 lines)
 - [**Product Requirements (PRD)**](docs/PRD.md) - Product vision and requirements
 - [**Epic Breakdown**](docs/epics.md) - Detailed epic and story breakdown
 - [**UX Specification**](docs/ux-specification.md) - User experience design
 
 ### Technical Specifications
+
 - [**Tech Spec - Epic 1: Foundation**](docs/tech-spec-epic-1.md) - MVP infrastructure
 - [**Tech Spec - Epic 2: Multi-Format**](docs/tech-spec-epic-2.md) - File processing
 - [**Tech Spec - Epic 3: Voice Cloning**](docs/tech-spec-epic-3.md) - Voice cloning system
@@ -93,6 +96,7 @@ falador batch process --input-dir ./books/ --output-dir ./audiobooks/
 - [**Tech Spec - Epic 5-9**](docs/) - Quality tools, API, AI direction, Enterprise, Distribution
 
 ### Validation & Alignment
+
 - [**Cohesion Check Report**](docs/cohesion-check-report.md) - Requirements coverage validation (100%)
 - [**Epic Alignment Matrix**](docs/epic-alignment-matrix.md) - Epic-to-component mapping
 - [**Validation Report**](docs/validation-report-2025-10-17.md) - Phase 3 validation (100% complete)
@@ -102,6 +106,7 @@ falador batch process --input-dir ./books/ --output-dir ./audiobooks/
 ## 🏗️ Architecture
 
 ### Architecture Style
+
 **Modular Monolith with Plugin Architecture**
 
 ```
@@ -130,22 +135,22 @@ falador/
 
 ### Technology Stack
 
-| Category | Technology | Version | Purpose |
-|----------|------------|---------|---------|
-| **Runtime** | Bun | 1.3.0 | Native TypeScript, 3x faster than Node.js |
-| **Backend** | Elysia | 1.4.12 | TypeScript-first, 20x faster than Express |
-| **Frontend** | Astro | 5.14.5 | Island architecture, minimal JS |
-| **Language** | TypeScript | 5.9.3 | Strict type safety |
-| **Database** | PostgreSQL | 17.4 | ACID compliance, JSON support |
-| **ORM** | Drizzle | 0.44.6 | Type-safe queries |
-| **Queue** | BullMQ | 5.61.0 | Distributed job processing |
-| **Cache** | Node LRU Cache | 12.0.0 | In-memory caching |
-| **Auth** | Lucia Auth | 3.2.2 | Session-based + API keys |
-| **TTS** | KokoroTTS | Latest | Brazilian Portuguese optimization |
-| **Audio** | FFmpeg | 7.1.0 | Format conversion, metadata |
-| **Testing** | Bun Test | Built-in | Native test runner |
-| **Mutation Testing** | Stryker | 0.35.1 | 80% mutation score |
-| **Deployment** | GCP Cloud Run | N/A | Serverless containers |
+| Category             | Technology     | Version  | Purpose                                   |
+| -------------------- | -------------- | -------- | ----------------------------------------- |
+| **Runtime**          | Bun            | 1.3.0    | Native TypeScript, 3x faster than Node.js |
+| **Backend**          | Elysia         | 1.4.12   | TypeScript-first, 20x faster than Express |
+| **Frontend**         | Astro          | 5.14.5   | Island architecture, minimal JS           |
+| **Language**         | TypeScript     | 5.9.3    | Strict type safety                        |
+| **Database**         | PostgreSQL     | 17.4     | ACID compliance, JSON support             |
+| **ORM**              | Drizzle        | 0.44.6   | Type-safe queries                         |
+| **Queue**            | BullMQ         | 5.61.0   | Distributed job processing                |
+| **Cache**            | Node LRU Cache | 12.0.0   | In-memory caching                         |
+| **Auth**             | Lucia Auth     | 3.2.2    | Session-based + API keys                  |
+| **TTS**              | KokoroTTS      | Latest   | Brazilian Portuguese optimization         |
+| **Audio**            | FFmpeg         | 7.1.0    | Format conversion, metadata               |
+| **Testing**          | Bun Test       | Built-in | Native test runner                        |
+| **Mutation Testing** | Stryker        | 0.35.1   | 80% mutation score                        |
+| **Deployment**       | GCP Cloud Run  | N/A      | Serverless containers                     |
 
 **Full Stack:** [81 technologies documented](docs/solution-architecture.md#11-technology-and-library-decision-table)
 
@@ -154,6 +159,7 @@ falador/
 ## ✨ Features
 
 ### Current (MVP - Epic 1-2)
+
 - ✅ **CLI Tool** - Convert text files to Brazilian Portuguese audio
 - ✅ **Multi-Format Support** - EPUB, PDF, Markdown, HTML, TXT
 - ✅ **Chapter Detection** - Automatic segmentation and structure preservation
@@ -161,6 +167,7 @@ falador/
 - ✅ **Progress Monitoring** - Real-time status and logging
 
 ### Planned (Epic 3-9)
+
 - 🔄 **Voice Cloning** - Clone your voice from 30-second samples (Epic 3)
 - 🔄 **Web Dashboard** - Visual project management UI (Epic 4)
 - 🔄 **Quality Tools** - Pronunciation editor, regeneration workflows (Epic 5)
@@ -176,6 +183,7 @@ falador/
 ## 🎯 Use Cases
 
 ### 1. Technical Publisher - Batch Production
+
 ```bash
 # Configure batch job
 falador batch init > batch-config.yaml
@@ -193,6 +201,7 @@ falador batch status --job-id batch-12345 --follow
 **Result:** 25 books processed in 36 hours, 92% quality approval
 
 ### 2. Independent Author - Voice Cloning
+
 ```bash
 # Upload voice sample (30 seconds)
 falador voice clone --sample my-voice.mp3 --name "Carlos Silva"
@@ -204,6 +213,7 @@ falador generate fantasy-novel.epub --voice "Carlos Silva" --output audiobook.m4
 **Result:** Personal voice clone, 4.6/5 quality, 48-hour completion
 
 ### 3. Developer - API Integration
+
 ```typescript
 import { Falador } from '@falador/sdk';
 
@@ -214,7 +224,7 @@ const job = await falador.audio.generate({
   text: courseContent,
   voice: 'pt-BR-neural',
   format: 'mp3',
-  webhook: 'https://myapp.com/webhooks/falador'
+  webhook: 'https://myapp.com/webhooks/falador',
 });
 
 // Poll status
@@ -238,9 +248,7 @@ import { Logger } from '@falador/shared/types';
 
 @injectable()
 export class MyPlugin {
-  constructor(
-    @inject('Logger') private logger: Logger
-  ) {}
+  constructor(@inject('Logger') private logger: Logger) {}
 
   async execute(input: string): Promise<void> {
     this.logger.info({ input }, 'Processing...');
@@ -285,11 +293,92 @@ git commit -m "feat: add new feature"
 ```
 
 **Standards:**
+
 - ✅ 80% code coverage (enforced)
 - ✅ 80% mutation score (enforced)
 - ✅ ESLint strict mode (no `any` types)
 - ✅ Prettier formatting
 - ✅ No disabled ESLint rules (per CLAUDE.md)
+
+---
+
+## 🐳 Docker Development
+
+### Prerequisites
+
+- **Docker** >= 20.10
+- **Docker Compose** >= 2.0
+
+### Local Development with Docker
+
+```bash
+# Start all services (PostgreSQL + Redis + Application)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f app
+
+# Stop services
+docker-compose down
+
+# Start specific service
+docker-compose up -d postgres redis
+
+# Access database directly
+docker-compose exec postgres psql -U falador -d falador
+```
+
+### Docker Build
+
+```bash
+# Build application image
+docker build -t falador-app .
+
+# Build with no cache
+docker build --no-cache -t falador-app .
+
+# Multi-platform build (for production)
+docker buildx build --platform linux/amd64,linux/arm64 -t falador-app .
+```
+
+### Services
+
+| Service  | Port | Description                    |
+| -------- | ---- | ------------------------------ |
+| app      | 3000 | Main application (API Gateway) |
+| postgres | 5432 | PostgreSQL database            |
+| redis    | 6379 | Redis cache and job queue      |
+| pgadmin  | 5050 | Database management (optional) |
+
+### Environment Configuration
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Development environment
+NODE_ENV=development
+DATABASE_URL=postgresql://falador:falador_dev@localhost:5432/falador
+REDIS_URL=redis://localhost:6379
+```
+
+### Hot Reload
+
+The development container includes hot reload capabilities:
+
+- **Source Code**: Changes to `./packages` are automatically reflected
+- **Configuration**: Changes to config files trigger container restart
+- **Database**: Connection automatically re-established
+
+### Database Initialization
+
+Database initialization scripts are located in `scripts/init-db/`:
+
+- `01-init-database.sql` - Database and extensions setup
+- `02-create-tables.sql` - Core table creation
+- `03-seed-data.sql` - Initial seed data
+
+Scripts are automatically executed when PostgreSQL container starts.
 
 ---
 
@@ -335,12 +424,14 @@ gcloud run deploy falador-worker --image gcr.io/falador-prod/worker:latest
 ## 📊 Performance
 
 ### Benchmarks
+
 - **Audio Generation:** 2x real-time processing speed (NFR004)
 - **API Response Time:** <100ms (95th percentile) (NFR003)
 - **Concurrent Requests:** 1,000+ without degradation (NFR002)
 - **Uptime:** 99.9% SLA (NFR001)
 
 ### Scalability
+
 - **Year 1:** 1,000 hours/month audio generation
 - **Year 3:** 10,000+ hours/month (horizontal scaling)
 - **Auto-scaling:** Cloud Run (0-100 instances)
@@ -390,19 +481,23 @@ refactor: improve plugin architecture
 ## 📈 Roadmap
 
 ### Phase 1: MVP Foundation (Weeks 1-4)
+
 - [x] Epic 1: Foundation & Basic TTS (15 stories) ✅
 - [x] Epic 2: Multi-Format Processing (10 stories) ✅
 
 ### Phase 2: Competitive Differentiation (Weeks 5-10)
+
 - [ ] Epic 3: Voice Cloning (12-15 stories)
 - [ ] Epic 4: Web Dashboard (15-18 stories)
 
 ### Phase 3: Quality & Developer Ecosystem (Weeks 11-18)
+
 - [ ] Epic 5: Quality Tools (8-10 stories)
 - [ ] Epic 6: API & Webhooks (10-12 stories)
 - [ ] Epic 7: AI Direction (10-12 stories)
 
 ### Phase 4: Enterprise Market (Weeks 19-24)
+
 - [ ] Epic 8: Enterprise Collaboration (12-15 stories)
 - [ ] Epic 9: Distribution (8-10 stories)
 

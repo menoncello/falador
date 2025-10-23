@@ -1,20 +1,38 @@
 /**
- * Falador Core Domain
- * Business logic and domain entities
+ * Core Domain Module
+ * Contains domain entities and business logic
  */
 
-export const version = '0.0.1';
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: Date;
+}
 
-// Domain entities will be defined here
 export interface Project {
   id: string;
-  title: string;
+  name: string;
+  description?: string;
+  userId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface VoiceProfile {
+  id: string;
+  name: string;
+  language: string;
+  gender: string;
   userId: string;
   createdAt: Date;
 }
 
-export interface User {
+export interface AudioFile {
   id: string;
-  email: string;
-  name: string;
+  filename: string;
+  size: number;
+  duration?: number;
+  projectId: string;
+  createdAt: Date;
 }
