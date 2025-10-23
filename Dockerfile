@@ -8,16 +8,18 @@ WORKDIR /app
 
 # Copy package files for the entire workspace
 COPY package.json bun.lockb ./
+
+# Install all dependencies for building
+# Ignore prepare scripts (husky) as they're only needed for local development
+RUN bun install --no-cache --ignore-scripts
+
+# Copy individual package files to ensure workspace dependencies are resolved
 COPY packages/api-gateway/package.json ./packages/api-gateway/
 COPY packages/application/package.json ./packages/application/
 COPY packages/cli/package.json ./packages/cli/
 COPY packages/core-domain/package.json ./packages/core-domain/
 COPY packages/infrastructure/package.json ./packages/infrastructure/
 COPY packages/job-worker/package.json ./packages/job-worker/
-
-# Install all dependencies for building
-# Ignore prepare scripts (husky) as they're only needed for local development
-RUN bun install --no-cache --ignore-scripts
 
 # Stage 2: Builder
 # Build TypeScript code for all packages using Turborepo
@@ -77,7 +79,7 @@ EXPOSE 3000
 
 # Health check for API Gateway
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD bun run --bun /app/packages/api-gateway/dist/index.js || exit 1
+  CMD bun run --bun -e "import('./packages/api-gateway/src/index.js').then(m => m.startServer())" || exit 1
 
 # Default command starts API Gateway (can be overridden for different services)
-CMD ["bun", "run", "--bun", "/app/packages/api-gateway/dist/index.js"]
+CMD ["bun", "run", "--bun", "-e", "import('./packages/api-gateway/src/index.js').then(m => m.startServer())"]

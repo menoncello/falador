@@ -197,7 +197,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker build -t falador-api:test -f Dockerfile.api .
+        run: docker build -t falador-api:test -f Dockerfile .
 
       - name: Verify image created
         run: docker images | grep falador-api

@@ -8,7 +8,9 @@ import { Elysia } from 'elysia';
 const API_PORT = 3000;
 
 const app = new Elysia()
-  .get('/', () => ({ message: 'Falador API Gateway - Audio Book Generator' }))
-  .listen(API_PORT);
+  .get('/', () => ({ message: 'Falador API Gateway - Audio Book Generator' }));
 
-export { app };
+// Function to start the server when needed
+export const startServer = () => app.listen(API_PORT);
+
+export { app, API_PORT };
