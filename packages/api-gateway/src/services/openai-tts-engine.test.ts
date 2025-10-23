@@ -1,346 +1,463 @@
-import { describe, it, expect, beforeEach } from 'bun:test';
+import { describe, it, expect, beforeEach, mock } from 'bun:test';
+import type { Voice } from '../../../core-domain/src/index';
 import { OpenAITTSEngine } from './openai-tts-engine';
-import type { Voice } from '@falador/core-domain';
 
 describe('OpenAITTSEngine', () => {
   let engine: OpenAITTSEngine;
+  let mockVoice: Voice;
 
   beforeEach(() => {
-    engine = new OpenAITTSEngine('test-api-key');
+    engine = new OpenAITTSEngine();
+    mockVoice = {
+      id: 'test-voice',
+      name: 'Test Voice',
+      language: 'en-US',
+      gender: 'neutral',
+      age: 'adult',
+      provider: 'openai',
+      providerId: 'test-voice',
+      isActive: true,
+      isAvailable: true,
+      isDefault: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
   });
 
-  describe('Constructor', () => {
-    it('should create engine with API key', () => {
-      const testEngine = new OpenAITTSEngine('test-key');
-      expect(testEngine).toBeDefined();
+  describe('generate', () => {
+    it('should generate audio from text', async () => {
+      const text = 'Hello, world!';
+
+      const result = await engine.generate(text, mockVoice);
+
+      expect(result).toBeInstanceOf(ArrayBuffer);
     });
 
-    it('should create engine with custom base URL', () => {
-      const testEngine = new OpenAITTSEngine('test-key', 'https://custom.openai.com/v1');
-      expect(testEngine).toBeDefined();
+    it('should return non-empty audio buffer', async () => {
+      const text = 'Test audio generation';
+
+      const result = await engine.generate(text, mockVoice);
+
+      expect(result.byteLength).toBeGreaterThan(0);
     });
 
-    it('should use default base URL when not specified', () => {
-      const testEngine = new OpenAITTSEngine('test-key');
-      expect(testEngine).toBeDefined();
+    it('should handle short text', async () => {
+      const text = 'Hi';
+
+      const result = await engine.generate(text, mockVoice);
+
+      expect(result).toBeInstanceOf(ArrayBuffer);
+      expect(result.byteLength).toBeGreaterThan(0);
+    });
+
+    it('should handle long text', async () => {
+      const text = 'This is a very long text '.repeat(100);
+
+      const result = await engine.generate(text, mockVoice);
+
+      expect(result).toBeInstanceOf(ArrayBuffer);
+    });
+
+    it('should handle empty text', async () => {
+      const text = '';
+
+      const result = await engine.generate(text, mockVoice);
+
+      expect(result).toBeInstanceOf(ArrayBuffer);
+    });
+
+    it('should simulate API delay', async () => {
+      const startTime = Date.now();
+      const text = 'Test delay';
+
+      await engine.generate(text, mockVoice);
+
+      const elapsedTime = Date.now() - startTime;
+      expect(elapsedTime).toBeGreaterThanOrEqual(90); // At least 90ms (close to 100ms)
+    });
+
+    it('should work with different voice objects', async () => {
+      const voice1 = { ...mockVoice, id: 'voice1', name: 'Voice 1' };
+      const voice2 = { ...mockVoice, id: 'voice2', name: 'Voice 2' };
+
+      const result1 = await engine.generate('Text 1', voice1);
+      const result2 = await engine.generate('Text 2', voice2);
+
+      expect(result1).toBeInstanceOf(ArrayBuffer);
+      expect(result2).toBeInstanceOf(ArrayBuffer);
+    });
+
+    it('should encode text to mock audio data', async () => {
+      const text = 'Test encoding';
+
+      const result = await engine.generate(text, mockVoice);
+      const view = new Uint8Array(result);
+      const decoder = new TextDecoder();
+      const decoded = decoder.decode(view);
+
+      expect(decoded).toBe('mock-audio-data');
+    });
+
+    it('should handle special characters in text', async () => {
+      const text = 'Special: !@#$%^&*()';
+
+      const result = await engine.generate(text, mockVoice);
+
+      expect(result).toBeInstanceOf(ArrayBuffer);
+    });
+
+    it('should handle unicode characters', async () => {
+      const text = 'Unicode: 你好世界 🌍';
+
+      const result = await engine.generate(text, mockVoice);
+
+      expect(result).toBeInstanceOf(ArrayBuffer);
     });
   });
 
   describe('getVoices', () => {
-    it('should return available voices', async () => {
+    it('should return array of voices', async () => {
       const voices = await engine.getVoices();
 
-      expect(voices).toHaveLength(6);
-      expect(voices[0]).toHaveProperty('id');
-      expect(voices[0]).toHaveProperty('name');
-      expect(voices[0]).toHaveProperty('language');
-      expect(voices[0]).toHaveProperty('gender');
-      expect(voices[0]).toHaveProperty('age');
-      expect(voices[0]).toHaveProperty('providerId');
-      expect(voices[0]).toHaveProperty('isActive');
+      expect(Array.isArray(voices)).toBe(true);
+      expect(voices.length).toBeGreaterThan(0);
     });
 
-    it('should return voices with correct provider', async () => {
+    it('should return 6 default voices', async () => {
       const voices = await engine.getVoices();
 
-      voices.forEach(voice => {
-        expect(voice.provider).toBe('openai');
-        expect(voice.isActive).toBe(true);
-      });
+      expect(voices.length).toBe(6);
     });
 
-    it('should return expected voice IDs', async () => {
+    it('should return voices with correct structure', async () => {
       const voices = await engine.getVoices();
-      const voiceIds = voices.map(v => v.id);
+      const firstVoice = voices[0];
 
-      expect(voiceIds).toContain('alloy');
-      expect(voiceIds).toContain('echo');
-      expect(voiceIds).toContain('fable');
-      expect(voiceIds).toContain('onyx');
-      expect(voiceIds).toContain('nova');
-      expect(voiceIds).toContain('shimmer');
+      expect(firstVoice).toHaveProperty('id');
+      expect(firstVoice).toHaveProperty('name');
+      expect(firstVoice).toHaveProperty('language');
+      expect(firstVoice).toHaveProperty('gender');
+      expect(firstVoice).toHaveProperty('age');
+      expect(firstVoice).toHaveProperty('provider');
+      expect(firstVoice).toHaveProperty('providerId');
+      expect(firstVoice).toHaveProperty('isActive');
+      expect(firstVoice).toHaveProperty('isAvailable');
+      expect(firstVoice).toHaveProperty('isDefault');
+      expect(firstVoice).toHaveProperty('createdAt');
+      expect(firstVoice).toHaveProperty('updatedAt');
     });
 
-    it('should return voices with correct properties', async () => {
+    it('should include Alloy voice', async () => {
       const voices = await engine.getVoices();
 
-      // Check specific voice properties
-      const alloy = voices.find(v => v.id === 'alloy');
+      const alloy = voices.find((v) => v.id === 'alloy');
+
       expect(alloy).toBeDefined();
-      expect(alloy!.name).toBe('Alloy');
-      expect(alloy!.language).toBe('en-US');
-      expect(alloy!.gender).toBe('neutral');
-      expect(alloy!.age).toBe('adult');
-      expect(alloy!.providerId).toBe('alloy');
+      expect(alloy?.name).toBe('Alloy');
+    });
 
-      const echo = voices.find(v => v.id === 'echo');
+    it('should include Echo voice', async () => {
+      const voices = await engine.getVoices();
+
+      const echo = voices.find((v) => v.id === 'echo');
+
       expect(echo).toBeDefined();
-      expect(echo!.name).toBe('Echo');
-      expect(echo!.gender).toBe('male');
+      expect(echo?.name).toBe('Echo');
+    });
 
-      const nova = voices.find(v => v.id === 'nova');
+    it('should include Fable voice', async () => {
+      const voices = await engine.getVoices();
+
+      const fable = voices.find((v) => v.id === 'fable');
+
+      expect(fable).toBeDefined();
+      expect(fable?.name).toBe('Fable');
+    });
+
+    it('should include Onyx voice', async () => {
+      const voices = await engine.getVoices();
+
+      const onyx = voices.find((v) => v.id === 'onyx');
+
+      expect(onyx).toBeDefined();
+      expect(onyx?.name).toBe('Onyx');
+    });
+
+    it('should include Nova voice', async () => {
+      const voices = await engine.getVoices();
+
+      const nova = voices.find((v) => v.id === 'nova');
+
       expect(nova).toBeDefined();
-      expect(nova!.name).toBe('Nova');
-      expect(nova!.gender).toBe('female');
+      expect(nova?.name).toBe('Nova');
+    });
 
-      const shimmer = voices.find(v => v.id === 'shimmer');
+    it('should include Shimmer voice', async () => {
+      const voices = await engine.getVoices();
+
+      const shimmer = voices.find((v) => v.id === 'shimmer');
+
       expect(shimmer).toBeDefined();
-      expect(shimmer!.age).toBe('young');
+      expect(shimmer?.name).toBe('Shimmer');
+    });
+
+    it('should set all voices as active', async () => {
+      const voices = await engine.getVoices();
+
+      expect(voices.every((v) => v.isActive)).toBe(true);
+    });
+
+    it('should set all voices as available', async () => {
+      const voices = await engine.getVoices();
+
+      expect(voices.every((v) => v.isAvailable)).toBe(true);
+    });
+
+    it('should set provider to openai', async () => {
+      const voices = await engine.getVoices();
+
+      expect(voices.every((v) => v.provider === 'openai')).toBe(true);
+    });
+
+    it('should set language to en-US', async () => {
+      const voices = await engine.getVoices();
+
+      expect(voices.every((v) => v.language === 'en-US')).toBe(true);
+    });
+
+    it('should set Alloy as default voice', async () => {
+      const voices = await engine.getVoices();
+
+      const alloy = voices.find((v) => v.id === 'alloy');
+
+      expect(alloy?.isDefault).toBe(true);
+    });
+
+    it('should set other voices as non-default', async () => {
+      const voices = await engine.getVoices();
+
+      const nonDefaultVoices = voices.filter((v) => v.id !== 'alloy');
+
+      expect(nonDefaultVoices.every((v) => v.isDefault === false)).toBe(true);
+    });
+
+    it('should set providerId same as id', async () => {
+      const voices = await engine.getVoices();
+
+      expect(voices.every((v) => v.providerId === v.id)).toBe(true);
+    });
+
+    it('should have valid timestamps', async () => {
+      const voices = await engine.getVoices();
+      const firstVoice = voices[0];
+
+      expect(firstVoice.createdAt).toBeInstanceOf(Date);
+      expect(firstVoice.updatedAt).toBeInstanceOf(Date);
+    });
+
+    it('should have matching created and updated timestamps', async () => {
+      const voices = await engine.getVoices();
+      const firstVoice = voices[0];
+
+      expect(firstVoice.createdAt.getTime()).toBe(
+        firstVoice.updatedAt.getTime()
+      );
+    });
+
+    it('should return voices with correct genders', async () => {
+      const voices = await engine.getVoices();
+
+      const alloy = voices.find((v) => v.id === 'alloy');
+      const echo = voices.find((v) => v.id === 'echo');
+      const nova = voices.find((v) => v.id === 'nova');
+
+      expect(alloy?.gender).toBe('neutral');
+      expect(echo?.gender).toBe('male');
+      expect(nova?.gender).toBe('female');
+    });
+
+    it('should return voices with correct ages', async () => {
+      const voices = await engine.getVoices();
+
+      const alloy = voices.find((v) => v.id === 'alloy');
+      const onyx = voices.find((v) => v.id === 'onyx');
+      const shimmer = voices.find((v) => v.id === 'shimmer');
+
+      expect(alloy?.age).toBe('adult');
+      expect(onyx?.age).toBe('mature');
+      expect(shimmer?.age).toBe('young');
     });
   });
 
   describe('validateVoice', () => {
-    it('should validate existing voice ID', async () => {
-      const isValid = await engine.validateVoice('alloy');
-      expect(isValid).toBe(true);
+    it('should return true for valid voice ID', async () => {
+      const result = await engine.validateVoice('alloy');
+
+      expect(result).toBe(true);
     });
 
-    it('should validate all available voice IDs', async () => {
+    it('should return true for echo voice', async () => {
+      const result = await engine.validateVoice('echo');
+
+      expect(result).toBe(true);
+    });
+
+    it('should return true for fable voice', async () => {
+      const result = await engine.validateVoice('fable');
+
+      expect(result).toBe(true);
+    });
+
+    it('should return true for onyx voice', async () => {
+      const result = await engine.validateVoice('onyx');
+
+      expect(result).toBe(true);
+    });
+
+    it('should return true for nova voice', async () => {
+      const result = await engine.validateVoice('nova');
+
+      expect(result).toBe(true);
+    });
+
+    it('should return true for shimmer voice', async () => {
+      const result = await engine.validateVoice('shimmer');
+
+      expect(result).toBe(true);
+    });
+
+    it('should return false for invalid voice ID', async () => {
+      const result = await engine.validateVoice('invalid-voice');
+
+      expect(result).toBe(false);
+    });
+
+    it('should return false for empty string', async () => {
+      const result = await engine.validateVoice('');
+
+      expect(result).toBe(false);
+    });
+
+    it('should return false for non-existent voice', async () => {
+      const result = await engine.validateVoice('non-existent');
+
+      expect(result).toBe(false);
+    });
+
+    it('should be case-sensitive', async () => {
+      const result = await engine.validateVoice('ALLOY');
+
+      expect(result).toBe(false);
+    });
+
+    it('should handle special characters in voice ID', async () => {
+      const result = await engine.validateVoice('voice@123');
+
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('createVoice (via getVoices)', () => {
+    it('should handle config with isDefault true', async () => {
+      const voices = await engine.getVoices();
+      const defaultVoice = voices.find((v) => v.isDefault);
+
+      expect(defaultVoice).toBeDefined();
+      expect(defaultVoice?.isDefault).toBe(true);
+    });
+
+    it('should handle config with isDefault undefined', async () => {
+      const voices = await engine.getVoices();
+      const nonDefaultVoices = voices.filter((v) => !v.isDefault);
+
+      expect(nonDefaultVoices.length).toBe(5); // 6 total - 1 default
+    });
+
+    it('should handle config without isDefault property', async () => {
+      const voices = await engine.getVoices();
+      const echo = voices.find((v) => v.id === 'echo');
+
+      // Echo config doesn't have isDefault, should default to false
+      expect(echo?.isDefault).toBe(false);
+    });
+  });
+
+  describe('integration scenarios', () => {
+    it('should generate audio with validated voice', async () => {
+      const isValid = await engine.validateVoice('alloy');
+      expect(isValid).toBe(true);
+
+      const voices = await engine.getVoices();
+      const alloyVoice = voices.find((v) => v.id === 'alloy');
+
+      if (alloyVoice) {
+        const audio = await engine.generate('Test text', alloyVoice);
+        expect(audio).toBeInstanceOf(ArrayBuffer);
+      }
+    });
+
+    it('should handle multiple generate calls', async () => {
+      const voices = await engine.getVoices();
+      const voice = voices[0];
+
+      const audio1 = await engine.generate('Text 1', voice);
+      const audio2 = await engine.generate('Text 2', voice);
+
+      expect(audio1).toBeInstanceOf(ArrayBuffer);
+      expect(audio2).toBeInstanceOf(ArrayBuffer);
+    });
+
+    it('should work with all available voices', async () => {
       const voices = await engine.getVoices();
 
       for (const voice of voices) {
         const isValid = await engine.validateVoice(voice.id);
         expect(isValid).toBe(true);
+
+        const audio = await engine.generate('Test', voice);
+        expect(audio).toBeInstanceOf(ArrayBuffer);
       }
     });
 
-    it('should reject non-existent voice ID', async () => {
-      const isValid = await engine.validateVoice('non-existent-voice');
-      expect(isValid).toBe(false);
-    });
-
-    it('should reject empty voice ID', async () => {
-      const isValid = await engine.validateVoice('');
-      expect(isValid).toBe(false);
-    });
-
-    it('should reject null voice ID', async () => {
-      // @ts-expect-error Testing null input
-      const isValid = await engine.validateVoice(null);
-      expect(isValid).toBe(false);
-    });
-  });
-
-  describe('generateSpeech', () => {
-    it('should generate speech for valid text and voice', async () => {
-      const text = 'Hello, world!';
-      const voiceId = 'alloy';
-
-      const audioBuffer = await engine.generateSpeech(text, voiceId);
-
-      expect(audioBuffer).toBeInstanceOf(ArrayBuffer);
-      expect(audioBuffer.byteLength).toBeGreaterThan(0);
-    });
-
-    it('should generate speech for all available voices', async () => {
+    it('should handle concurrent generation requests', async () => {
       const voices = await engine.getVoices();
-      const text = 'Test speech generation';
+      const voice = voices[0];
 
-      for (const voice of voices) {
-        const audioBuffer = await engine.generateSpeech(text, voice.id);
-        expect(audioBuffer).toBeInstanceOf(ArrayBuffer);
-        expect(audioBuffer.byteLength).toBeGreaterThan(0);
-      }
-    });
-
-    it('should handle empty text', async () => {
-      const text = '';
-      const voiceId = 'alloy';
-
-      const audioBuffer = await engine.generateSpeech(text, voiceId);
-      expect(audioBuffer).toBeInstanceOf(ArrayBuffer);
-    });
-
-    it('should handle long text', async () => {
-      const text = 'This is a very long text for testing speech generation. '.repeat(10);
-      const voiceId = 'alloy';
-
-      const audioBuffer = await engine.generateSpeech(text, voiceId);
-      expect(audioBuffer).toBeInstanceOf(ArrayBuffer);
-      expect(audioBuffer.byteLength).toBeGreaterThan(0);
-    });
-
-    it('should handle special characters', async () => {
-      const text = 'Hello, world! @#$%^&*()_+-=[]{}|;:,.<>?';
-      const voiceId = 'alloy';
-
-      const audioBuffer = await engine.generateSpeech(text, voiceId);
-      expect(audioBuffer).toBeInstanceOf(ArrayBuffer);
-      expect(audioBuffer.byteLength).toBeGreaterThan(0);
-    });
-
-    it('should handle Unicode characters', async () => {
-      const text = 'Hello, 世界! ¡Hola! Bonjour! こんにちは!';
-      const voiceId = 'alloy';
-
-      const audioBuffer = await engine.generateSpeech(text, voiceId);
-      expect(audioBuffer).toBeInstanceOf(ArrayBuffer);
-      expect(audioBuffer.byteLength).toBeGreaterThan(0);
-    });
-  });
-
-  describe('Mock Implementation Details', () => {
-    it('should return consistent mock audio data', async () => {
-      const text = 'Test text';
-      const voiceId = 'alloy';
-
-      const audioBuffer1 = await engine.generateSpeech(text, voiceId);
-      const audioBuffer2 = await engine.generateSpeech(text, voiceId);
-
-      expect(audioBuffer1).toEqual(audioBuffer2);
-    });
-
-    it('should return mock audio data that can be decoded', async () => {
-      const text = 'Test';
-      const voiceId = 'alloy';
-
-      const audioBuffer = await engine.generateSpeech(text, voiceId);
-      const decoder = new TextDecoder();
-      const decoded = decoder.decode(audioBuffer);
-
-      expect(decoded).toBe('mock-audio-data');
-    });
-
-    it('should return consistent voice data', async () => {
-      const voices1 = await engine.getVoices();
-      const voices2 = await engine.getVoices();
-
-      expect(voices1).toEqual(voices2);
-    });
-
-    it('should maintain voice order across calls', async () => {
-      const voices1 = await engine.getVoices();
-      const voices2 = await engine.getVoices();
-
-      expect(voices1.length).toBe(voices2.length);
-      for (let i = 0; i < voices1.length; i++) {
-        expect(voices1[i].id).toBe(voices2[i].id);
-        expect(voices1[i].name).toBe(voices2[i].name);
-      }
-    });
-  });
-
-  describe('Error Handling', () => {
-    it('should handle invalid voice ID gracefully', async () => {
-      const text = 'Test text';
-      const invalidVoiceId = 'invalid-voice';
-
-      // Should not throw an error even with invalid voice
-      const audioBuffer = await engine.generateSpeech(text, invalidVoiceId);
-      expect(audioBuffer).toBeInstanceOf(ArrayBuffer);
-    });
-
-    it('should handle null inputs gracefully', async () => {
-      // @ts-expect-error Testing null inputs
-      const audioBuffer1 = await engine.generateSpeech(null, 'alloy');
-      expect(audioBuffer1).toBeInstanceOf(ArrayBuffer);
-
-      // @ts-expect-error Testing null inputs
-      const audioBuffer2 = await engine.generateSpeech('test', null);
-      expect(audioBuffer2).toBeInstanceOf(ArrayBuffer);
-    });
-
-    it('should handle undefined inputs gracefully', async () => {
-      // @ts-expect-error Testing undefined inputs
-      const audioBuffer1 = await engine.generateSpeech(undefined, 'alloy');
-      expect(audioBuffer1).toBeInstanceOf(ArrayBuffer);
-
-      // @ts-expect-error Testing undefined inputs
-      const audioBuffer2 = await engine.generateSpeech('test', undefined);
-      expect(audioBuffer2).toBeInstanceOf(ArrayBuffer);
-    });
-  });
-
-  describe('Integration with Voice Interface', () => {
-    it('should return voices that implement Voice interface', async () => {
-      const voices = await engine.getVoices();
-
-      voices.forEach(voice => {
-        // Check all required Voice interface properties
-        expect(voice).toHaveProperty('id');
-        expect(voice).toHaveProperty('name');
-        expect(voice).toHaveProperty('language');
-        expect(voice).toHaveProperty('gender');
-        expect(voice).toHaveProperty('age');
-        expect(voice).toHaveProperty('provider');
-        expect(voice).toHaveProperty('providerId');
-        expect(voice).toHaveProperty('isActive');
-
-        // Check types
-        expect(typeof voice.id).toBe('string');
-        expect(typeof voice.name).toBe('string');
-        expect(typeof voice.language).toBe('string');
-        expect(['male', 'female', 'neutral']).toContain(voice.gender);
-        expect(['adult', 'young', 'mature']).toContain(voice.age);
-        expect(typeof voice.provider).toBe('string');
-        expect(typeof voice.providerId).toBe('string');
-        expect(typeof voice.isActive).toBe('boolean');
-      });
-    });
-
-    it('should support all voice properties required by the domain', async () => {
-      const voices = await engine.getVoices();
-
-      // Ensure we have voices with different properties
-      const hasMale = voices.some(v => v.gender === 'male');
-      const hasFemale = voices.some(v => v.gender === 'female');
-      const hasNeutral = voices.some(v => v.gender === 'neutral');
-
-      expect(hasMale).toBe(true);
-      expect(hasFemale).toBe(true);
-      expect(hasNeutral).toBe(true);
-
-      const hasAdult = voices.some(v => v.age === 'adult');
-      const hasYoung = voices.some(v => v.age === 'young');
-      const hasMature = voices.some(v => v.age === 'mature');
-
-      expect(hasAdult).toBe(true);
-      expect(hasYoung).toBe(true);
-      expect(hasMature).toBe(true);
-    });
-  });
-
-  describe('Performance', () => {
-    it('should handle multiple rapid calls', async () => {
-      const promises = Array.from({ length: 10 }, () =>
-        engine.getVoices()
+      const promises = Array.from({ length: 5 }, (_, i) =>
+        engine.generate(`Text ${i}`, voice)
       );
 
       const results = await Promise.all(promises);
 
-      results.forEach(voices => {
-        expect(voices).toHaveLength(6);
-      });
+      expect(results.every((r) => r instanceof ArrayBuffer)).toBe(true);
+    });
+  });
+
+  describe('edge cases', () => {
+    it('should handle newlines in text', async () => {
+      const text = 'Line 1\nLine 2\nLine 3';
+
+      const result = await engine.generate(text, mockVoice);
+
+      expect(result).toBeInstanceOf(ArrayBuffer);
     });
 
-    it('should handle concurrent speech generation', async () => {
-      const text = 'Concurrent test';
-      const voiceId = 'alloy';
+    it('should handle tabs in text', async () => {
+      const text = 'Column1\tColumn2\tColumn3';
 
-      const promises = Array.from({ length: 5 }, () =>
-        engine.generateSpeech(text, voiceId)
-      );
+      const result = await engine.generate(text, mockVoice);
 
-      const results = await Promise.all(promises);
-
-      results.forEach(audioBuffer => {
-        expect(audioBuffer).toBeInstanceOf(ArrayBuffer);
-        expect(audioBuffer.byteLength).toBeGreaterThan(0);
-      });
+      expect(result).toBeInstanceOf(ArrayBuffer);
     });
 
-    it('should complete operations quickly', async () => {
-      const startTime = Date.now();
+    it('should handle mixed case voice IDs in validation', async () => {
+      const lowerCase = await engine.validateVoice('alloy');
+      const mixedCase = await engine.validateVoice('Alloy');
+      const upperCase = await engine.validateVoice('ALLOY');
 
-      await engine.getVoices();
-      await engine.validateVoice('alloy');
-      await engine.generateSpeech('Test', 'alloy');
-
-      const endTime = Date.now();
-      const duration = endTime - startTime;
-
-      // All mock operations should complete very quickly
-      expect(duration).toBeLessThan(100);
+      expect(lowerCase).toBe(true);
+      expect(mixedCase).toBe(false);
+      expect(upperCase).toBe(false);
     });
   });
 });

@@ -15,27 +15,14 @@ persona:
   principles: []
 
 # Add custom critical actions (appended after standard config loading)
-critical_actions:
-  - "Enforce TypeScript 0 errors (strict mode, no 'any')"
-  - "Enforce ESLint 0 errors (no eslint-disable comments)"
-  - "Verify 100% test pass rate (Bun Test)"
-  - "Validate mutation testing 80%+ score (Stryker)"
-  - "Check Prettier 100% compliance"
-  - "NEVER suggest disabling ESLint rules or @ts-ignore"
-  - "ALWAYS fix underlying code issues instead of bypassing checks"
+critical_actions: []
 
 # Add persistent memories for the agent
-memories:
-  - "Project enforces strict TypeScript with no implicit any"
-  - "ESLint rules cannot be disabled via inline comments"
-  - "Mutation testing threshold is 80% - never lower this"
-  - "All code must be in English - comments and documentation"
-  - "Test runner is Bun Test - use native test runner"
-  - "Quality gates are mandatory - stop if any check fails"
-  - "Zero-tolerance policy for eslint-disable comments"
-  - "Never use @ts-ignore or @ts-expect-error"
-  - "User name: Eduardo Menoncello"
-  - "Communication language: English"
+memories: []
+# Example:
+# memories:
+#   - "User prefers detailed technical explanations"
+#   - "Current project uses React and TypeScript"
 
 # Add custom menu items (appended to base menu)
 # Don't include * prefix or help/exit - auto-injected
@@ -53,3 +40,18 @@ prompts: []
 # - id: my-prompt
 #   content: |
 #     Prompt instructions here
+
+# Code Quality Rules
+# Critical: Always run lint:fix, typecheck, and format before committing
+# Critical: Never disable ESLint rules with inline comments
+# Critical: Always fix all JSDoc documentation requirements
+# Critical: Extract constants for magic numbers
+# Critical: Keep functions under 30 lines and complexity under 10
+# Critical: Always provide proper JSDoc descriptions and parameter documentation
+# Critical: Use explicit return types for all functions
+# Critical: Set proper error names for custom error classes
+# Critical: Always access process.env properties with bracket notation (process.env['KEY'])
+# Critical: Handle exactOptionalPropertyTypes by providing explicit undefined values where needed
+# Critical: Ensure proper type compatibility with framework-specific error handlers
+# Critical: Always remove unused imports, variables, and function parameters
+# Critical: Provide proper type guards for union types and optional properties

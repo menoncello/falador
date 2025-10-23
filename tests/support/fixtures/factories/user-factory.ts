@@ -1,5 +1,20 @@
 import { faker } from '@faker-js/faker';
-import type { APIRequestContext } from '@playwright/test';
+import type { APIRequestContext, Page } from '@playwright/test';
+import { shouldUseMockMode } from '../mock-api-server';
+import {
+  createUserWithNetworkIntercept,
+  loginWithNetworkIntercept,
+  createApiKeyWithNetworkIntercept,
+  waitForResponseWithValidation
+} from '../../helpers/network-first-helpers';
+import {
+  BaseFactory,
+  TestUser,
+  UserOverrides,
+  TestApiKey,
+  ApiKeyOverrides,
+  AuthManager
+} from '../base/base-fixture';
 
 /**
  * User factory with faker-based data generation and auto-cleanup
@@ -16,27 +31,17 @@ import type { APIRequestContext } from '@playwright/test';
  * const apiKey = await userFactory.createApiKey(user.id);
  */
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  tier: 'free' | 'pro' | 'enterprise';
-  createdAt: string;
-  password?: string; // Password used for creation (for testing only)
-}
-
-interface UserOverrides {
-  email?: string;
-  name?: string;
-  password?: string;
-  tier?: 'free' | 'pro' | 'enterprise';
-}
-
-export class UserFactory {
-  private createdUserIds: string[] = [];
+/**
+ * Enhanced User Factory with network-first patterns and base factory integration
+ */
+export class UserFactory extends BaseFactory<TestUser, UserOverrides> {
   private createdApiKeyIds: string[] = [];
+  private page?: Page;
 
-  constructor(private request: APIRequestContext) {}
+  constructor(request: APIRequestContext, page?: Page) {
+    super(request);
+    this.page = page;
+  }
 
   /**
    * Create a test user with optional overrides
@@ -44,31 +49,49 @@ export class UserFactory {
    * @param overrides - Optional user properties to override
    * @returns Created user object
    */
-  async createUser(overrides: UserOverrides = {}): Promise<User> {
-    const password =
-      overrides.password || faker.internet.password({ length: 12 });
-    const userData = {
+  async create(overrides: UserOverrides = {}): Promise<TestUser> {
+    return this.createUser(overrides);
+  }
+
+  /**
+   * Create a test user with optional overrides
+   *
+   * @param overrides - Optional user properties to override
+   * @returns Created user object
+   */
+  async createUser(overrides: UserOverrides = {}): Promise<TestUser> {
+    const userData = this.generateUserData(overrides);
+
+    try {
+      // Use network-first pattern to prevent race conditions
+      const { userResponse, user } = await createUserWithNetworkIntercept(
+        this.request,
+        userData
+      );
+
+      this.trackCreated(user.id);
+
+      // Store password for testing purposes
+      return { ...user, password: userData.password };
+    } catch (error) {
+      // If real API fails and mock mode is available, try to provide helpful error
+      if (shouldUseMockMode() && this.page) {
+        throw new Error(`API connection failed. Mock mode should handle this automatically. Error: ${error.message}`);
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Generate user data with faker and overrides
+   */
+  private generateUserData(overrides: UserOverrides = {}): UserOverrides & { password: string } {
+    return {
       email: overrides.email || faker.internet.email(),
       name: overrides.name || faker.person.fullName(),
-      password,
+      password: overrides.password || faker.internet.password({ length: 12 }),
       tier: overrides.tier || 'free',
     };
-
-    const response = await this.request.post('/api/auth/register', {
-      data: userData,
-    });
-
-    if (!response.ok()) {
-      throw new Error(
-        `Failed to create user: ${response.status()} ${await response.text()}`
-      );
-    }
-
-    const user = await response.json();
-    this.createdUserIds.push(user.id);
-
-    // Store password for testing purposes
-    return { ...user, password };
   }
 
   /**
@@ -102,26 +125,25 @@ export class UserFactory {
     }
     const token = await this.login(user.email, user.password);
 
-    const response = await this.request.post('/api/auth/api-keys', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      data: {
-        name: name || faker.word.words(2),
-        scopes: ['read', 'write'],
-      },
-    });
-
-    if (!response.ok()) {
-      throw new Error(
-        `Failed to create API key: ${response.status()} ${await response.text()}`
+    try {
+      // Use network-first pattern for API key creation
+      const { apiKey, apiKeyId } = await createApiKeyWithNetworkIntercept(
+        this.request,
+        token,
+        {
+          name: name || faker.word.words(2),
+          scopes: ['read', 'write'],
+        }
       );
+
+      this.createdApiKeyIds.push(apiKeyId);
+      return apiKey;
+    } catch (error) {
+      if (shouldUseMockMode() && this.page) {
+        throw new Error(`API connection failed. Mock mode should handle this automatically. Error: ${error.message}`);
+      }
+      throw error;
     }
-
-    const data = await response.json();
-    this.createdApiKeyIds.push(data.id);
-
-    return data.key;
   }
 
   /**
@@ -132,18 +154,20 @@ export class UserFactory {
    * @returns JWT auth token
    */
   async login(email: string, password: string): Promise<string> {
-    const response = await this.request.post('/api/auth/login', {
-      data: { email, password },
-    });
-
-    if (!response.ok()) {
-      throw new Error(
-        `Login failed: ${response.status()} ${await response.text()}`
+    try {
+      // Use network-first pattern for login to prevent race conditions
+      const { token } = await loginWithNetworkIntercept(
+        this.request,
+        { email, password }
       );
-    }
 
-    const data = await response.json();
-    return data.token;
+      return token;
+    } catch (error) {
+      if (shouldUseMockMode() && this.page) {
+        throw new Error(`API connection failed. Mock mode should handle this automatically. Error: ${error.message}`);
+      }
+      throw error;
+    }
   }
 
   /**
@@ -161,8 +185,9 @@ export class UserFactory {
       }
     }
 
-    // Delete users
-    for (const userId of this.createdUserIds) {
+    // Delete users using base factory cleanup
+    const userIds = this.getCreatedIds();
+    for (const userId of userIds) {
       try {
         await this.request.delete(`/api/users/${userId}`);
       } catch (error) {
@@ -171,7 +196,7 @@ export class UserFactory {
     }
 
     // Reset tracking arrays
-    this.createdUserIds = [];
     this.createdApiKeyIds = [];
+    this.resetTracking();
   }
 }

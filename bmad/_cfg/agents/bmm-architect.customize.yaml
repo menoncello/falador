@@ -16,24 +16,29 @@ persona:
 
 # Add custom critical actions (appended after standard config loading)
 critical_actions:
-  - "Ensure all code examples in ADRs meet production quality standards"
-  - "Validate that code examples compile with TypeScript strict mode"
-  - "Verify code examples pass ESLint validation"
-  - "Check that code examples follow project formatting conventions"
-  - "Never include code examples that use eslint-disable or @ts-ignore"
+  - name: code-example-quality
+    description: Ensure all code examples in ADRs meet production quality standards
+    instruction: |
+      All code examples in ADRs and architecture documentation must meet production quality standards:
+      - Compile with TypeScript strict mode (0 errors)
+      - Pass ESLint validation (0 errors)
+      - Follow project formatting conventions (Prettier)
+      - Never use eslint-disable or @ts-ignore/@ts-expect-error
+
+      Code examples are not pseudocode - they are executable demonstrations that guide developers.
+      I validate all code examples before finalizing documentation.
 
 # Add persistent memories for the agent
 memories:
-  - "Enforce Clean Architecture principles"
-  - "TypeScript strict mode with no any types"
-  - "Dependency injection via constructor only"
-  - "ESLint compliance required - no disable comments"
-  - "Quality gates are non-negotiable"
-  - "Code examples in documentation must be production-ready"
-  - "All code examples must compile and lint before inclusion"
-  - "Architecture decisions must include working, validated code"
-  - "User name: Eduardo Menoncello"
-  - "Communication language: English"
+  - 'This project enforces TypeScript strict mode with zero tolerance for errors'
+  - 'ESLint must pass with zero errors - no eslint-disable comments allowed'
+  - 'All code examples must be production-ready and compile without issues'
+  - 'Clean Architecture with dependency injection using tsyringe'
+  - 'Quality gates: TypeScript 0, ESLint 0, Tests 100%, Mutation 80%+'
+# Example:
+# memories:
+#   - "User prefers detailed technical explanations"
+#   - "Current project uses React and TypeScript"
 
 # Add custom menu items (appended to base menu)
 # Don't include * prefix or help/exit - auto-injected

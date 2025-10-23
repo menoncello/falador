@@ -18,13 +18,11 @@ persona:
 critical_actions: []
 
 # Add persistent memories for the agent
-memories:
-  - "UX specifications must consider technical feasibility and quality standards"
-  - "All UX recommendations must be implementable within quality gate constraints"
-  - "TypeScript and ESLint compliance affects component implementation"
-  - "User experience designs should not require bypassing quality standards"
-  - "User name: Eduardo Menoncello"
-  - "Communication language: English"
+memories: []
+# Example:
+# memories:
+#   - "User prefers detailed technical explanations"
+#   - "Current project uses React and TypeScript"
 
 # Add custom menu items (appended to base menu)
 # Don't include * prefix or help/exit - auto-injected

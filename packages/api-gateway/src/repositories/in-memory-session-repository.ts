@@ -4,8 +4,8 @@
  * Implements the SessionRepository interface using the in-memory Database
  */
 
-import { SessionRepository, TokenGenerator } from '@falador/core-domain';
 import { inject, injectable } from 'tsyringe';
+import { SessionRepository, Session } from '../../../core-domain/src/index.js';
 import { Database } from '../database.js';
 
 /**
@@ -16,12 +16,8 @@ export class InMemorySessionRepository implements SessionRepository {
   /**
    *
    * @param database
-   * @param tokenGenerator
    */
-  constructor(
-    @inject('Database') private database: Database,
-    @inject('TokenGenerator') private tokenGenerator: TokenGenerator
-  ) {}
+  constructor(@inject('Database') private database: Database) {}
 
   /**
    *
@@ -35,17 +31,12 @@ export class InMemorySessionRepository implements SessionRepository {
    *
    * @param token
    */
-  async findByToken(
-    token: string
-  ): Promise<{ userId: string; expiresAt: string } | null> {
+  async findByToken(token: string): Promise<Session | null> {
     const session = this.database.getSession(token);
     if (!session) {
       return null;
     }
-    return {
-      userId: session.userId,
-      expiresAt: session.expiresAt,
-    };
+    return session;
   }
 
   /**
@@ -53,11 +44,6 @@ export class InMemorySessionRepository implements SessionRepository {
    * @param token
    */
   async delete(token: string): Promise<boolean> {
-    // The Database class doesn't have a deleteSession method, so we'll implement it
-    // by clearing the session from the sessions map
-    return (
-      (this.database.deleteSession && this.database.deleteSession(token)) ||
-      true
-    );
+    return this.database.deleteSession(token);
   }
 }

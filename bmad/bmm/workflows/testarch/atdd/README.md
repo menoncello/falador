@@ -295,9 +295,7 @@ test('should display error for invalid credentials', async ({ page }) => {
   await page.click('[data-testid="login-button"]');
 
   // THEN: Error message is displayed
-  await expect(page.locator('[data-testid="error-message"]')).toHaveText(
-    'Invalid email or password'
-  );
+  await expect(page.locator('[data-testid="error-message"]')).toHaveText('Invalid email or password');
 });
 ```
 
@@ -333,8 +331,7 @@ export const createUser = (overrides = {}) => ({
   ...overrides,
 });
 
-export const createUsers = (count: number) =>
-  Array.from({ length: count }, () => createUser());
+export const createUsers = (count: number) => Array.from({ length: count }, () => createUser());
 ```
 
 **Factory principles:**
@@ -391,9 +388,7 @@ test('should display user name', async ({ page }) => {
 // ❌ WRONG: Multiple assertions (not atomic)
 test('should display user info', async ({ page }) => {
   await expect(page.locator('[data-testid="user-name"]')).toHaveText('John');
-  await expect(page.locator('[data-testid="user-email"]')).toHaveText(
-    'john@example.com'
-  );
+  await expect(page.locator('[data-testid="user-email"]')).toHaveText('john@example.com');
 });
 ```
 
@@ -669,7 +664,7 @@ npm run test:e2e -- user-authentication.spec.ts --debug
 2. Run failing tests to confirm RED phase: `npm run test:e2e`
 3. Begin implementation using checklist as guide
 4. Share progress in daily standup
-5. When all tests pass, run `bmad sm story-approved` to move story to DONE
+5. When all tests pass, run `bmad sm story-done` to move story to DONE
 
 ```
 

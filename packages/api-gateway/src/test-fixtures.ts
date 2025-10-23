@@ -1,237 +1,176 @@
-import { db } from './database';
-import { createTestUser, createTestProject, TEST_PASSWORDS } from './test-factories';
-
 /**
- * Test fixtures for common authentication and request patterns
+ * Test Fixtures
  *
- * These fixtures provide reusable test setup utilities to reduce duplication
- * and ensure consistent authentication patterns across tests.
+ * Reusable test setup patterns for common scenarios like authentication
  */
 
+import { db } from './database';
+import { createTestUser, UserFactoryData } from './test-factories';
+
 export interface AuthenticatedUser {
-  user: ReturnType<typeof db.createUser>;
+  userData: UserFactoryData;
+  user: { id: string; email: string; name: string; tier: string };
   token: string;
 }
 
-/**
- * Create an authenticated user with a valid session token
- * @param userData - Optional user data overrides
- * @returns Authenticated user object with user data and token
- */
-export function createAuthenticatedUser(userData?: Parameters<typeof createTestUser>[0]): AuthenticatedUser {
-  const testUser = createTestUser(userData);
-
-  const user = db.createUser({
-    email: testUser.email,
-    name: testUser.name,
-    password: testUser.password,
-    tier: testUser.tier,
-  });
-
-  const token = db.createSession(user.id);
-
-  return { user, token };
+export interface TestFixture {
+  createAuthenticatedUser: (
+    overrides?: Partial<UserFactoryData>
+  ) => AuthenticatedUser;
+  createMultipleAuthenticatedUsers: (
+    count: number,
+    overrides?: Array<Partial<UserFactoryData>>
+  ) => AuthenticatedUser[];
+  clearDatabase: () => void;
 }
 
 /**
- * Create an authenticated HTTP request with proper headers
- * @param url - Request URL
- * @param method - HTTP method
+ * Creates a fixture with authenticated user setup
+ * @returns A fixture object with helper methods for common test scenarios
+ */
+
+/**
+ * Creates an authenticated user for testing
+ * @param overrides - Optional overrides for user data
+ * @returns Authenticated user data including user object and token
+ */
+function createAuthenticatedUserForFixture(
+  overrides: Partial<UserFactoryData> = {}
+): AuthenticatedUser {
+  const userData = createTestUser(overrides);
+  const user = db.createUser({
+    email: userData.email,
+    name: userData.name,
+    password: userData.password,
+    tier: userData.tier,
+  });
+  const token = db.createSession(user.id);
+
+  return {
+    userData,
+    user,
+    token,
+  };
+}
+
+/**
+ * Creates multiple authenticated users for testing
+ * @param count - Number of users to create
+ * @param overrides - Optional overrides for each user
+ * @returns Array of authenticated users
+ */
+function createMultipleAuthenticatedUsersForFixture(
+  count: number,
+  overrides: Array<Partial<UserFactoryData>> = []
+): AuthenticatedUser[] {
+  const users: AuthenticatedUser[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const userOverrides = overrides[i] || {};
+    users.push(createAuthenticatedUserForFixture(userOverrides));
+  }
+
+  return users;
+}
+export function createTestFixture(): TestFixture {
+  return {
+    /**
+     * Creates an authenticated user for testing
+     * @param overrides - Optional overrides for user data
+     * @returns Authenticated user data including user object and token
+     */
+    createAuthenticatedUser(
+      overrides: Partial<UserFactoryData> = {}
+    ): AuthenticatedUser {
+      return createAuthenticatedUserForFixture(overrides);
+    },
+
+    /**
+     * Creates multiple authenticated users for testing
+     * @param count - Number of users to create
+     * @param overrides - Optional overrides for each user
+     * @returns Array of authenticated users
+     */
+    createMultipleAuthenticatedUsers(
+      count: number,
+      overrides: Array<Partial<UserFactoryData>> = []
+    ): AuthenticatedUser[] {
+      return createMultipleAuthenticatedUsersForFixture(count, overrides);
+    },
+
+    /**
+     * Clears the database for clean test isolation
+     */
+    clearDatabase(): void {
+      db.clear();
+    },
+  };
+}
+
+/**
+ * Creates an authenticated request with proper headers
+ * @param url - The request URL
  * @param token - Authentication token
- * @param body - Optional request body
- * @returns Configured Request object
+ * @param options - Additional request options
+ * @returns Request object with authentication headers
  */
 export function createAuthenticatedRequest(
   url: string,
+  token: string,
+  options: RequestInit = {}
+): Request {
+  const headers = new Headers(options.headers);
+  headers.set('Authorization', `Bearer ${token}`);
+
+  if (!headers.has('Content-Type') && options.body) {
+    headers.set('Content-Type', 'application/json');
+  }
+
+  return new Request(url, {
+    ...options,
+    headers,
+  });
+}
+
+/**
+ * Creates a project request with authentication
+ * @param method - HTTP method
+ * @param token - Authentication token
+ * @param body - Request body
+ * @param url - Request URL (optional, defaults to projects endpoint)
+ * @returns Request object for project operations
+ */
+export function createProjectRequest(
   method: string,
   token: string,
-  body?: Record<string, unknown>
+  body?: unknown,
+  url = 'http://localhost/api/projects'
 ): Request {
-  return new Request(url, {
+  return createAuthenticatedRequest(url, token, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
     body: body ? JSON.stringify(body) : undefined,
   });
 }
 
 /**
- * Create a user with specific tier for testing tier-based functionality
- * @param tier - User tier ('free', 'pro', 'enterprise')
- * @returns Authenticated user with specified tier
+ * Creates an auth request for authentication endpoints
+ * @param method - HTTP method
+ * @param endpoint - Auth endpoint (e.g., 'register', 'login', 'me')
+ * @param body - Request body
+ * @returns Request object for auth operations
  */
-export function createAuthenticatedUserWithTier(tier: 'free' | 'pro' | 'enterprise'): AuthenticatedUser {
-  return createAuthenticatedUser({ tier });
-}
+export function createAuthRequest(
+  method: string,
+  endpoint: string,
+  body?: unknown
+): Request {
+  const url = `http://localhost/api/auth/${endpoint}`;
 
-/**
- * Create multiple authenticated users for testing multi-user scenarios
- * @param count - Number of users to create
- * @param userDataPrefix - Optional prefix for user data to ensure uniqueness
- * @returns Array of authenticated users
- */
-export function createMultipleAuthenticatedUsers(
-  count: number,
-  userDataPrefix: string = 'test'
-): AuthenticatedUser[] {
-  const users: AuthenticatedUser[] = [];
-
-  for (let i = 0; i < count; i++) {
-    users.push(createAuthenticatedUser({
-      email: `${userDataPrefix}-${i + 1}@example.com`,
-      name: `${userDataPrefix.charAt(0).toUpperCase() + userDataPrefix.slice(1)} User ${i + 1}`,
-    }));
-  }
-
-  return users;
-}
-
-/**
- * Create a project for a specific user with optional project data
- * @param userId - User ID to associate the project with
- * @param projectData - Optional project data overrides
- * @returns Created project
- */
-export function createProjectForUser(
-  userId: string,
-  projectData?: Parameters<typeof createTestProject>[0]
-): ReturnType<typeof db.createProject> {
-  const testProject = createTestProject({ userId, ...projectData });
-
-  return db.createProject({
-    userId: testProject.userId,
-    title: testProject.title,
-    author: testProject.author,
-    language: testProject.language,
-    genre: testProject.genre,
-    status: testProject.status,
-    metadata: testProject.metadata,
+  return new Request(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
   });
 }
-
-/**
- * Fixture for creating a complete authentication setup with user and projects
- * @param projectCount - Number of projects to create for the user
- * @returns Authenticated user with projects
- */
-export function createAuthenticatedUserWithProjects(projectCount: number = 1): {
-  authenticatedUser: AuthenticatedUser;
-  projects: ReturnType<typeof db.createProject>[];
-} {
-  const authenticatedUser = createAuthenticatedUser();
-  const projects: ReturnType<typeof db.createProject>[] = [];
-
-  for (let i = 0; i < projectCount; i++) {
-    const project = createProjectForUser(authenticatedUser.user.id, {
-      title: `Test Project ${i + 1}`,
-      author: `Test Author ${i + 1}`,
-    });
-    projects.push(project);
-  }
-
-  return { authenticatedUser, projects };
-}
-
-/**
- * Create API key fixture for testing API key functionality
- * @param userId - User ID to create API key for
- * @param keyData - Optional API key data overrides
- * @returns Created API key
- */
-export function createApiKeyForUser(
-  userId: string,
-  keyData?: { name?: string; scopes?: string[] }
-): ReturnType<typeof db.createApiKey> {
-  return db.createApiKey({
-    userId,
-    name: keyData?.name || 'Test API Key',
-    scopes: keyData?.scopes || ['read', 'write'],
-  });
-}
-
-/**
- * Fixture for testing invalid authentication scenarios
- * @returns Object with various invalid authentication tokens
- */
-export const InvalidAuthFixtures = {
-  /** Empty token */
-  empty: '',
-  /** Malformed token (no Bearer prefix) */
-  malformed: 'invalid-token-format',
-  /** Non-existent token */
-  nonExistent: 'non-existent-token',
-  /** Null token */
-  null: null as unknown as string,
-  /** Undefined token */
-  undefined: undefined as unknown as string,
-} as const;
-
-/**
- * Network-first testing utilities for edge cases
- * These utilities help test network-related scenarios and error conditions
- */
-export const NetworkFixtures = {
-  /**
-   * Create a request that simulates a timeout scenario
-   * @param url - Request URL
-   * @param token - Authentication token
-   * @returns Request configured for timeout testing
-   */
-  createTimeoutRequest: (url: string, token: string): Request =>
-    new Request(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'X-Test-Timeout': 'true',
-      },
-    }),
-
-  /**
-   * Create a request that simulates a network error
-   * @param url - Request URL
-   * @param token - Authentication token
-   * @returns Request configured for network error testing
-   */
-  createNetworkErrorRequest: (url: string, token: string): Request =>
-    new Request(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'X-Test-Network-Error': 'true',
-      },
-    }),
-
-  /**
-   * Create a request with malformed JSON for testing parsing errors
-   * @param url - Request URL
-   * @param token - Authentication token
-   * @returns Request with malformed JSON body
-   */
-  createMalformedJsonRequest: (url: string, token: string): Request =>
-    new Request(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: '{ malformed json }',
-    }),
-
-  /**
-   * Create a request with oversized payload for testing size limits
-   * @param url - Request URL
-   * @param token - Authentication token
-   * @returns Request with oversized payload
-   */
-  createOversizedRequest: (url: string, token: string): Request => {
-    const largePayload = 'x'.repeat(10 * 1024 * 1024); // 10MB
-    return new Request(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ data: largePayload }),
-    });
-  },
-} as const;

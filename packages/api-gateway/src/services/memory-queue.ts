@@ -1,5 +1,4 @@
-import type { GenerationJob } from '../../../core-domain/src/entities/index.js';
-import type { Queue } from '../../../core-domain/src/interfaces/index.js';
+import type { GenerationJob, Queue } from '../../../core-domain/src/index.js';
 
 /**
  * In-Memory Queue Implementation
@@ -14,7 +13,7 @@ interface QueueJob {
 }
 
 /**
- *
+ * In-Memory Queue Implementation
  */
 export class MemoryQueue implements Queue {
   private jobs: QueueJob[] = [];

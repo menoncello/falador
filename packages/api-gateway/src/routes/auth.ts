@@ -1,167 +1,65 @@
 import { Elysia, t } from 'elysia';
-import { CONFIG } from '../config';
-import { HTTP_STATUS } from '../constants';
 import { db } from '../database';
-import type { RegisterBody, LoginBody, CreateApiKeyBody } from '../types';
 import { extractAuthUser } from '../utils/auth';
 
-/**
- * Validate password length requirements
- * @param password - The password to validate
- * @returns Error message if invalid, null if valid
- */
-function validatePasswordLength(password: string): string | null {
-  const { PASSWORD_REQUIREMENTS } = CONFIG;
-
-  if (password.length < PASSWORD_REQUIREMENTS.MIN_LENGTH) {
-    return `Password must be at least ${PASSWORD_REQUIREMENTS.MIN_LENGTH} characters long`;
-  }
-
-  if (password.length > PASSWORD_REQUIREMENTS.MAX_LENGTH) {
-    return `Password must be less than ${PASSWORD_REQUIREMENTS.MAX_LENGTH} characters long`;
-  }
-
-  return null;
-}
+// HTTP status codes
+const HTTP_STATUS_BAD_REQUEST = 400;
 
 /**
- * Validate password character requirements
- * @param password - The password to validate
- * @returns Error message if invalid, null if valid
+ * Validate and authorize API key deletion
+ * @param params - The route parameters containing the API key ID
+ * @param params.id - The ID of the API key to delete
+ * @param authUser - The authenticated user object
+ * @param authUser.id - The ID of the authenticated user
+ * @returns Validation result with error and status if validation fails
  */
-function validatePasswordCharacters(password: string): string | null {
-  const { PASSWORD_REQUIREMENTS } = CONFIG;
-
-  if (PASSWORD_REQUIREMENTS.REQUIRE_LOWERCASE && !/[a-z]/.test(password)) {
-    return 'Password must contain at least one lowercase letter';
+function validateApiKeyDeletion(
+  params: { id: string },
+  authUser: { id: string } | null
+): { error?: string; status?: number } {
+  if (!authUser) {
+    return { error: 'Unauthorized', status: 401 };
   }
 
-  if (PASSWORD_REQUIREMENTS.REQUIRE_UPPERCASE && !/[A-Z]/.test(password)) {
-    return 'Password must contain at least one uppercase letter';
+  const apiKey = db.getApiKeyById(params.id);
+  if (!apiKey) {
+    return { error: 'API key not found', status: 404 };
   }
 
-  if (PASSWORD_REQUIREMENTS.REQUIRE_NUMBERS && !/\d/.test(password)) {
-    return 'Password must contain at least one number';
+  // Check authorization - only owner can delete their API keys
+  if (apiKey.userId !== authUser.id) {
+    return { error: 'Forbidden', status: 403 };
   }
 
-  if (
-    PASSWORD_REQUIREMENTS.REQUIRE_SPECIAL_CHARS &&
-    !PASSWORD_REQUIREMENTS.SPECIAL_CHARS_REGEX.test(password)
-  ) {
-    return 'Password must contain at least one special character';
-  }
-
-  return null;
-}
-
-/**
- * Validate password strength requirements
- * @param password - The password to validate
- * @returns Error message if invalid, null if valid
- */
-function validatePasswordStrength(password: string): string | null {
-  const lengthError = validatePasswordLength(password);
-  if (lengthError) {
-    return lengthError;
-  }
-
-  const characterError = validatePasswordCharacters(password);
-  if (characterError) {
-    return characterError;
-  }
-
-  return null;
-}
-
-/**
- * Validate string input length
- * @param value - The string to validate
- * @param fieldName - The name of the field for error messages
- * @param minLength - Minimum allowed length
- * @param maxLength - Maximum allowed length
- * @returns Error message if invalid, null if valid
- */
-function validateStringLength(
-  value: string,
-  fieldName: string,
-  minLength: number,
-  maxLength: number
-): string | null {
-  if (value.length < minLength) {
-    return `${fieldName} must be at least ${minLength} characters long`;
-  }
-
-  if (value.length > maxLength) {
-    return `${fieldName} must be less than ${maxLength} characters long`;
-  }
-
-  return null;
-}
-
-/**
- * Validate registration input data
- * @param body - The registration request body
- * @returns Error message if invalid, null if valid
- */
-function validateRegistrationInput(body: RegisterBody): string | null {
-  // Validate required fields
-  if (!body.email || !body.name || !body.password) {
-    return 'Missing required fields: email, name, password';
-  }
-
-  // Validate input lengths
-  const nameError = validateStringLength(
-    body.name,
-    'Name',
-    CONFIG.NAME_MIN_LENGTH,
-    CONFIG.NAME_MAX_LENGTH
-  );
-  if (nameError) {
-    return nameError;
-  }
-
-  const emailError = validateStringLength(
-    body.email,
-    'Email',
-    CONFIG.EMAIL_MIN_LENGTH,
-    CONFIG.EMAIL_MAX_LENGTH
-  );
-  if (emailError) {
-    return emailError;
-  }
-
-  // Validate password strength
-  const passwordError = validatePasswordStrength(body.password);
-  if (passwordError) {
-    return passwordError;
-  }
-
-  return null;
+  return {};
 }
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   // POST /api/auth/register
   .post(
     '/register',
-    ({
-      body,
-      set,
-    }: {
-      body: RegisterBody;
-      set: { status: (code: number) => void };
-    }) => {
-      const validationError = validateRegistrationInput(body);
-      if (validationError) {
-        set.status = HTTP_STATUS.BAD_REQUEST;
-        return { error: validationError };
+    ({ body, set }) => {
+      // Validate email format - simple validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!body.email || !emailRegex.test(body.email)) {
+        set.status = 400;
+        return { error: 'Valid email is required' };
       }
 
+      // Validate required fields
+      if (!body.name || !body.password) {
+        set.status = 400;
+        return { error: 'Missing required fields: name, password' };
+      }
+
+      // Check for duplicate email
       const existingUser = db.getUserByEmail(body.email);
       if (existingUser) {
-        set.status = HTTP_STATUS.CONFLICT;
+        set.status = 409;
         return { error: 'User with this email already exists' };
       }
 
+      // Create user
       const user = db.createUser({
         email: body.email,
         name: body.name,
@@ -169,7 +67,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         ...(body.tier && { tier: body.tier }),
       });
 
-      set.status = HTTP_STATUS.CREATED;
+      set.status = 201;
       return {
         id: user.id,
         email: user.email,
@@ -179,9 +77,9 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
     },
     {
       body: t.Object({
-        email: t.String(),
-        name: t.String(),
-        password: t.String(),
+        email: t.Optional(t.String()),
+        name: t.Optional(t.String()),
+        password: t.Optional(t.String()),
         tier: t.Optional(
           t.Union([
             t.Literal('free'),
@@ -196,31 +94,25 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
   // POST /api/auth/login
   .post(
     '/login',
-    ({
-      body,
-      set,
-    }: {
-      body: LoginBody;
-      set: { status: (code: number) => void };
-    }) => {
+    ({ body, set }) => {
       // Find user
       const user = db.getUserByEmail(body.email);
       if (!user) {
-        set.status = HTTP_STATUS.UNAUTHORIZED;
+        set.status = 401;
         return { error: 'Invalid credentials' };
       }
 
       // Verify password
       const isValid = db.verifyPassword(body.password, user.passwordHash);
       if (!isValid) {
-        set.status = HTTP_STATUS.UNAUTHORIZED;
+        set.status = 401;
         return { error: 'Invalid credentials' };
       }
 
       // Create session
       const token = db.createSession(user.id);
 
-      set.status = HTTP_STATUS.OK;
+      set.status = 200;
       return { token };
     },
     {
@@ -232,41 +124,24 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
   )
 
   // GET /api/auth/me
-  .get(
-    '/me',
-    ({
-      headers,
-      set,
-    }: {
-      headers: { authorization?: string };
-      set: { status: (code: number) => void };
-    }) => {
-      const authUser = extractAuthUser(headers['authorization'] || null);
-      if (!authUser) {
-        set.status = HTTP_STATUS.UNAUTHORIZED;
-        return { error: 'Unauthorized' };
-      }
-
-      set.status = HTTP_STATUS.OK;
-      return authUser;
+  .get('/me', ({ headers, set }) => {
+    const authUser = extractAuthUser(headers['authorization'] || null);
+    if (!authUser) {
+      set.status = 401;
+      return { error: 'Unauthorized' };
     }
-  )
+
+    set.status = 200;
+    return authUser;
+  })
 
   // POST /api/auth/api-keys
   .post(
     '/api-keys',
-    ({
-      body,
-      headers,
-      set,
-    }: {
-      body: CreateApiKeyBody;
-      headers: { authorization?: string };
-      set: { status: (code: number) => void };
-    }) => {
+    ({ body, headers, set }) => {
       const authUser = extractAuthUser(headers['authorization'] || null);
       if (!authUser) {
-        set.status = HTTP_STATUS.UNAUTHORIZED;
+        set.status = 401;
         return { error: 'Unauthorized' };
       }
 
@@ -276,7 +151,7 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
         scopes: body.scopes,
       });
 
-      set.status = HTTP_STATUS.CREATED;
+      set.status = 201;
       return {
         id: apiKey.id,
         key: apiKey.key,
@@ -293,31 +168,20 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
   )
 
   // DELETE /api/auth/api-keys/:id
-  .delete(
-    '/api-keys/:id',
-    ({
-      params,
-      _headers,
-      set,
-    }: {
-      params: { id: string };
-      _headers: { authorization?: string };
-      set: { status: (code: number) => void };
-    }) => {
-      const deleted = db.deleteApiKey(params.id);
-      if (!deleted) {
-        set.status = HTTP_STATUS.NOT_FOUND;
-        return { error: 'API key not found' };
-      }
-      set.status = HTTP_STATUS.NO_CONTENT;
-      return null;
-    }
-  );
+  .delete('/api-keys/:id', ({ params, headers, set }) => {
+    const authUser = extractAuthUser(headers['authorization'] || null);
+    const validation = validateApiKeyDeletion(params, authUser);
 
-// Test cleanup endpoint (only available in test environment)
-if (process.env.NODE_ENV === 'test') {
-  authRoutes.post('/test/cleanup', () => {
-    db.clear();
-    return { message: 'Database cleared' };
+    if (validation.error) {
+      set.status = validation.status || HTTP_STATUS_BAD_REQUEST;
+      return { error: validation.error };
+    }
+
+    const deleted = db.deleteApiKey(params.id);
+    if (!deleted) {
+      set.status = 404;
+      return { error: 'API key not found' };
+    }
+    set.status = 204;
+    return null;
   });
-}

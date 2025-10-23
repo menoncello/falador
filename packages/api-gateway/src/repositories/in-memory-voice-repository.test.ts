@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'bun:test';
+import type { Voice } from '../../../core-domain/src/index';
 import { InMemoryVoiceRepository } from './in-memory-voice-repository';
-import type { Voice } from '@falador/core-domain';
 
 describe('InMemoryVoiceRepository', () => {
   let repository: InMemoryVoiceRepository;
@@ -9,347 +9,344 @@ describe('InMemoryVoiceRepository', () => {
     repository = new InMemoryVoiceRepository();
   });
 
-  describe('Basic CRUD Operations', () => {
-    it('should create a repository with initial data', () => {
-      const voices = repository.findAll();
-      expect(voices).toHaveLength(5); // Initial seed data
-    });
-
-    it('should find a voice by ID', async () => {
+  describe('initialization', () => {
+    it('should seed initial voice data on construction', async () => {
       const voices = await repository.findAll();
-      const firstVoice = voices[0];
 
-      const found = await repository.findById(firstVoice.id);
-      expect(found).toEqual(firstVoice);
+      expect(voices).toBeDefined();
+      expect(voices.length).toBeGreaterThan(0);
+      expect(voices.length).toBe(5); // Based on DEFAULT_VOICE_CONFIGS
     });
 
-    it('should return null when voice not found', async () => {
-      const found = await repository.findById('non-existent-id');
-      expect(found).toBeNull();
+    it('should have default voice configured', async () => {
+      const defaultVoice = await repository.findDefault();
+
+      expect(defaultVoice).toBeDefined();
+      expect(defaultVoice?.isDefault).toBe(true);
+      expect(defaultVoice?.name).toBe('Alice');
+    });
+  });
+
+  describe('findById', () => {
+    it('should find voice by id', async () => {
+      const voiceId = 'voice-1';
+
+      const result = await repository.findById(voiceId);
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBe(voiceId);
+      expect(result?.name).toBe('Alice');
     });
 
-    it('should find all voices', async () => {
-      const voices = await repository.findAll();
-      expect(voices).toHaveLength(5);
+    it('should return null for non-existent voice', async () => {
+      const result = await repository.findById('non-existent');
 
-      // Verify structure of initial voices
-      voices.forEach(voice => {
-        expect(voice).toHaveProperty('id');
-        expect(voice).toHaveProperty('name');
-        expect(voice).toHaveProperty('language');
-        expect(voice).toHaveProperty('gender');
-        expect(voice).toHaveProperty('provider');
-        expect(voice).toHaveProperty('isAvailable');
-        expect(voice).toHaveProperty('isDefault');
-        expect(voice).toHaveProperty('createdAt');
-        expect(voice).toHaveProperty('updatedAt');
-      });
+      expect(result).toBeNull();
     });
 
-    it('should save a new voice', async () => {
+    it('should find voice with correct structure', async () => {
+      const result = await repository.findById('voice-2');
+
+      expect(result).toBeDefined();
+      expect(result?.id).toBeDefined();
+      expect(result?.name).toBeDefined();
+      expect(result?.language).toBeDefined();
+      expect(result?.gender).toBeDefined();
+      expect(result?.age).toBeDefined();
+      expect(result?.provider).toBeDefined();
+      expect(result?.createdAt).toBeInstanceOf(Date);
+      expect(result?.updatedAt).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all voices', async () => {
+      const result = await repository.findAll();
+
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(5);
+    });
+
+    it('should return voices with different attributes', async () => {
+      const result = await repository.findAll();
+
+      const names = result.map((v) => v.name);
+      expect(names).toContain('Alice');
+      expect(names).toContain('Bob');
+      expect(names).toContain('Maria');
+      expect(names).toContain('Pierre');
+      expect(names).toContain('Yuki');
+    });
+  });
+
+  describe('findByProvider', () => {
+    it('should find voices by provider', async () => {
+      const result = await repository.findByProvider('openai');
+
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(5); // All seeded voices use 'openai'
+      expect(result.every((v) => v.provider === 'openai')).toBe(true);
+    });
+
+    it('should return empty array for non-existent provider', async () => {
+      const result = await repository.findByProvider('google');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle case-sensitive provider names', async () => {
+      const result = await repository.findByProvider('OpenAI');
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('findAvailable', () => {
+    it('should find only available voices', async () => {
+      const result = await repository.findAvailable();
+
+      expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.every((v) => v.isAvailable === true)).toBe(true);
+      expect(result.length).toBe(4); // Yuki is not available
+    });
+
+    it('should exclude unavailable voices', async () => {
+      const result = await repository.findAvailable();
+
+      const yukiIncluded = result.some((v) => v.name === 'Yuki');
+      expect(yukiIncluded).toBe(false);
+    });
+  });
+
+  describe('save', () => {
+    it('should save new voice', async () => {
       const newVoice: Voice = {
-        id: 'custom-voice-1',
-        name: 'Custom Voice',
-        language: 'en-GB',
+        id: 'voice-new',
+        name: 'NewVoice',
+        language: 'de-DE',
         gender: 'male',
-        provider: 'custom',
+        age: 'adult',
+        provider: 'openai',
+        providerId: 'voice-new',
+        isActive: true,
         isAvailable: true,
         isDefault: false,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      const saved = await repository.save(newVoice);
-      expect(saved).toEqual(newVoice);
+      const result = await repository.save(newVoice);
 
-      const found = await repository.findById(newVoice.id);
-      expect(found).toEqual(newVoice);
+      expect(result).toEqual(newVoice);
+      expect(repository.size()).toBe(6);
     });
 
-    it('should update an existing voice', async () => {
-      const voices = await repository.findAll();
-      const voiceToUpdate = voices[0];
+    it('should update existing voice when saving with same id', async () => {
+      const existingVoice = await repository.findById('voice-1');
+      expect(existingVoice).toBeDefined();
 
-      const updates = {
-        name: 'Updated Name',
-        isAvailable: false,
+      const updatedVoice: Voice = {
+        ...existingVoice!,
+        name: 'UpdatedAlice',
       };
 
-      const updated = await repository.update(voiceToUpdate.id, updates);
+      await repository.save(updatedVoice);
+      const result = await repository.findById('voice-1');
 
-      expect(updated).not.toBeNull();
-      expect(updated!.id).toBe(voiceToUpdate.id);
-      expect(updated!.name).toBe(updates.name);
-      expect(updated!.isAvailable).toBe(updates.isAvailable);
-      expect(updated!.updatedAt).not.toEqual(voiceToUpdate.updatedAt);
-    });
-
-    it('should return null when updating non-existent voice', async () => {
-      const updated = await repository.update('non-existent-id', { name: 'Test' });
-      expect(updated).toBeNull();
-    });
-
-    it('should delete a voice', async () => {
-      const voices = await repository.findAll();
-      const voiceToDelete = voices[0];
-
-      const deleted = await repository.delete(voiceToDelete.id);
-      expect(deleted).toBe(true);
-
-      const found = await repository.findById(voiceToDelete.id);
-      expect(found).toBeNull();
-
-      const remainingVoices = await repository.findAll();
-      expect(remainingVoices).toHaveLength(4);
-    });
-
-    it('should return false when deleting non-existent voice', async () => {
-      const deleted = await repository.delete('non-existent-id');
-      expect(deleted).toBe(false);
+      expect(result?.name).toBe('UpdatedAlice');
+      expect(repository.size()).toBe(5); // Size shouldn't change
     });
   });
 
-  describe('Query Methods', () => {
-    it('should find voices by provider', async () => {
-      const openaiVoices = await repository.findByProvider('openai');
-      expect(openaiVoices).toHaveLength(5);
+  describe('delete', () => {
+    it('should delete voice by id', async () => {
+      const initialSize = repository.size();
+      const result = await repository.delete('voice-1');
 
-      openaiVoices.forEach(voice => {
-        expect(voice.provider).toBe('openai');
-      });
-
-      const customVoices = await repository.findByProvider('non-existent');
-      expect(customVoices).toHaveLength(0);
+      expect(result).toBe(true);
+      expect(repository.size()).toBe(initialSize - 1);
     });
 
-    it('should find available voices', async () => {
-      const availableVoices = await repository.findAvailable();
-      expect(availableVoices.length).toBeGreaterThan(0);
+    it('should return false for non-existent voice', async () => {
+      const result = await repository.delete('non-existent');
 
-      availableVoices.forEach(voice => {
-        expect(voice.isAvailable).toBe(true);
-      });
-
-      // Mark one voice as unavailable
-      const voices = await repository.findAll();
-      const voiceToUpdate = voices[0];
-      await repository.update(voiceToUpdate.id, { isAvailable: false });
-
-      const updatedAvailable = await repository.findAvailable();
-      expect(updatedAvailable.length).toBe(availableVoices.length - 1);
+      expect(result).toBe(false);
     });
 
-    it('should find voices by language', async () => {
-      const englishVoices = await repository.findByLanguage('en-US');
-      expect(englishVoices.length).toBeGreaterThan(0);
+    it('should verify voice is deleted', async () => {
+      await repository.delete('voice-2');
+      const result = await repository.findById('voice-2');
 
-      englishVoices.forEach(voice => {
-        expect(voice.language).toBe('en-US');
-      });
+      expect(result).toBeNull();
+    });
+  });
 
-      const spanishVoices = await repository.findByLanguage('es-ES');
-      expect(spanishVoices.length).toBe(1);
-      expect(spanishVoices[0].name).toBe('Maria');
+  describe('update', () => {
+    it('should update voice', async () => {
+      const voiceId = 'voice-1';
+      const updates = { name: 'Alice Updated', age: 'mature' as const };
+
+      const result = await repository.update(voiceId, updates);
+
+      expect(result).toBeDefined();
+      expect(result?.name).toBe('Alice Updated');
+      expect(result?.age).toBe('mature');
+      expect(result?.id).toBe(voiceId);
     });
 
+    it('should return null for non-existent voice', async () => {
+      const result = await repository.update('non-existent', { name: 'Test' });
+
+      expect(result).toBeNull();
+    });
+
+    it('should update updatedAt timestamp', async () => {
+      const before = new Date();
+      const result = await repository.update('voice-1', { name: 'Updated' });
+
+      expect(result?.updatedAt).toBeInstanceOf(Date);
+      expect(result!.updatedAt.getTime()).toBeGreaterThanOrEqual(
+        before.getTime()
+      );
+    });
+
+    it('should preserve unmodified fields', async () => {
+      const original = await repository.findById('voice-1');
+      const result = await repository.update('voice-1', {
+        name: 'Updated Name',
+      });
+
+      expect(result?.id).toBe(original?.id);
+      expect(result?.language).toBe(original?.language);
+      expect(result?.gender).toBe(original?.gender);
+      expect(result?.provider).toBe(original?.provider);
+    });
+  });
+
+  describe('findByLanguage', () => {
+    it('should find voices by exact language match', async () => {
+      const result = await repository.findByLanguage('en-US');
+
+      expect(result).toBeDefined();
+      expect(result.length).toBe(2); // Alice and Bob
+      expect(result.every((v) => v.language === 'en-US')).toBe(true);
+    });
+
+    it('should find voices by partial language match', async () => {
+      const result = await repository.findByLanguage('en');
+
+      expect(result).toBeDefined();
+      expect(result.length).toBeGreaterThan(0);
+      expect(result.every((v) => v.language.includes('en'))).toBe(true);
+    });
+
+    it('should return empty array for non-matching language', async () => {
+      const result = await repository.findByLanguage('pt-BR');
+
+      expect(result).toEqual([]);
+    });
+
+    it('should handle case-sensitive language codes', async () => {
+      const result = await repository.findByLanguage('EN-US');
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('findDefault', () => {
     it('should find default voice', async () => {
-      const defaultVoice = await repository.findDefault();
-      expect(defaultVoice).not.toBeNull();
-      expect(defaultVoice!.isDefault).toBe(true);
-      expect(defaultVoice!.name).toBe('Alice');
+      const result = await repository.findDefault();
+
+      expect(result).toBeDefined();
+      expect(result?.isDefault).toBe(true);
+      expect(result?.id).toBe('voice-1');
     });
 
     it('should return null when no default voice exists', async () => {
       // Remove default flag from all voices
-      const voices = await repository.findAll();
-      for (const voice of voices) {
-        await repository.update(voice.id, { isDefault: false });
-      }
+      await repository.update('voice-1', { isDefault: false });
 
-      const defaultVoice = await repository.findDefault();
-      expect(defaultVoice).toBeNull();
+      const result = await repository.findDefault();
+
+      expect(result).toBeNull();
+    });
+
+    it('should return first default voice when multiple exist', async () => {
+      await repository.update('voice-2', { isDefault: true });
+
+      const result = await repository.findDefault();
+
+      expect(result).toBeDefined();
+      expect(result?.isDefault).toBe(true);
+      // Should return voice-1 as it's the first one
+      expect(result?.id).toBe('voice-1');
     });
   });
 
-  describe('Data Management', () => {
-    it('should clear all data', () => {
+  describe('clear', () => {
+    it('should clear all voices', () => {
       repository.clear();
 
-      const voices = repository.findAll();
-      expect(voices).toHaveLength(0);
-    });
-
-    it('should report correct size', () => {
-      expect(repository.size()).toBe(5);
-
-      repository.clear();
       expect(repository.size()).toBe(0);
     });
 
-    it('should handle multiple operations correctly', async () => {
-      // Add multiple voices
-      const newVoices: Voice[] = [
-        {
-          id: 'voice-6',
-          name: 'Test Voice 6',
-          language: 'de-DE',
-          gender: 'female',
-          provider: 'test',
-          isAvailable: true,
-          isDefault: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          id: 'voice-7',
-          name: 'Test Voice 7',
-          language: 'it-IT',
-          gender: 'male',
-          provider: 'test',
-          isAvailable: true,
-          isDefault: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-      ];
-
-      for (const voice of newVoices) {
-        await repository.save(voice);
-      }
-
-      expect(repository.size()).toBe(7);
-
-      // Verify all voices are findable
-      for (const voice of newVoices) {
-        const found = await repository.findById(voice.id);
-        expect(found).toEqual(voice);
-      }
-
-      // Update voices
-      await repository.update('voice-6', { isAvailable: false });
-      const updated = await repository.findById('voice-6');
-      expect(updated!.isAvailable).toBe(false);
-
-      // Delete some voices
-      await repository.delete('voice-7');
-      expect(repository.size()).toBe(6);
-      expect(await repository.findById('voice-7')).toBeNull();
-    });
-  });
-
-  describe('Edge Cases', () => {
-    it('should handle empty repository operations', async () => {
+    it('should allow adding voices after clear', async () => {
       repository.clear();
 
-      expect(await repository.findAll()).toHaveLength(0);
-      expect(await repository.findById('any-id')).toBeNull();
-      expect(await repository.findByProvider('any-provider')).toHaveLength(0);
-      expect(await repository.findAvailable()).toHaveLength(0);
-      expect(await repository.findByLanguage('any-lang')).toHaveLength(0);
-      expect(await repository.findDefault()).toBeNull();
-    });
-
-    it('should handle voice with all properties', async () => {
-      const completeVoice: Voice = {
-        id: 'complete-voice',
-        name: 'Complete Voice',
-        language: 'fr-FR',
-        gender: 'female',
-        provider: 'complete-provider',
+      const newVoice: Voice = {
+        id: 'voice-test',
+        name: 'Test',
+        language: 'en-US',
+        gender: 'neutral',
+        age: 'adult',
+        provider: 'test',
+        providerId: 'test-1',
+        isActive: true,
         isAvailable: true,
         isDefault: false,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        updatedAt: new Date('2023-01-01T00:00:00Z'),
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
-      await repository.save(completeVoice);
-      const found = await repository.findById(completeVoice.id);
+      await repository.save(newVoice);
 
-      expect(found).toEqual(completeVoice);
-    });
-
-    it('should handle concurrent operations', async () => {
-      const promises = Array.from({ length: 10 }, (_, i) => {
-        const voice: Voice = {
-          id: `concurrent-${i}`,
-          name: `Concurrent Voice ${i}`,
-          language: 'en-US',
-          gender: i % 2 === 0 ? 'male' : 'female',
-          provider: 'concurrent',
-          isAvailable: true,
-          isDefault: false,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        };
-        return repository.save(voice);
-      });
-
-      await Promise.all(promises);
-
-      expect(repository.size()).toBe(15); // 5 initial + 10 concurrent
-
-      // Verify all concurrent voices were saved
-      for (let i = 0; i < 10; i++) {
-        const found = await repository.findById(`concurrent-${i}`);
-        expect(found).not.toBeNull();
-        expect(found!.name).toBe(`Concurrent Voice ${i}`);
-      }
+      expect(repository.size()).toBe(1);
     });
   });
 
-  describe('Initial Data Validation', () => {
-    it('should have valid initial voice data', async () => {
-      const voices = await repository.findAll();
+  describe('size', () => {
+    it('should return correct size', () => {
+      const result = repository.size();
 
-      // Check expected initial voices
-      const voiceNames = voices.map(v => v.name);
-      expect(voiceNames).toContain('Alice');
-      expect(voiceNames).toContain('Bob');
-      expect(voiceNames).toContain('Maria');
-      expect(voiceNames).toContain('Pierre');
-      expect(voiceNames).toContain('Yuki');
-
-      // Verify Alice is the default voice
-      const alice = voices.find(v => v.name === 'Alice');
-      expect(alice).toBeDefined();
-      expect(alice!.isDefault).toBe(true);
-      expect(alice!.isAvailable).toBe(true);
-
-      // Verify Yuki is unavailable
-      const yuki = voices.find(v => v.name === 'Yuki');
-      expect(yuki).toBeDefined();
-      expect(yuki!.isAvailable).toBe(false);
-
-      // Verify all voices have required properties
-      voices.forEach(voice => {
-        expect(voice.id).toBeTruthy();
-        expect(voice.name).toBeTruthy();
-        expect(voice.language).toBeTruthy();
-        expect(['male', 'female', 'neutral']).toContain(voice.gender);
-        expect(voice.provider).toBeTruthy();
-        expect(typeof voice.isAvailable).toBe('boolean');
-        expect(typeof voice.isDefault).toBe('boolean');
-        expect(voice.createdAt).toBeInstanceOf(Date);
-        expect(voice.updatedAt).toBeInstanceOf(Date);
-      });
+      expect(result).toBe(5);
     });
 
-    it('should have different languages represented', async () => {
-      const voices = await repository.findAll();
-      const languages = [...new Set(voices.map(v => v.language))];
+    it('should update size after operations', async () => {
+      const initialSize = repository.size();
 
-      expect(languages).toContain('en-US');
-      expect(languages).toContain('es-ES');
-      expect(languages).toContain('fr-FR');
-      expect(languages).toContain('ja-JP');
-    });
+      await repository.delete('voice-1');
+      expect(repository.size()).toBe(initialSize - 1);
 
-    it('should have both genders represented', async () => {
-      const voices = await repository.findAll();
-      const genders = [...new Set(voices.map(v => v.gender))];
+      const newVoice: Voice = {
+        id: 'voice-new',
+        name: 'New',
+        language: 'en-US',
+        gender: 'neutral',
+        age: 'adult',
+        provider: 'test',
+        providerId: 'test',
+        isActive: true,
+        isAvailable: true,
+        isDefault: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
 
-      expect(genders).toContain('male');
-      expect(genders).toContain('female');
+      await repository.save(newVoice);
+      expect(repository.size()).toBe(initialSize);
     });
   });
 });

@@ -12,38 +12,6 @@ export interface Job {
 }
 
 /**
- * Get supported job types
- * @returns Array of supported job types
- */
-export function getSupportedJobTypes(): string[] {
-  return ['audio-processing', 'text-generation'];
-}
-
-/**
- * Validate job structure
- * @param job - The job to validate
- * @returns True if job is valid
- */
-export function validateJob(job: Job): boolean {
-  const hasValidId = job.id && typeof job.id === 'string' && job.id.length > 0;
-  const hasValidType =
-    job.type && typeof job.type === 'string' && job.type.length > 0;
-  const hasValidData = job.data && typeof job.data === 'object';
-
-  return hasValidId && hasValidType && hasValidData;
-}
-
-/**
- * Check if job type is supported
- * @param jobType - The job type to check
- * @returns True if job type is supported
- */
-export function isSupportedJobType(jobType: string): boolean {
-  const supportedTypes = getSupportedJobTypes();
-  return supportedTypes.includes(jobType);
-}
-
-/**
  * Process a background job
  * @param job - The job to process
  */

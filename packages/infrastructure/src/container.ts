@@ -1,108 +1,245 @@
 /**
- * Dependency Injection Container
- * Composition root for the Clean Architecture implementation
+ * Dependency Injection Container Configuration
+ * Sets up and manages the DI container for the application
  */
 
-import { AudioGenerationUseCase } from '@falador/application/use-cases/audio-generation.js';
-import { ProjectManagementUseCase } from '@falador/application/use-cases/project-management.js';
-import { UserManagementUseCase } from '@falador/application/use-cases/user-management.js';
-import { VoiceManagementUseCase } from '@falador/application/use-cases/voice-management.js';
 import { container } from 'tsyringe';
-import { InMemoryAudioFileRepository } from './database/repositories/audio-file-repository.js';
-import { InMemoryGenerationJobRepository } from './database/repositories/generation-job-repository.js';
-import { InMemoryProjectRepository } from './database/repositories/project-repository.js';
-import { InMemoryUserRepository } from './database/repositories/user-repository.js';
-import { InMemoryVoiceRepository } from './database/repositories/voice-repository.js';
-import { InMemoryQueue } from './external/services/queue.js';
-import { InMemoryStorage } from './external/services/storage.js';
-import { MockTTSEngine } from './external/services/tts-engine.js';
+import type {
+  PasswordHasher,
+  TokenGenerator,
+  ApiKeyGenerator,
+  Storage,
+  Queue,
+  TTSEngine,
+
+  ProjectRepository,
+  UserRepository,
+  SessionRepository,
+  VoiceRepository,
+  GenerationJobRepository} from '../../core-domain/src/index';
+import {
+  CreateProjectUseCase,
+  GetProjectUseCase,
+  UpdateProjectUseCase,
+  DeleteProjectUseCase,
+  ListProjectsUseCase,
+} from '../../application/src/use-cases';
 
 /**
- * Configure the dependency injection container
+ * Configuration options for dependency registration
  */
-export function configureContainer(): void {
-  // Repository registrations
-  container.register('UserRepository', { useClass: InMemoryUserRepository });
-  container.register('ProjectRepository', {
-    useClass: InMemoryProjectRepository,
-  });
-  container.register('VoiceRepository', { useClass: InMemoryVoiceRepository });
-  container.register('GenerationJobRepository', {
-    useClass: InMemoryGenerationJobRepository,
-  });
-  container.register('AudioFileRepository', {
-    useClass: InMemoryAudioFileRepository,
-  });
+export interface RegisterDependenciesOptions {
+  database?: unknown;
+  passwordHasher?: new () => PasswordHasher;
+  tokenGenerator?: new () => TokenGenerator;
+  apiKeyGenerator?: new () => ApiKeyGenerator;
+  storage?: new () => Storage;
+  queue?: new () => Queue;
+  ttsEngine?: new () => TTSEngine;
+  projectRepository?: new () => ProjectRepository | ((database: unknown) => ProjectRepository);
+  userRepository?: new () => UserRepository | ((database: unknown) => UserRepository);
+  sessionRepository?: new () => SessionRepository | ((database: unknown) => SessionRepository);
+  voiceRepository?: new () => VoiceRepository | ((database: unknown) => VoiceRepository);
+  generationJobRepository?: new () => GenerationJobRepository | ((database: unknown) => GenerationJobRepository);
+}
 
-  // Service registrations
-  container.register('TTSEngine', { useClass: MockTTSEngine });
-  container.register('Storage', { useClass: InMemoryStorage });
-  container.register('Queue', { useClass: InMemoryQueue });
+/**
+ * Registers singleton services (shared stateless services)
+ */
+function registerSingletonServices(options: RegisterDependenciesOptions): void {
+  const singletonServices = [
+    { key: 'PasswordHasher', constructor: options.passwordHasher },
+    { key: 'TokenGenerator', constructor: options.tokenGenerator },
+    { key: 'ApiKeyGenerator', constructor: options.apiKeyGenerator },
+  ] as const;
 
-  // Use case registrations
-  container.register('UserManagementUseCase', {
-    useClass: UserManagementUseCase,
-  });
-  container.register('ProjectManagementUseCase', {
-    useClass: ProjectManagementUseCase,
-  });
-  container.register('AudioGenerationUseCase', {
-    useClass: AudioGenerationUseCase,
-  });
-  container.register('VoiceManagementUseCase', {
-    useClass: VoiceManagementUseCase,
-  });
-
-  // Controller registrations (these are only used by the presentation layer)
-  // Note: Controllers are not in the infrastructure package but are registered here for DI convenience
-  try {
-    const {
-      UserController,
-    } = require('@falador/api-gateway/controllers/user-controller');
-    const {
-      ProjectController,
-    } = require('@falador/api-gateway/controllers/project-controller');
-    const {
-      AudioGenerationController,
-    } = require('@falador/api-gateway/controllers/audio-generation-controller');
-    const {
-      VoiceController,
-    } = require('@falador/api-gateway/controllers/voice-controller');
-
-    container.register('UserController', { useClass: UserController });
-    container.register('ProjectController', { useClass: ProjectController });
-    container.register('AudioGenerationController', {
-      useClass: AudioGenerationController,
-    });
-    container.register('VoiceController', { useClass: VoiceController });
-  } catch (error) {
-    // Controllers may not be available during infrastructure-only initialization
-    console.warn(
-      'Could not register controllers in infrastructure container:',
-      error
-    );
+  for (const service of singletonServices) {
+    if (service.constructor) {
+      container.register(service.key as string, {
+        useClass: service.constructor as never,
+      });
+    }
   }
 }
 
 /**
- * Get the configured container
+ * Registers scoped services (per-request lifecycle where needed)
  */
-export function getContainer() {
+function registerScopedServices(options: RegisterDependenciesOptions): void {
+  const scopedServices = [
+    { key: 'Storage', constructor: options.storage },
+    { key: 'Queue', constructor: options.queue },
+    { key: 'TTSEngine', constructor: options.ttsEngine },
+  ] as const;
+
+  for (const service of scopedServices) {
+    if (service.constructor) {
+      container.register(service.key as string, {
+        useClass: service.constructor as never,
+      });
+    }
+  }
+}
+
+/**
+ * Registers repository implementations with proper lifecycle management
+ */
+function registerRepositories(options: RegisterDependenciesOptions): void {
+  const repositories = [
+    { key: 'ProjectRepository', constructor: options.projectRepository },
+    { key: 'UserRepository', constructor: options.userRepository },
+    { key: 'SessionRepository', constructor: options.sessionRepository },
+    { key: 'VoiceRepository', constructor: options.voiceRepository },
+    { key: 'GenerationJobRepository', constructor: options.generationJobRepository },
+  ] as const;
+
+  for (const repository of repositories) {
+    if (repository.constructor) {
+      // Use factory for all repositories to handle database dependency consistently
+      container.register(repository.key as string, {
+        useFactory: () => new (repository.constructor as any)(options.database),
+      });
+    }
+  }
+}
+
+/**
+ * Registers singleton services with proper lifecycle management
+ */
+function registerServices(options: RegisterDependenciesOptions): void {
+  registerSingletonServices(options);
+  registerScopedServices(options);
+}
+
+/**
+ * Factory function to create CreateProjectUseCase
+ */
+function createCreateProjectUseCase(c: typeof container): CreateProjectUseCase {
+  const projectRepo = c.resolve<ProjectRepository>('ProjectRepository');
+  const userRepo = c.resolve<UserRepository>('UserRepository');
+  return new CreateProjectUseCase(projectRepo, userRepo);
+}
+
+/**
+ * Factory function to create GetProjectUseCase
+ */
+function createGetProjectUseCase(c: typeof container): GetProjectUseCase {
+  const projectRepo = c.resolve<ProjectRepository>('ProjectRepository');
+  return new GetProjectUseCase(projectRepo);
+}
+
+/**
+ * Factory function to create UpdateProjectUseCase
+ */
+function createUpdateProjectUseCase(c: typeof container): UpdateProjectUseCase {
+  const projectRepo = c.resolve<ProjectRepository>('ProjectRepository');
+  return new UpdateProjectUseCase(projectRepo);
+}
+
+/**
+ * Factory function to create DeleteProjectUseCase
+ */
+function createDeleteProjectUseCase(c: typeof container): DeleteProjectUseCase {
+  const projectRepo = c.resolve<ProjectRepository>('ProjectRepository');
+  return new DeleteProjectUseCase(projectRepo);
+}
+
+/**
+ * Factory function to create ListProjectsUseCase
+ */
+function createListProjectsUseCase(c: typeof container): ListProjectsUseCase {
+  const projectRepo = c.resolve<ProjectRepository>('ProjectRepository');
+  return new ListProjectsUseCase(projectRepo);
+}
+
+/**
+ * Registers project-related use cases with factory functions
+ */
+function registerProjectUseCases(): void {
+  container.register(CreateProjectUseCase, {
+    useFactory: createCreateProjectUseCase,
+  });
+
+  container.register(GetProjectUseCase, {
+    useFactory: createGetProjectUseCase,
+  });
+
+  container.register(UpdateProjectUseCase, {
+    useFactory: createUpdateProjectUseCase,
+  });
+
+  container.register(DeleteProjectUseCase, {
+    useFactory: createDeleteProjectUseCase,
+  });
+
+  container.register(ListProjectsUseCase, {
+    useFactory: createListProjectsUseCase,
+  });
+}
+
+/**
+ * Register use case implementations with transient lifecycle (new instance per resolution)
+ */
+function registerUseCases(): void {
+  registerProjectUseCases();
+}
+
+/**
+ * Registers database connection if provided
+ */
+function registerDatabaseConnection(database?: unknown): void {
+  if (database) {
+    container.register('Database', {
+      useValue: database,
+    });
+  }
+}
+
+/**
+ * Register all dependencies in the DI container
+ * This should be called once at application startup
+ */
+export function registerDependencies(
+  options: RegisterDependenciesOptions
+): void {
+  // Register database connection first as other dependencies might need it
+  registerDatabaseConnection(options.database);
+
+  // Register all dependency layers with proper lifecycle management
+  registerRepositories(options);
+  registerServices(options);
+  registerUseCases();
+}
+
+/**
+ * Create a child container for testing or scoped operations
+ */
+export function createChildContainer(): typeof container {
+  return container.createChildContainer();
+}
+
+/**
+ * Clear the container (useful for testing)
+ */
+export function clearContainer(): void {
+  container.clearInstances();
+}
+
+/**
+ * Get the DI container instance
+ */
+export function getContainer(): typeof container {
   return container;
 }
 
 /**
- * Resolve a dependency from the container
- * @param token
+ * Token type for dependency resolution
  */
-export function resolve<T>(token: string | (new (...args: any[]) => T)): T {
-  return container.resolve<T>(token);
-}
+type DependencyToken<T> = string | symbol | (new (...args: never[]) => T);
 
 /**
- * Clear all registrations (useful for testing)
+ * Resolve a dependency from the container
  */
-export function clearContainer(): void {
-  container.clearInstances();
-  container.reset();
+export function resolve<T>(token: DependencyToken<T>): T {
+  return container.resolve(token as never);
 }

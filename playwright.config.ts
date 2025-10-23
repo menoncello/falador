@@ -44,8 +44,14 @@ const playwrightConfig = defineConfig({
 
   // Shared settings for all tests
   use: {
-    // Base URL for API tests
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    // Base URL for API tests - use dedicated test environment
+    baseURL: process.env.TEST_API_URL || process.env.BASE_URL || 'http://localhost:3001',
+
+    // Add test environment headers for isolation
+    extraHTTPHeaders: {
+      'x-test-environment': 'true',
+      'x-test-run-id': process.env.TEST_RUN_ID || `test-${Date.now()}`,
+    },
 
     // Collect trace on failure for debugging
     trace: 'retain-on-failure',
@@ -82,9 +88,6 @@ const playwrightConfig = defineConfig({
     {
       name: 'api',
       testMatch: '**/api/**/*.spec.ts',
-      // Run API tests serially to avoid database state conflicts
-      fullyParallel: false,
-      workers: 1,
       use: {
         // API tests don't need a browser
       },
@@ -101,16 +104,8 @@ const playwrightConfig = defineConfig({
   // Output folder for test artifacts
   outputDir: 'test-results/artifacts',
 
-  // Web server configuration for API tests
-  webServer: {
-    command: 'cd packages/api-gateway && bun run dev',
-    port: 3000,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
-
   // Global setup/teardown (if needed)
-  // globalSetup: './tests/support/global-setup.ts',
+  // globalSetup: require.resolve('./tests/support/global-setup.ts'),
   // globalTeardown: require.resolve('./tests/support/global-teardown.ts'),
 });
 

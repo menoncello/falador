@@ -1,7 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "noPropertyAccessFromIndexSignature": false,
-    "exactOptionalPropertyTypes": false
-  }
-}

@@ -4,8 +4,12 @@
  * Implements the ProjectRepository interface using the in-memory Database
  */
 
-import { ProjectRepository } from '@falador/core-domain';
 import { inject, injectable } from 'tsyringe';
+import {
+  ProjectRepository,
+  Project,
+  CreateProjectRequest,
+} from '../../../core-domain/src/index.js';
 import { Database } from '../database.js';
 
 /**
@@ -22,23 +26,8 @@ export class InMemoryProjectRepository implements ProjectRepository {
   /**
    *
    * @param data
-   * @param data.userId
-   * @param data.title
-   * @param data.author
-   * @param data.language
-   * @param data.genre
-   * @param data.status
-   * @param data.metadata
    */
-  async create(data: {
-    userId: string;
-    title: string;
-    author?: string;
-    language?: 'pt-BR' | 'en';
-    genre?: string;
-    status?: 'draft' | 'queued' | 'processing' | 'completed' | 'failed';
-    metadata?: Record<string, unknown>;
-  }) {
+  async create(data: CreateProjectRequest): Promise<Project> {
     return this.database.createProject(data);
   }
 
@@ -46,7 +35,7 @@ export class InMemoryProjectRepository implements ProjectRepository {
    *
    * @param id
    */
-  async findById(id: string) {
+  async findById(id: string): Promise<Project | null> {
     return this.database.getProjectById(id) || null;
   }
 
@@ -54,7 +43,7 @@ export class InMemoryProjectRepository implements ProjectRepository {
    *
    * @param userId
    */
-  async findByUserId(userId: string) {
+  async findByUserId(userId: string): Promise<Project[]> {
     return this.database.getProjectsByUserId(userId);
   }
 
@@ -65,13 +54,8 @@ export class InMemoryProjectRepository implements ProjectRepository {
    */
   async update(
     id: string,
-    data: Partial<
-      Omit<
-        import('@falador/core-domain').Project,
-        'id' | 'userId' | 'createdAt'
-      >
-    >
-  ) {
+    data: Partial<Omit<Project, 'id' | 'userId' | 'createdAt'>>
+  ): Promise<Project | null> {
     return this.database.updateProject(id, data) || null;
   }
 
@@ -79,7 +63,7 @@ export class InMemoryProjectRepository implements ProjectRepository {
    *
    * @param id
    */
-  async delete(id: string) {
+  async delete(id: string): Promise<boolean> {
     return this.database.deleteProject(id);
   }
 }

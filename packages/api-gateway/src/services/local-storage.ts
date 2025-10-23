@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import type { Storage } from '../../../core-domain/src/interfaces/index.js';
+import type { Storage } from '../../../core-domain/src/index.js';
 
 /**
  * Local File Storage Implementation
@@ -22,35 +22,37 @@ export class LocalStorage implements Storage {
 
   /**
    *
-   * @param audioBuffer
-   * @param filename
+   * @param key
+   * @param data
    */
-  async save(audioBuffer: ArrayBuffer, filename: string): Promise<string> {
-    const filePath = this.getFilePath(filename);
+  async save(key: string, data: Buffer | string): Promise<string> {
+    const filePath = this.getFilePath(key);
     await this.ensureDirectoryExists();
-    await fs.writeFile(filePath, new Uint8Array(audioBuffer));
+    await fs.writeFile(filePath, data);
     return filePath;
   }
 
   /**
    *
-   * @param path
+   * @param key
    */
-  async load(path: string): Promise<ArrayBuffer> {
+  async load(key: string): Promise<Buffer | null> {
     try {
-      return new Uint8Array(await fs.readFile(path)).buffer;
+      const filePath = this.getFilePath(key);
+      return await fs.readFile(filePath);
     } catch {
-      throw new Error(`Failed to load file: ${path}`);
+      return null;
     }
   }
 
   /**
    *
-   * @param path
+   * @param key
    */
-  async delete(path: string): Promise<boolean> {
+  async delete(key: string): Promise<boolean> {
     try {
-      await fs.unlink(path);
+      const filePath = this.getFilePath(key);
+      await fs.unlink(filePath);
       return true;
     } catch {
       return false;

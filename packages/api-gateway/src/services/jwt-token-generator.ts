@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import type { TokenGenerator } from '../../../core-domain/src/interfaces/index.js';
+import type { TokenGenerator } from '../../../core-domain/src/index.js';
 
 /**
  * JWT Token Generator Implementation
@@ -10,19 +10,19 @@ export class JWTTokenGenerator implements TokenGenerator {
 
   /**
    *
+   * @param payload
    */
-  generate(): string {
-    const payload = { iat: Date.now() };
-    return jwt.sign(payload, this.secret, { expiresIn: this.expiresIn });
+  generate(payload?: Record<string, unknown>): string {
+    return jwt.sign(payload || {}, this.secret, { expiresIn: this.expiresIn });
   }
 
   /**
    *
    * @param token
    */
-  verify(token: string): Record<string, any> | null {
+  verify(token: string): Record<string, unknown> | null {
     try {
-      return jwt.verify(token, this.secret) as Record<string, any>;
+      return jwt.verify(token, this.secret) as Record<string, unknown>;
     } catch {
       return null;
     }
@@ -32,9 +32,9 @@ export class JWTTokenGenerator implements TokenGenerator {
    *
    * @param token
    */
-  decode(token: string): Record<string, any> | null {
+  decode(token: string): Record<string, unknown> | null {
     try {
-      return jwt.decode(token) as Record<string, any>;
+      return jwt.decode(token) as Record<string, unknown>;
     } catch {
       return null;
     }

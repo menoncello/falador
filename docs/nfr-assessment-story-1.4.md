@@ -1,596 +1,547 @@
-# NFR Assessment: Story 1.4 - User Authentication and Project Management API
+# Non-Functional Requirements Assessment - Story 1.4
 
-**Assessment Date**: 2025-10-20
-**Assessor**: Murat (Test Excellence Architect)
-**Scope**: API endpoints for authentication (register, login, API keys) and project management (CRUD operations)
-**Recommendation**: **PASS** - Meets all critical NFR thresholds with minor concerns
+**Story:** User Authentication & Project Management API
+**Feature:** Authentication and Project Management Endpoints
+**Date:** 2025-10-17
+**Evaluator:** Murat (TEA Agent)
+**Overall Status:** ⚠️ CONCERNS (3 HIGH issues)
 
 ---
 
 ## Executive Summary
 
-**Overall Assessment**: PASS ✅
+**Assessment:** 2 PASS, 2 CONCERNS, 0 FAIL
+**Blockers:** None
+**High Priority Issues:** 3 (Security testing missing, Performance baselines missing, Test failures)
+**Recommendation:** Address HIGH priority issues before production deployment
 
-**Key Findings**:
+**Key Findings:**
 
-- **Performance**: ✅ **PASS** - Response times under 300ms, meeting 500ms threshold
-- **Security**: ✅ **PASS** - Strong authentication patterns, no critical vulnerabilities
-- **Reliability**: ✅ **PASS** - 100% test pass rate, proper error handling
-- **Maintainability**: ⚠️ **CONCERNS** - Mutation score 73.15% below 80% target
-
-**Summary**:
-Story 1.4 demonstrates solid engineering quality across all NFR categories. The authentication and project management API endpoints meet performance requirements, implement security best practices, and show excellent reliability. The primary concern is maintainability, where mutation testing coverage falls short of the 80% target. This indicates areas where test quality can be improved to better detect code changes and potential regressions.
-
----
-
-## Assessment Context
-
-### System Information
-- **Component**: User Authentication and Project Management API
-- **Technology Stack**: Node.js, TypeScript, PostgreSQL, Drizzle ORM
-- **Test Framework**: Playwright (API testing), Stryker (mutation testing)
-- **Coverage Scope**: 23 API tests covering authentication and project CRUD operations
-
-### Threshold Configuration
-```yaml
-nfr_thresholds:
-  performance:
-    response_time_p95: 500ms  # Maximum acceptable response time
-    throughput_min: 100 RPS   # Minimum requests per second
-    error_rate_max: 1%        # Maximum error rate
-
-  security:
-    auth_coverage_min: 100%   # Authentication endpoints must be tested
-    vuln_score_max: 4         # OWASP risk score threshold
-    secret_protection: 100%   # No hardcoded secrets
-
-  reliability:
-    availability_min: 99.9%   # Minimum uptime
-    error_handling_min: 95%   # Proper error responses
-    burn_in_pass_rate: 100%   # CI burn-in requirements
-
-  maintainability:
-    mutation_score_min: 80%   # Mutation testing threshold
-    test_coverage_min: 80%    # Code coverage threshold
-    tech_debt_ratio_max: 10%  # Technical debt limit
-```
+- ✅ Reliability validation looks good (automated fixtures, cleanup)
+- ⚠️ Security NFRs not validated (no security tests)
+- ⚠️ Performance NFRs not baselined (no load testing)
+- ⚠️ Test failures detected (2/26 tests failing - 92% pass rate)
 
 ---
 
-## Performance NFR Assessment
+## Performance Assessment
 
-### Status: ✅ PASS
+### Response Time (API Endpoints)
 
-#### Evidence Collected
+- **Status:** CONCERNS ⚠️
+- **Threshold:** <100ms (p95) - from tech-spec-epic-1.md:724
+- **Actual:** NOT_MEASURED
+- **Evidence:** NO EVIDENCE
+- **Findings:** No performance testing conducted
+- **Recommendation:** HIGH - Add k6 load testing to measure API response times
 
-**Load Testing Results**:
-- Test File: `tests/api/performance-load.spec.ts`
-- Average Response Time: **285ms** (Target: <500ms) ✅
-- P95 Response Time: **320ms** (Target: <500ms) ✅
-- Throughput: **150 RPS** (Target: >100 RPS) ✅
-- Error Rate: **0%** (Target: <1%) ✅
+**Why CONCERNS:**
 
-**Performance Profile**:
-```javascript
-// Performance test results summary
-{
-  "authentication_endpoints": {
-    "POST /api/auth/register": { "avg": 260ms, "p95": 290ms },
-    "POST /api/auth/login": { "avg": 240ms, "p95": 270ms },
-    "GET /api/auth/me": { "avg": 180ms, "p95": 200ms }
-  },
-  "project_endpoints": {
-    "GET /api/projects": { "avg": 220ms, "p95": 250ms },
-    "POST /api/projects": { "avg": 310ms, "p95": 340ms },
-    "PATCH /api/projects/:id": { "avg": 290ms, "p95": 320ms }
-  }
-}
-```
+- Threshold defined in tech spec but no evidence of validation
+- API endpoints exist but performance not baselined
+- Cannot verify if implementation meets performance requirements
 
-#### Assessment Details
+**Quick Wins:**
 
-**Response Time Analysis**:
-- ✅ **Authentication endpoints**: All under 300ms average
-- ✅ **Project CRUD operations**: All under 350ms average
-- ✅ **Database operations**: Efficient query patterns with proper indexing
-
-**Throughput Analysis**:
-- ✅ **Concurrent users**: Handles 50+ concurrent requests
-- ✅ **Request processing**: 150 RPS sustained load
-- ✅ **Resource utilization**: CPU and memory within acceptable limits
-
-**Performance Optimization Evidence**:
-```typescript
-// fixtures.ts:68-71 - Performance tracking implementation
-if (duration > 500) {
-  console.warn(`⚠️  Slow test detected: ${duration}ms (target: <500ms)`);
-}
-```
-
-#### Quick Wins for Performance
-
-1. **Add response caching** for user profile endpoints (estimated 15% improvement)
-2. **Implement database connection pooling** for better resource management
-3. **Add request compression** for large response payloads
+1. **Run basic k6 load test** (1 hour) - Baseline p50/p95/p99 response times
+   - Test: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/projects`
+   - Target: 10-50 concurrent users for 30 seconds
+   - Pass if p95 < 500ms (relaxed threshold for MVP)
 
 ---
 
-## Security NFR Assessment
+### Throughput
 
-### Status: ✅ PASS
+- **Status:** CONCERNS ⚠️
+- **Threshold:** UNKNOWN (not defined in tech spec)
+- **Actual:** NOT_MEASURED
+- **Evidence:** NO EVIDENCE
+- **Findings:** No load testing conducted
+- **Recommendation:** MEDIUM - Define throughput requirements, then test
 
-#### Evidence Collected
+**Why CONCERNS:**
 
-**Authentication Security**:
-- Test File: `tests/api/auth-security.spec.ts`
-- Authentication Coverage: **100%** ✅
-- Authorization Validation: **100%** ✅
-- Password Security: **Strong validation** ✅
-
-**Security Test Results**:
-```typescript
-// Security validations implemented
-- Password complexity validation: ✅ PASS
-- SQL injection protection: ✅ PASS
-- XSS prevention: ✅ PASS
-- CSRF protection: ✅ PASS
-- Rate limiting: ✅ PASS
-```
-
-**Secret Management**:
-- ✅ **No hardcoded secrets**: All secrets properly externalized
-- ✅ **JWT token validation**: Proper expiration and verification
-- ✅ **API key security**: Secure generation and storage patterns
-
-#### Assessment Details
-
-**Authentication Implementation**:
-```typescript
-// auth.spec.ts:147-165 - Login security validation
-test('1.4-API-007 [P0]: should reject login with invalid password', async ({
-  userFactory,
-  request,
-}) => {
-  const user = await userFactory.createUser();
-  const response = await request.post('/api/auth/login', {
-    data: {
-      email: user.email,
-      password: TEST_PASSWORDS.WRONG, // Wrong password test
-    },
-  });
-  expect(response.status()).toBe(401); // Proper rejection
-});
-```
-
-**Authorization Patterns**:
-```typescript
-// projects.spec.ts:206-240 - Project access control
-test('1.4-API-021 [P0]: should not allow access to other user projects', async ({
-  projectFactory,
-  userFactory,
-  request,
-}) => {
-  // Given: Project belongs to another user
-  const otherUser = await userFactory.createUser();
-  const project = await projectFactory.createProject({
-    userId: otherUser.id,
-  });
-
-  // When: Attempting to access other user's project
-  const response = await request.get(`/api/projects/${project.id}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-
-  // Then: Access is denied
-  expect(response.status()).toBe(403);
-});
-```
-
-**Input Validation**:
-- ✅ **Request sanitization**: All inputs properly validated
-- ✅ **SQL injection protection**: Parameterized queries throughout
-- ✅ **XSS prevention**: Output encoding implemented
-
-#### Security Recommendations
-
-1. **Implement rate limiting** for authentication endpoints (medium priority)
-2. **Add request logging** for security audit trails
-3. **Implement API versioning** for future security updates
+- No threshold defined (need to define target requests/second)
+- No evidence of load testing
+- Cannot verify system handles expected load
 
 ---
 
-## Reliability NFR Assessment
+## Security Assessment
 
-### Status: ✅ PASS
+### Authentication & Authorization
 
-#### Evidence Collected
+- **Status:** CONCERNS ⚠️
+- **Threshold:** Auth/authz tests green, no critical vulnerabilities
+- **Actual:** NO SECURITY TESTS
+- **Evidence:** NO EVIDENCE (tests focus on functional behavior only)
+- **Findings:** No dedicated security testing performed
+- **Recommendation:** HIGH - Add security tests (SQL injection, XSS, RBAC, token expiry)
 
-**Test Execution Results**:
-- Total Tests: **23**
-- Pass Rate: **100%** ✅
-- Failed Tests: **0** ✅
-- Flaky Tests: **0** ✅
+**Why CONCERNS:**
 
-**Error Handling Validation**:
-```typescript
-// Comprehensive error response testing
-- 400 Bad Request: ✅ Proper validation errors
-- 401 Unauthorized: ✅ Authentication failures
-- 403 Forbidden: ✅ Authorization failures
-- 404 Not Found: ✅ Resource not found errors
-- 409 Conflict: ✅ Duplicate resource errors
-```
+- Functional tests exist (login, registration) but security aspects not validated
+- Missing tests:
+  - JWT token expiry validation
+  - SQL injection/XSS attempts
+  - Unauthorized access attempts (RBAC)
+  - Password leakage in errors/logs
+  - API key security
 
-**Network-First Pattern Implementation**:
-```typescript
-// fixtures.ts:83-94 - Reliable request patterns
-const registrationPromise = request.waitForResponse('**/api/auth/register');
-const response = await request.post('/api/auth/register', { data: userData });
-const actualResponse = await registrationPromise;
-expect(actualResponse.status()).toBe(201);
-```
+**Test Coverage Analysis (from existing tests):**
 
-#### Assessment Details
+- ✅ Functional auth works (login, registration, API key generation)
+- ❌ Token expiry not tested
+- ❌ Security boundaries not tested (SQL injection, XSS)
+- ❌ Password handling security not validated
 
-**Error Handling Quality**:
-- ✅ **Consistent error responses**: All endpoints return proper error formats
-- ✅ **Graceful degradation**: System handles invalid requests appropriately
-- ✅ **Database constraint handling**: Proper validation and error messaging
+**Quick Wins:**
 
-**Test Reliability**:
-```typescript
-// fixtures.ts:21-57 - Database cleanup for test isolation
-cleanupDatabase: async ({ request }, use) => {
-  const testId = `test-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-  // ... comprehensive cleanup logic
-}
-```
-
-**System Stability**:
-- ✅ **Parallel test execution**: Tests run in parallel without interference
-- ✅ **Resource cleanup**: Proper test isolation and cleanup
-- ✅ **Deterministic behavior**: No flaky test patterns detected
-
-#### Reliability Recommendations
-
-1. **Add circuit breakers** for database connection failures
-2. **Implement retry logic** for transient failures
-3. **Add health check endpoints** for monitoring
+1. **Add JWT token expiry test** (2 hours) - Validate 15-minute expiry
+2. **Add SQL injection test** (1 hour) - Verify input sanitization
+3. **Add password leak test** (1 hour) - Verify passwords never appear in errors/logs
 
 ---
 
-## Maintainability NFR Assessment
+### Data Protection
 
-### Status: ⚠️ CONCERNS
-
-#### Evidence Collected
-
-**Mutation Testing Results**:
-- Current Score: **73.15%** (Target: 80%) ⚠️
-- Surviving Mutants: **26.85%** of code changes not detected
-- Test Quality: **Good patterns, needs coverage improvement**
-
-**Code Quality Metrics**:
-```typescript
-// Test Quality Review Summary
-- BDD Format: ✅ Excellent (5/5)
-- Network-First Pattern: ✅ Perfect implementation (5/5)
-- Data Factories: ✅ Professional (5/5)
-- Test Length: ⚠️ Files exceed 300 lines (3/5)
-- Test Duration: ⚠️ Some tests >500ms (3/5)
-```
-
-**Technical Debt Analysis**:
-- Test File Size: **auth.spec.ts: 418 lines, projects.spec.ts: 362 lines** (⚠️ >300)
-- Edge Case Coverage: **Limited** - Missing some error condition scenarios
-- Documentation: **Excellent** - Comprehensive test documentation
-
-#### Assessment Details
-
-**Mutation Testing Gaps**:
-```javascript
-// Surviving mutants by category
-{
-  "authentication_logic": 15%,    // Login validation mutants surviving
-  "authorization_checks": 22%,    // Project access control mutants
-  "error_handling": 18%,          // Error response mutants
-  "validation_logic": 31%,        // Input validation mutants
-  "database_operations": 28%      // CRUD operation mutants
-}
-```
-
-**Code Quality Strengths**:
-```typescript
-// Excellent maintainability patterns
-- Network-first architecture: ✅ Perfect implementation
-- Factory pattern usage: ✅ Comprehensive and consistent
-- Test isolation: ✅ Proper cleanup and parallel execution
-- BDD structure: ✅ Clear Given-When-Then organization
-```
-
-**Areas for Improvement**:
-```typescript
-// Maintainability concerns identified
-1. Large test files (418 and 362 lines)
-2. Missing edge case coverage
-3. Limited mutation test detection
-4. Some performance bottlenecks in test execution
-```
-
-#### Maintainability Quick Wins
-
-1. **Split large test files** into focused modules (estimated effort: 4-6 hours)
-2. **Add edge case tests** for mutation coverage improvement (effort: 3-4 hours)
-3. **Optimize test performance** for faster execution (effort: 2-3 hours)
+- **Status:** CONCERNS ⚠️
+- **Threshold:** PII encrypted, passwords hashed
+- **Actual:** ASSUMED (implementation likely correct but not validated)
+- **Evidence:** NO EVIDENCE
+- **Findings:** No explicit validation of encryption/hashing
+- **Recommendation:** MEDIUM - Add tests to verify password hashing and PII protection
 
 ---
 
-## Overall Assessment Summary
+## Reliability Assessment
 
-### NFR Status Matrix
+### Error Handling
 
-| NFR Category        | Status          | Priority | Blockers | Evidence Score |
-| ------------------- | --------------- | -------- | -------- | -------------- |
-| **Performance**     | ✅ **PASS**     | P2       | 0        | 5/5 (100%)     |
-| **Security**        | ✅ **PASS**     | P2       | 0        | 5/5 (100%)     |
-| **Reliability**     | ✅ **PASS**     | P2       | 0        | 5/5 (100%)     |
-| **Maintainability** | ⚠️ **CONCERNS** | P1       | 1        | 4/5 (80%)      |
+- **Status:** PASS ✅
+- **Threshold:** Graceful error handling with explicit messages
+- **Actual:** 400/401/403/404/409 HTTP codes used correctly
+- **Evidence:** Test suite validates error responses (tests/api/auth.spec.ts, tests/api/projects.spec.ts)
+- **Findings:** Error handling is explicit and user-friendly
 
-### Overall Decision: ✅ **PASS**
+**Supporting Evidence:**
 
-**Rationale**: Story 1.4 meets all critical NFR thresholds for performance, security, and reliability. The authentication and project management API endpoints demonstrate solid engineering quality with proper testing patterns and comprehensive coverage. While maintainability shows concerns due to mutation testing coverage, this does not impact the production readiness of the current implementation.
+- `1.4-API-003 [P2]`: Missing email → 400 Bad Request ✅
+- `1.4-API-004 [P1]`: Duplicate email → 409 Conflict ✅
+- `1.4-API-007 [P0]`: Invalid password → 401 Unauthorized ✅
+- `1.4-API-010 [P1]`: No auth → 401 Unauthorized ✅
+- `1.4-API-020 [P1]`: Not found → 404 Not Found ✅
+- `1.4-API-021 [P0]`: Unauthorized access → 403 Forbidden ✅
 
-### HIGH Priority Issues (Must Fix Before Production)
+**Quality Strengths:**
 
-**None** ✅ - All critical NFR thresholds met
+- Explicit HTTP status codes for all error scenarios
+- Error responses are consistent
+- No silent failures detected
 
-### Medium Priority Issues (Should Address Current Sprint)
+---
 
-1. **P1 (HIGH):** Mutation Testing Below Target
-   - **Issue:** 73.15% mutation score (target: ≥80%)
-   - **Impact:** Test coverage gaps could miss regressions
-   - **Action:** Add tests for error handling and validation logic
+### Test Stability
 
-### Evidence Gaps Summary
+- **Status:** CONCERNS ⚠️
+- **Threshold:** 100% test pass rate (P0/P1), no flakiness
+- **Actual:** 92% pass rate (24/26 tests passing)
+- **Evidence:** Playwright test execution (2025-10-17)
+- **Findings:** 2 P0/P1 tests failing with 409 Conflict errors
 
-| Evidence Type                    | Status        | Impact   | Priority |
-| -------------------------------- | ------------- | -------- | -------- |
-| Production Performance Monitoring | ✅ Implemented | Low      | P3       |
-| Mutation Testing Coverage        | ⚠️ Below target | Medium   | P1       |
-| Error Recovery Tests             | ✅ Implemented | Low      | P3       |
-| Security Test Coverage           | ✅ Strong     | Low      | P3       |
+**Test Failures:**
+
+1. **`1.4-API-001 [P0]`**: Registration test failing (Expected 201, Received 409)
+   - Likely cause: Hardcoded test data causing duplicate email conflicts
+   - Priority: P0 (blocking)
+   - Impact: Critical test not validating registration
+
+2. **`1.4-API-002 [P1]`**: Registration response object test failing
+   - Same root cause: 409 Conflict due to hardcoded data
+   - Priority: P1 (high)
+
+**Why CONCERNS:**
+
+- 2/9 P0 tests failing (78% P0 pass rate, below 100% threshold)
+- Root cause is deterministic (hardcoded test data), not flakiness
+- Easy to fix but currently blocking quality gate
+
+**Recommendation:** HIGH - Fix test data collisions before merge
+
+**Quick Wins:**
+
+1. **Replace hardcoded emails with unique values** (30 minutes)
+   - Use `faker.internet.email()` or timestamp suffix
+   - Fixes both failures immediately
+   - Reference: bmad/bmm/testarch/knowledge/data-factories.md
+
+---
+
+### Health Checks
+
+- **Status:** PASS ✅
+- **Threshold:** `/health` endpoint exists and returns status
+- **Actual:** Health endpoint implemented (packages/api-gateway/src/index.ts)
+- **Evidence:** Unit test `1.1-UNIT-001 [P1]` passing
+- **Findings:** Health endpoint returns `{"status": "ok", "timestamp": "...", "service": "falador-api-gateway"}`
+
+---
+
+## Maintainability Assessment
+
+### Test Coverage
+
+- **Status:** CONCERNS ⚠️
+- **Threshold:** ≥80% code coverage - from tech-spec-epic-1.md:718
+- **Actual:** NOT_MEASURED
+- **Evidence:** NO EVIDENCE (coverage report not generated)
+- **Findings:** No coverage reports available
+- **Recommendation:** MEDIUM - Run `bun test --coverage` to generate coverage report
+
+**Test Count Analysis:**
+
+- 26 total tests (24 API + 1 unit + 1 example E2E)
+- 100% acceptance criteria coverage (24/24 ACs have tests - from traceability matrix)
+- But code coverage percentage unknown
+
+---
+
+### Code Quality
+
+- **Status:** PASS ✅
+- **Threshold:** ESLint rules pass, no critical violations
+- **Actual:** Linting configured (eslint.config.js with strict rules)
+- **Evidence:** Config file exists with strict rules (no `any` types, explicit returns, SonarJS, Unicorn, JSDoc)
+- **Findings:** Code quality standards defined and enforced
+
+**Quality Configuration:**
+
+- ✅ ESLint 9.37.0 with flat config
+- ✅ TypeScript ESLint with strict rules
+- ✅ Prettier integration (no conflicts)
+- ✅ Husky + lint-staged (pre-commit enforcement)
+- ✅ SonarJS plugin (code smell detection)
+- ✅ Unicorn plugin (best practices)
+
+---
+
+### Documentation
+
+- **Status:** PASS ✅
+- **Threshold:** README, API docs, setup instructions
+- **Actual:** Comprehensive documentation exists
+- **Evidence:**
+  - README.md (14KB) with setup instructions
+  - Story files with acceptance criteria
+  - Test IDs follow naming convention
+- **Findings:** Documentation is complete and well-structured
+
+---
+
+### Mutation Testing
+
+- **Status:** CONCERNS ⚠️
+- **Threshold:** ≥80% mutation score - from tech-spec-epic-1.md:719
+- **Actual:** NOT_MEASURED
+- **Evidence:** NO EVIDENCE (Stryker configured but not run)
+- **Findings:** Stryker config exists (stryker.config.json) but no mutation testing executed
+- **Recommendation:** MEDIUM - Run `bun run test:mutate` to validate test quality
+
+---
+
+## Quick Wins
+
+### 1. Fix Test Data Collisions (Security + Reliability)
+
+**Priority:** P0 (CRITICAL - blocking)
+**Effort:** 30 minutes
+**Owner:** DEV
+**Impact:** Fixes 2 failing P0/P1 tests, unblocks quality gate
+
+**Actions:**
+
+1. Replace hardcoded emails with unique values:
+
+   ```typescript
+   // Before:
+   email: 'newuser@example.com';
+
+   // After (Option 1 - Faker):
+   email: faker.internet.email();
+
+   // After (Option 2 - Timestamp):
+   email: `testuser-${Date.now()}@example.com`;
+   ```
+
+2. Apply to affected tests:
+   - `tests/api/auth.spec.ts:23` (1.4-API-001)
+   - `tests/api/auth.spec.ts:40` (1.4-API-002)
+   - Any other hardcoded email addresses
+
+**Benefit:** Immediate 100% P0 pass rate
+
+---
+
+### 2. Add Basic Performance Baseline (Performance)
+
+**Priority:** P1 (HIGH)
+**Effort:** 2 hours
+**Owner:** DEV
+**Impact:** Establishes performance baseline for future optimization
+
+**Actions:**
+
+1. Create k6 load test script:
+
+   ```javascript
+   // tests/nfr/performance.k6.js
+   import http from 'k6/http';
+   import { check } from 'k6';
+
+   export const options = {
+     vus: 10,
+     duration: '30s',
+     thresholds: {
+       http_req_duration: ['p(95)<500'],
+     },
+   };
+
+   export default function () {
+     const loginRes = http.post(
+       `${__ENV.BASE_URL}/api/auth/login`,
+       JSON.stringify({
+         email: 'test@example.com',
+         password: 'TestPassword123!',
+       }),
+       { headers: { 'Content-Type': 'application/json' } }
+     );
+
+     check(loginRes, {
+       'login status is 200': (r) => r.status === 200,
+       'login responds in <500ms': (r) => r.timings.duration < 500,
+     });
+   }
+   ```
+
+2. Run load test: `k6 run tests/nfr/performance.k6.js`
+3. Document baseline metrics in NFR report
+
+**Benefit:** Validates MVP performance, catches regressions early
+
+---
+
+### 3. Add JWT Token Expiry Test (Security)
+
+**Priority:** P1 (HIGH)
+**Effort:** 2 hours
+**Owner:** DEV
+**Impact:** Validates critical security requirement (token expiry)
+
+**Actions:**
+
+1. Add test to `tests/nfr/security.spec.ts` (new file):
+
+   ```typescript
+   test('JWT tokens expire after 15 minutes', async ({ page, request }) => {
+     // Login and capture token
+     await page.goto('/login');
+     await page.getByLabel('Email').fill('test@example.com');
+     await page.getByLabel('Password').fill('ValidPass123!');
+     await page.getByRole('button', { name: 'Sign In' }).click();
+
+     const token = await page.evaluate(() =>
+       localStorage.getItem('auth_token')
+     );
+
+     // Fast-forward 16 minutes
+     await page.clock.fastForward('00:16:00');
+
+     // Token should be expired
+     const response = await request.get('/api/auth/me', {
+       headers: { Authorization: `Bearer ${token}` },
+     });
+
+     expect(response.status()).toBe(401);
+   });
+   ```
+
+2. Verify test passes
+3. Document security test coverage
+
+**Benefit:** Validates critical security control
 
 ---
 
 ## Recommended Actions
 
-### Immediate Actions (This Sprint)
+### Immediate (Before PR Merge)
 
-#### Priority 1: Improve Mutation Testing Coverage
-**Impact**: High - Better regression detection
-**Effort**: 6-8 hours
-**Target**: Increase from 73.15% to 80%+
+1. **Fix test data collisions** (30 min, P0) - DEV
+   - Replace hardcoded emails with unique values
+   - Re-run tests, verify 100% pass rate
+   - Unblocks quality gate
 
-```typescript
-// Specific tests needed
-1. Add authentication edge case tests
-2. Expand authorization boundary tests
-3. Add input validation boundary tests
-4. Improve error handling scenario coverage
-```
-
-#### Priority 2: Split Large Test Files
-**Impact**: Medium - Better maintainability
-**Effort**: 4-6 hours
-**Target**: All files under 300 lines
-
-```bash
-# Recommended file split
-auth.spec.ts → {
-  auth-registration.spec.ts,
-  auth-login.spec.ts,
-  auth-me.spec.ts,
-  auth-api-keys.spec.ts
-}
-
-projects.spec.ts → {
-  projects-list.spec.ts,
-  projects-create.spec.ts,
-  projects-get.spec.ts,
-  projects-update.spec.ts
-}
-```
-
-### Short-term Actions (Next Sprint)
-
-#### Priority 3: Add Performance Monitoring
-**Impact**: Medium - Production observability
-**Effort**: 4-6 hours
-**Target**: Real-time performance metrics
-
-#### Priority 4: Enhanced Security Logging
-**Impact**: Medium - Security audit capabilities
-**Effort**: 3-4 hours
-**Target**: Complete security event tracking
-
-### Long-term Actions (Backlog)
-
-#### Priority 5: Load Testing Infrastructure
-**Impact**: High - Scalability validation
-**Effort**: 8-12 hours
-**Target**: Automated performance regression testing
-
-#### Priority 6: Contract Testing
-**Impact**: Medium - API stability assurance
-**Effort**: 6-8 hours
-**Target**: Consumer-driven contract tests
+2. **Run coverage report** (10 min, P1) - DEV
+   - Execute: `bun test --coverage`
+   - Verify ≥80% coverage threshold
+   - Document results in NFR assessment
 
 ---
 
-## Conclusion and Production Readiness
+### Short-term (This Sprint)
 
-### Final Assessment: PASS ✅
+1. **Add k6 performance baseline** (2 hours, P1) - DEV
+   - Create k6 load test for auth endpoints
+   - Baseline p50/p95/p99 response times
+   - Add to CI/CD pipeline
 
-**Rationale**:
-Story 1.4 meets all critical NFR thresholds for performance, security, and reliability. The authentication and project management API endpoints demonstrate solid engineering quality with proper testing patterns and comprehensive coverage. While maintainability shows concerns due to mutation testing coverage, this does not impact the production readiness of the current implementation.
+2. **Add security tests** (4 hours, P1) - DEV
+   - JWT token expiry validation
+   - SQL injection/XSS attempts
+   - Password leak validation
+   - Document security test coverage
 
-### Production Readiness: ✅ APPROVED
+3. **Run mutation testing** (1 hour, P2) - DEV
+   - Execute: `bun run test:mutate`
+   - Verify ≥80% mutation score
+   - Fix any surviving mutants
 
-The system is ready for production deployment with the following recommendations:
-
-1. **Deploy with monitoring** - Implement recommended monitoring and alerting
-2. **Address maintainability** - Complete mutation testing improvements in current sprint
-3. **Plan scalability testing** - Implement load testing infrastructure for future releases
-
-### Next Steps
-
-1. **Immediate** (24-48 hours):
-   - Deploy to production with standard monitoring
-   - Begin mutation testing improvements
-
-2. **Short-term** (Current sprint):
-   - Complete test file reorganization
-   - Implement performance monitoring
-   - Add security logging capabilities
-
-3. **Long-term** (Next releases):
-   - Implement comprehensive load testing
-   - Add contract testing framework
-   - Enhance observability platform
-
-### Assessment Sign-Off
-
-**Assessed By**: Murat (Test Excellence Architect)
-**Assessment Date**: 2025-10-20
-**Review Status**: Complete
-**Next Review Date**: 2025-11-20 (30-day follow-up recommended)
-
-**NFR Score Breakdown**:
-- Performance: **95/100** ✅
-- Security: **92/100** ✅
-- Reliability: **98/100** ✅
-- Maintainability: **78/100** ⚠️
-
-**Overall NFR Score**: **91/100** - PASS with minor concerns
+4. **Add burn-in testing** (2 hours, P2) - DevOps
+   - Run tests 10 times to detect flakiness
+   - Document stability score
+   - Add to CI/CD pipeline
 
 ---
 
-## Evidence Artifacts
+### Long-term (Next Sprint)
 
-### Test Evidence Summary
+1. **Add E2E user journeys** (6 hours, P2) - DEV
+   - Register → Login → Create Project → Manage Project
+   - Validate complete workflows end-to-end
 
-| Test Category | Tests | Pass Rate | Coverage | Status |
-| ------------- | ----- | --------- | -------- | ------ |
-| Authentication | 14 | 100% | Complete | ✅ PASS |
-| Projects | 9 | 100% | Complete | ✅ PASS |
-| Security | 6 | 100% | Complete | ✅ PASS |
-| Performance | 5 | 100% | Complete | ✅ PASS |
-| **Total** | **34** | **100%** | **Complete** | **✅ PASS** |
+2. **Add Docker configuration** (4 hours, P1) - DevOps
+   - Dockerfile for API gateway
+   - docker-compose.yml for local dev
+   - CI/CD integration
 
-### Mutation Testing Details
-
-| Component | Mutation Score | Surviving Mutants | Status |
-| --------- | -------------- | ----------------- | ------ |
-| Authentication | 76% | 24% | ⚠️ CONCERNS |
-| Projects | 71% | 29% | ⚠️ CONCERNS |
-| Validation | 68% | 32% | ❌ FAIL |
-| **Overall** | **73.15%** | **26.85%** | **⚠️ CONCERNS** |
-
-### Performance Benchmarks
-
-| Endpoint | Avg Response | P95 Response | Throughput | Status |
-| -------- | ------------ | ------------ | ---------- | ------ |
-| POST /auth/register | 260ms | 290ms | 45 RPS | ✅ PASS |
-| POST /auth/login | 240ms | 270ms | 50 RPS | ✅ PASS |
-| GET /projects | 220ms | 250ms | 60 RPS | ✅ PASS |
-| POST /projects | 310ms | 340ms | 35 RPS | ✅ PASS |
+3. **Add CI/CD pipeline** (6 hours, P0) - DevOps
+   - GitHub Actions workflow
+   - Lint, typecheck, test, mutation test
+   - Quality gate enforcement
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: 2025-10-20
-**Next Review**: 2025-11-20
+## Evidence Gaps
+
+- [ ] **Performance load testing results** (k6, Artillery, JMeter)
+  - Owner: DEV Team
+  - Deadline: 2025-10-20
+  - Suggested evidence: Run k6 load test, document p50/p95/p99 response times
+
+- [ ] **Security testing results** (SAST, DAST, dependency scanning)
+  - Owner: Security Team / DEV
+  - Deadline: 2025-10-24
+  - Suggested evidence: Add security tests (JWT expiry, SQL injection, XSS)
+
+- [ ] **Code coverage report** (Istanbul, NYC, c8)
+  - Owner: DEV Team
+  - Deadline: 2025-10-18
+  - Suggested evidence: Run `bun test --coverage`, verify ≥80%
+
+- [ ] **Mutation testing report** (Stryker)
+  - Owner: DEV Team
+  - Deadline: 2025-10-20
+  - Suggested evidence: Run `bun run test:mutate`, verify ≥80% mutation score
+
+- [ ] **CI/CD pipeline results** (GitHub Actions, GitLab CI)
+  - Owner: DevOps Team
+  - Deadline: 2025-10-25
+  - Suggested evidence: Implement CI/CD workflow, show green build
+
+- [ ] **Docker configuration** (Dockerfile, docker-compose.yml)
+  - Owner: DevOps Team
+  - Deadline: 2025-10-25
+  - Suggested evidence: Create Docker configs, verify local dev environment works
 
 ---
 
-**Assessment Framework**: BMad Test Architecture NFR Assessment v4.0
-**Powered by BMAD-CORE™ Test Architecture**
+## Gate YAML Snippet (CI/CD Integration)
 
----
-
-## Appendix A: Detailed Evidence
-
-### Test Execution Results (Latest)
-
-```
-Running 23 tests using 6 workers
-✓ 23 passed (2.1s)
-
-Performance Summary:
-- Fastest test: 20ms (auth rejection)
-- Slowest test: 500ms (project creation validation)
-- Average: ~200ms per test
-- Sequential requests: 45-67ms
-- Concurrent load (20 requests): 107-121ms
-```
-
-### Mutation Testing Results
-
-```
-Mutation Score: 77.01% (437 killed, 109 survived)
-Files: 17 mutated, 546 mutants generated
-Coverage: 77.01% code coverage
-
-Top Areas for Improvement:
-1. Error response messages (38 surviving mutants)
-2. Validation logic (24 surviving mutants)
-3. Database operations (19 surviving mutants)
-```
-
-### CI/CD Pipeline Status
-
-```
-✅ Lint & Type Check: Passing
-✅ Security Scan: Passing (bun audit)
-✅ Unit & Integration Tests: 23/23 passing
-⚠️ Mutation Testing: 77.01% (below 80% threshold)
-✅ Performance Load Tests: Implemented with concurrent issue identified
-✅ E2E Tests: Passing
-✅ Docker Build: Successful
+```yaml
+nfr_assessment:
+  date: '2025-10-17'
+  story_id: '1.4'
+  categories:
+    performance: 'CONCERNS' # No load testing evidence
+    security: 'CONCERNS' # No security tests
+    reliability: 'CONCERNS' # 2 tests failing (92% pass rate)
+    maintainability: 'PASS' # Code quality enforced, docs complete
+  overall_status: 'CONCERNS'
+  critical_issues: 0
+  high_priority_issues: 3
+  medium_priority_issues: 3
+  concerns: 4
+  blockers: false
+  test_results:
+    total_tests: 26
+    passed: 24
+    failed: 2
+    pass_rate: 92%
+    p0_pass_rate: 78% # 7/9 P0 tests passing (below 100% threshold)
+    p1_pass_rate: 100% # 12/12 P1 tests passing
+  recommendations:
+    - 'Fix test data collisions (30 min, P0)'
+    - 'Add k6 performance baseline (2 hours, P1)'
+    - 'Add security tests - JWT expiry, SQL injection, XSS (4 hours, P1)'
+    - 'Run coverage report - verify ≥80% (10 min, P1)'
+    - 'Run mutation testing - verify ≥80% (1 hour, P2)'
+  evidence_gaps: 6
+  quick_wins:
+    - 'Replace hardcoded emails with faker.internet.email() - fixes 2 test failures'
+    - 'Run k6 load test for 30 seconds - establishes performance baseline'
+    - 'Add JWT token expiry test - validates critical security control'
 ```
 
 ---
 
-## Appendix B: NFR Assessment Framework
+## Related Artifacts
 
-### Assessment Methodology
-
-This assessment follows the BMad Test Architecture NFR Assessment Framework v4.0, which emphasizes:
-
-1. **Evidence-Based Validation**: NFRs must be objectively measured through automated tests
-2. **Deterministic Decision Rules**: Clear PASS/CONCERNS/FAIL criteria based on evidence
-3. **Right Tool for Each NFR**: Specialized tools for each category (k6 for performance, OWASP for security, etc.)
-4. **CI/CD Integration**: All NFR validation automated in deployment pipeline
-
-### Scoring System
-
-- **PASS**: All critical criteria met with strong evidence
-- **CONCERNS**: Some criteria missing or below thresholds (remediation required)
-- **FAIL**: Critical criteria missing or failed (deployment blocked)
-
-### Evidence Quality Levels
-
-- **Strong**: Automated tests with clear pass/fail criteria
-- **Moderate**: Manual tests or partial automation
-- **Weak**: Checklists or subjective assessments
-- **Missing**: No evidence available
+- **Story File:** docs/stories/story-1.4.md
+- **Tech Spec:** docs/tech-spec-epic-1.md
+- **Traceability Matrix:** docs/traceability-matrix-story-1.4.md
+- **Test Files:** tests/api/auth.spec.ts, tests/api/projects.spec.ts
+- **Test Results:** Playwright test execution (2025-10-17, 24/26 passing)
+- **Configuration:** eslint.config.js, stryker.config.json, playwright.config.ts
 
 ---
 
-**Assessment Completed:** 2025-10-20
-**Next Review Date:** When HIGH priority issues resolved
-**Assessment Framework Version:** BMad Test Architecture NFR Assessment v4.0
+## Sign-Off
+
+**NFR Assessment Status:**
+
+- Performance: ⚠️ CONCERNS (no load testing)
+- Security: ⚠️ CONCERNS (no security tests)
+- Reliability: ⚠️ CONCERNS (2 tests failing)
+- Maintainability: ✅ PASS (code quality enforced)
+
+**Overall Status:** ⚠️ CONCERNS - Address HIGH priority issues before production
+
+**Next Steps:**
+
+1. ✅ Fix test data collisions (30 min, P0)
+2. ✅ Run coverage report (10 min, P1)
+3. ✅ Add k6 performance baseline (2 hours, P1)
+4. ✅ Add security tests (4 hours, P1)
+
+**Deployment Recommendation:**
+
+- ⚠️ **Can deploy to staging** with current state
+- ❌ **Cannot deploy to production** until P0 issue resolved (test failures)
+- ⚠️ **Monitor closely** due to missing performance/security baselines
+
+**Generated:** 2025-10-17
+**Workflow:** testarch-nfr v4.0 (Evidence-Based NFR Validation)
 
 ---
 
-_Powered by BMAD-CORE™ Test Architecture_
+<!-- Powered by BMAD-CORE™ -->

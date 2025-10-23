@@ -1,63 +1,69 @@
 import 'reflect-metadata';
+import { registerDependencies } from '@falador/infrastructure/container';
 import { Elysia } from 'elysia';
+import { db } from './database.js';
 import {
-  configureContainer,
-  resolve,
-} from '@falador/infrastructure/container';
-import {
-  UserController,
-  ProjectController,
-  AudioGenerationController,
-  VoiceController,
-} from './controllers';
+  errorMonitoringPlugin,
+  globalErrorHandler,
+} from './middleware/error-monitoring-middleware';
+import { performancePlugin } from './middleware/performance-middleware';
+import { InMemoryProjectRepository } from './repositories/in-memory-project-repository.js';
+import { InMemoryUserRepository } from './repositories/in-memory-user-repository.js';
 import { authRoutes } from './routes/auth';
+import { monitoringRoutes } from './routes/monitoring';
 import { projectRoutes } from './routes/projects';
 
-// Configure the dependency injection container
-configureContainer();
+// Initialize DI Container
+registerDependencies({
+  database: db,
+  userRepository: InMemoryUserRepository,
+  projectRepository: InMemoryProjectRepository,
+});
 
-// Instantiate controllers with DI
-const userController = resolve(UserController);
-const projectController = resolve(ProjectController);
-const audioGenerationController = resolve(AudioGenerationController);
-const voiceController = resolve(VoiceController);
-
-const PORT = Number.parseInt(process.env['PORT'] || '3000');
+const PORT = 3000;
 
 const app = new Elysia()
+  // Add monitoring plugins
+  .use(performancePlugin)
+  .use(errorMonitoringPlugin)
 
-  // Register Clean Architecture controllers
-  .use(userController.registerRoutes.bind(userController))
-  .use(projectController.registerRoutes.bind(projectController))
-  .use(audioGenerationController.registerRoutes.bind(audioGenerationController))
-  .use(voiceController.registerRoutes.bind(voiceController))
+  // Enhanced health check endpoint
+  .get('/health', ({ getPerformanceMetrics, getUptimeSummary }) => ({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    service: 'falador-api-gateway',
+    performance: getPerformanceMetrics
+      ? {
+          uptime: getPerformanceMetrics().uptime,
+          requestCount: getPerformanceMetrics().requestCount,
+          averageResponseTime: getPerformanceMetrics().averageResponseTime,
+          errorRate: getPerformanceMetrics().errorRate,
+        }
+      : undefined,
+    uptime: getUptimeSummary
+      ? {
+          status: getUptimeSummary().status,
+          availability: getUptimeSummary().availability,
+          currentUptime: getUptimeSummary().currentUptime,
+          performanceScore: getUptimeSummary().performanceScore,
+        }
+      : undefined,
+  }))
 
-  // Register legacy routes (for backward compatibility during transition)
+  // Mount route modules
   .use(authRoutes)
   .use(projectRoutes)
+  .use(monitoringRoutes)
 
-  // API documentation endpoint
-  .get('/api/docs', () => ({
-    title: 'Falador API Gateway',
-    version: '0.0.1',
-    description: 'Simple API implementation for audiobook generation platform',
-    endpoints: {
-      auth: '/api/auth',
-      projects: '/api/projects',
-    },
-    architecture: 'Simple API with Elysia',
-  }));
+  // Global error handling
+  .onError(globalErrorHandler.error)
 
-// Start the server
-app.listen(PORT);
+  .listen(PORT);
 
 // Only log in development/non-test environments
-if (process.env['NODE_ENV'] !== 'test') {
+if (process.env.NODE_ENV !== 'test') {
   console.log(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-  );
-  console.log(
-    `📚 API Documentation available at http://localhost:${PORT}/api/docs`
   );
 }
 

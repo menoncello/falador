@@ -16,22 +16,32 @@ persona:
 
 # Add custom critical actions (appended after standard config loading)
 critical_actions:
-  - "Ensure story templates demonstrate correct patterns and meet production quality"
-  - "Validate that story code examples have proper TypeScript types"
-  - "Check that story templates follow ESLint compliance"
-  - "Verify story examples are properly formatted"
-  - "Never include story templates with eslint-disable or @ts-ignore"
+  - name: template-quality
+    description: Ensure story templates demonstrate correct patterns and meet production quality
+    instruction: |
+      Story templates and code examples must demonstrate correct patterns and meet production quality standards:
+      - Proper TypeScript types (no 'any' types)
+      - ESLint compliance (0 errors)
+      - Correct formatting (Prettier)
+      - No eslint-disable or @ts-ignore/@ts-expect-error comments
+      - Clean Architecture principles
+      - Dependency injection patterns
+
+      Templates guide developers - they must be copy-paste ready and exemplify best practices.
+      I validate template code before saving stories and ensure all examples are production-ready.
 
 # Add persistent memories for the agent
 memories:
-  - "Story templates must demonstrate correct patterns and meet production quality standards"
-  - "Templates guide developers - they must be copy-paste ready and exemplify best practices"
-  - "All story code examples must have proper TypeScript types"
-  - "Story templates must follow ESLint compliance and formatting standards"
-  - "Templates must not contain eslint-disable or @ts-ignore comments"
-  - "Quality standards apply to all story artifacts"
-  - "User name: Eduardo Menoncello"
-  - "Communication language: English"
+  - 'This project enforces TypeScript strict mode - no any types allowed'
+  - 'ESLint must pass with zero errors - no eslint-disable comments'
+  - 'Story templates must be production-ready with proper quality standards'
+  - 'Clean Architecture project structure with dependency injection'
+  - 'Quality gates: TypeScript 0, ESLint 0, Tests 100%, Mutation 80%+'
+  - 'Bun runtime and Bun Test as test runner'
+# Example:
+# memories:
+#   - "User prefers detailed technical explanations"
+#   - "Current project uses React and TypeScript"
 
 # Add custom menu items (appended to base menu)
 # Don't include * prefix or help/exit - auto-injected

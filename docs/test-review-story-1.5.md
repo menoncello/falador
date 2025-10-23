@@ -1,485 +1,393 @@
-# Test Quality Review: Story 1.5 Clean Architecture
+# Test Quality Review: Story 1.5 - Clean Architecture Project Structure
 
-**Quality Score**: 82/100 (B - Good)
-**Review Date**: 2025-10-20
-**Review Scope**: suite
-**Reviewer**: TEA Agent (Murat)
-
----
+**Quality Score**: 72/100 (C - Needs Improvement)
+**Review Date**: 2025-10-19
+**Review Scope**: Story 1.5 Clean Architecture Tests
+**Test Files Reviewed**: 6 files
+**Mutation Score**: 79.08% (Below 80% threshold)
+**Recommendation**: Reject - Must Fix Critical Issues
 
 ## Executive Summary
 
-**Overall Assessment**: Good
+The test suite for Story 1.5 demonstrates solid foundations with excellent use of test factories and proper isolation. However, **critical mutation testing issues** require immediate attention before merge. The mutation score of 79.08% falls below the mandatory 80% threshold, indicating gaps in test effectiveness.
 
-**Recommendation**: Approve with Comments
+**Strengths:**
 
-### Key Strengths
+- Excellent use of test factories with faker for unique, realistic data
+- Good test ID conventions following traceability patterns (1.1-UNIT-001 format)
+- Proper isolation with beforeEach cleanup
+- Comprehensive coverage of authentication and project management flows
+- Well-structured test constants and helper functions
 
-✅ **Excellent Clean Architecture Implementation**: Tests properly demonstrate domain purity, dependency injection, and layer separation
-✅ **Comprehensive Coverage**: Domain, infrastructure, application, and integration layers all tested
-✅ **No Hard Waits**: All tests use deterministic patterns with proper async handling
+**Critical Issues:**
 
-### Key Weaknesses
+- **Mutation Testing Score**: 79.08% (86 survived mutants) - BELOW 80% threshold
+- **Test Factories Not Tested**: 0% mutation coverage on test-factories.ts
+- **CLI Tests Inadequate**: Only 12.50% mutation coverage
+- **Job Worker Tests Weak**: 22.22% mutation coverage
 
-❌ **Missing Test IDs**: Tests lack proper traceability IDs (e.g., 1.5-DOM-001)
-❌ **No Priority Classification**: Tests not classified as P0/P1/P2/P3 for risk-based execution
-❌ **Limited Data Factory Usage**: Tests use hardcoded data instead of factory functions
+**Other Issues:**
 
-### Summary
+- Missing BDD (Given-When-Then) structure in most tests
+- Some hardcoded test data where factories could be used
+- Limited use of explicit priority markers in test descriptions
 
-Story 1.5 demonstrates solid Clean Architecture testing with excellent layer separation and comprehensive coverage. The tests properly validate domain purity, dependency injection patterns, and cross-layer integration. However, they miss key traceability and prioritization practices that would enhance maintainability and enable risk-based testing strategies.
-
----
+**Recommendation**: **REJECT** - Must fix mutation testing issues before merge. The 86 survived mutants represent significant gaps in test coverage that could allow bugs to reach production.
 
 ## Quality Criteria Assessment
 
-| Criterion                            | Status  | Violations | Notes                               |
-| ------------------------------------ | ------- | ---------- | ----------------------------------- |
-| BDD Format (Given-When-Then)         | ⚠️ WARN | 0          | Some structure but not explicit GWT |
-| Test IDs                             | ❌ FAIL | 4          | No traceability IDs found           |
-| Priority Markers (P0/P1/P2/P3)       | ❌ FAIL | 4          | No priority classification          |
-| Hard Waits (sleep, waitForTimeout)   | ✅ PASS | 0          | No hard waits detected              |
-| Determinism (no conditionals)        | ✅ PASS | 0          | Tests are deterministic             |
-| Isolation (cleanup, no shared state) | ✅ PASS | 0          | Proper test isolation               |
-| Fixture Patterns                     | ⚠️ WARN | 1          | Limited fixture usage               |
-| Data Factories                       | ❌ FAIL | 2          | Hardcoded test data                 |
-| Network-First Pattern                | ✅ PASS | 0          | N/A for unit tests                  |
-| Explicit Assertions                  | ✅ PASS | 0          | All assertions explicit             |
-| Test Length (≤300 lines)             | ✅ PASS | 0          | All files under 300 lines           |
-| Test Duration (≤1.5 min)             | ✅ PASS | 0          | Fast execution expected             |
-| Flakiness Patterns                   | ✅ PASS | 0          | No flaky patterns detected          |
-
-**Total Violations**: 0 Critical, 2 High, 1 Medium, 0 Low
-
----
-
-## Quality Score Breakdown
-
-```
-Starting Score:          100
-Critical Violations:     -0 × 10 = -0
-High Violations:         -2 × 5 = -10
-Medium Violations:       -1 × 2 = -2
-Low Violations:          -0 × 1 = -0
-
-Bonus Points:
-  Excellent BDD:         +0
-  Comprehensive Fixtures: +0
-  Data Factories:        +0
-  Network-First:         +5
-  Perfect Isolation:     +5
-  All Test IDs:          +0
-                         --------
-Total Bonus:             +10
-
-Final Score:             82/100
-Grade:                   B
-```
-
----
+| Criterion              | Status  | Violations | Details                                  |
+| ---------------------- | ------- | ---------- | ---------------------------------------- |
+| **BDD Format**         | ⚠️ WARN | 5/6 files  | Missing Given-When-Then structure        |
+| **Test IDs**           | ✅ PASS | 0          | All tests have proper IDs (1.1-UNIT-XXX) |
+| **Priority Markers**   | ⚠️ WARN | 3/6 files  | Some P1/P2 markers missing               |
+| **Hard Waits**         | ✅ PASS | 0          | No hard waits detected                   |
+| **Determinism**        | ✅ PASS | 0          | No conditionals or random behavior       |
+| **Isolation**          | ✅ PASS | 0          | Proper cleanup with beforeEach           |
+| **Fixture Patterns**   | ⚠️ WARN | 4/6 files  | Some setup repetition                    |
+| **Data Factories**     | ✅ PASS | 0          | Excellent factory implementation         |
+| **Network-First**      | N/A     | 0          | Not applicable (in-memory tests)         |
+| **Assertions**         | ✅ PASS | 0          | Explicit, clear assertions               |
+| **Test Length**        | ✅ PASS | 0          | All files under 300 lines                |
+| **Test Duration**      | ✅ PASS | 0          | Fast execution (unit tests)              |
+| **Flakiness Patterns** | ✅ PASS | 0          | No flaky patterns detected               |
 
 ## Critical Issues (Must Fix)
 
-No critical issues detected. ✅
+### 1. Mutation Testing Score Below Threshold (CRITICAL)
 
----
+**Issue**: Mutation score of 79.08% with 86 survived mutants falls below mandatory 80% threshold.
+
+**Files with Low Coverage**:
+
+- `test-factories.ts`: 0% coverage (10 survived mutants)
+- `cli/src/index.ts`: 12.50% coverage (7 survived mutants)
+- `job-worker/src/index.ts`: 22.22% coverage (14 survived mutants)
+
+**Specific Survived Mutants**:
+
+- **Auth routes**: String literal mutations in error messages and schema literals
+- **Project routes**: Authorization bypass mutations (project.userId !== authUser.id)
+- **Database**: Token generation logic and password validation bypasses
+- **Test factories**: All factory logic mutations survived (no tests)
+
+**Must Fix**: Add tests to kill at least 7 more mutants to reach 80% threshold.
+
+### 2. Test Factories Lack Coverage (CRITICAL)
+
+**Issue**: `test-factories.ts` has 0% mutation coverage - no tests validate factory behavior.
+
+**Survived Mutants**:
+
+- Factory return objects replaced with empty objects
+- Default values changed (language: '' instead of 'pt-BR')
+- Array options made empty (genre selection array empty)
+
+**Must Fix**: Add comprehensive tests for factory functions in `test-factories.test.ts`.
+
+### 3. CLI Tests Inadequate (CRITICAL)
+
+**Issue**: CLI module only has 12.50% mutation coverage.
+
+**Survived Mutants**:
+
+- Console.log statements and string constants
+- Import.meta.main conditional logic
+- Main function body replaced with empty function
+
+**Must Fix**: Add tests that verify CLI output and behavior.
 
 ## Recommendations (Should Fix)
 
-### 1. Add Test IDs for Traceability
+### 4. Add BDD Structure to Tests (P1)
 
-**Severity**: P1 (High)
-**Location**: All test files
-**Criterion**: Test IDs
-**Knowledge Base**: [test-quality.md](../../../testarch/knowledge/test-quality.md)
+**Current State**: Tests lack clear Given-When-Then structure, making intent harder to understand.
 
-**Issue Description**:
-Tests lack traceability IDs that map them to story requirements and enable quality gate decisions.
+**Files Affected**:
 
-**Current Code**:
+- `packages/api-gateway/src/index.test.ts:13-187`
+- `packages/api-gateway/src/routes/auth.test.ts:11-285`
+- `packages/api-gateway/src/routes/projects.test.ts:11-544`
+
+**Recommended Fix**:
 
 ```typescript
-// ⚠️ Could be improved (current implementation)
-describe('Domain Entities', () => {
-  it('should have required fields', () => {
-    // Test without ID
-  });
+// ❌ Current (auth.test.ts:28)
+it('should reject registration without email', async () => {
+  const response = await authRoutes.handle(/* ... */);
+  expect(response.status).toBe(400);
 });
-```
 
-**Recommended Improvement**:
-
-```typescript
-// ✅ Better approach (recommended)
-describe('1.5-DOMAIN-ENTITIES-001 [P1]: Domain entities should have required fields', () => {
-  it('1.5-DOM-USER-001 [P1]: User entity should validate required fields', () => {
-    // Test with proper ID
-  });
-});
-```
-
-**Benefits**:
-
-- Enables requirements traceability
-- Supports test coverage reporting
-- Facilitates risk-based test execution
-
-**Priority**:
-P1 - High impact for quality gates and traceability matrix
-
-### 2. Implement Data Factories
-
-**Severity**: P1 (High)
-**Location**: `/packages/core-domain/src/entities/index.test.ts`
-**Criterion**: Data Factories
-**Knowledge Base**: [data-factories.md](../../../testarch/knowledge/data-factories.md)
-
-**Issue Description**:
-Tests use hardcoded test data instead of factory functions, creating maintenance risks and parallel execution issues.
-
-**Current Code**:
-
-```typescript
-// ⚠️ Could be improved (current implementation)
-const user: User = {
-  id: 'user-123',
-  email: 'test@example.com',
-  name: 'Test User',
-  createdAt: new Date(),
-};
-```
-
-**Recommended Improvement**:
-
-```typescript
-// ✅ Better approach (recommended)
-import { createUser } from '../../../test-utils/factories/user-factory';
-
-const user = createUser({
-  email: 'test@example.com',
-  name: 'Test User',
-});
-```
-
-**Benefits**:
-
-- Parallel-safe test execution
-- Schema evolution resistance
-- Clear test intent through overrides
-
-**Priority**:
-P1 - High impact for maintainability and CI reliability
-
-### 3. Add Priority Classification
-
-**Severity**: P2 (Medium)
-**Location**: All test files
-**Criterion**: Priority Markers
-**Knowledge Base**: [test-priorities.md](../../../testarch/knowledge/test-priorities.md)
-
-**Issue Description**:
-Tests lack P0/P1/P2/P3 classification for risk-based execution and quality gate decisions.
-
-**Current Code**:
-
-```typescript
-// ⚠️ Could be improved (current implementation)
-describe('User Entity', () => {
-  it('should have required fields', () => {
-```
-
-**Recommended Improvement**:
-
-```typescript
-// ✅ Better approach (recommended)
-describe('1.5-DOM-USER-ENTITY [P2]: User Entity Tests', () => {
-  it('1.5-DOM-USER-REQ-001 [P1]: should validate required fields', () => {
-```
-
-**Benefits**:
-
-- Enables risk-based test selection
-- Supports quality gate decisions
-- Clarifies business criticality
-
-**Priority**:
-P2 - Medium impact for test strategy and execution planning
-
----
-
-## Best Practices Found
-
-### 1. Clean Architecture Domain Purity
-
-**Location**: `/packages/core-domain/src/entities/index.test.ts:1-189`
-**Pattern**: Domain Layer Testing
-**Knowledge Base**: [test-quality.md](../../../testarch/knowledge/test-quality.md)
-
-**Why This Is Good**:
-Domain tests maintain zero external dependencies, validating pure business logic without infrastructure concerns.
-
-**Code Example**:
-
-```typescript
-// ✅ Excellent pattern demonstrated in this test
-describe('Domain Entities', () => {
-  describe('User Entity', () => {
-    it('should have required fields', () => {
-      const user: User = {
-        id: 'user-123',
-        email: 'test@example.com',
-        name: 'Test User',
-        createdAt: new Date(),
+// ✅ Recommended
+describe('User Registration', () => {
+  describe('Given invalid registration data', () => {
+    it('When email is missing, Then should return 400 error', async () => {
+      // Given: No email provided
+      const registrationData = {
+        name: TEST_CREDENTIALS.NAME,
+        password: TEST_CREDENTIALS.PASSWORD,
       };
-      // Pure domain validation - no external deps
+
+      // When: Registration attempted
+      const response = await authRoutes.handle(
+        new Request('http://localhost/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(registrationData),
+        })
+      );
+
+      // Then: Should reject with validation error
+      expect(response.status).toBe(400);
+      const data = await response.json();
+      expect(data.error).toContain('Valid email is required');
     });
   });
 });
 ```
 
-**Use as Reference**:
-All domain layer tests should follow this pattern of pure business logic validation.
+**Knowledge Reference**: test-quality.md - BDD structure enhances test readability and maintainability.
 
-### 2. Proper Repository Pattern Testing
+### 5. Complete Priority Marker Coverage (P2)
 
-**Location**: `/packages/infrastructure/src/database/repositories/user-repository.test.ts:1-243`
-**Pattern**: Infrastructure Testing with Cleanup
-**Knowledge Base**: [test-quality.md](../../../testarch/knowledge/test-quality.md)
+**Current State**: Some tests missing priority classification in test IDs.
 
-**Why This Is Good**:
-Repository tests demonstrate proper cleanup, isolation, and full CRUD operations with edge cases.
+**Files Affected**:
 
-**Code Example**:
+- `packages/cli/src/index.test.ts` - Missing P1 markers on some tests
+- `packages/core-domain/src/index.test.ts:5` - Single test needs priority
+
+**Recommended Fix**:
 
 ```typescript
-// ✅ Excellent pattern demonstrated in this test
-beforeEach(() => {
-  repository = new InMemoryUserRepository();
-  repository.clear(); // Ensure clean state for each test
+// ❌ Current
+test('1.1-UNIT-DOM-001 [P2]: should export version', () => {
+  expect(version).toBe('0.0.1');
+});
+
+// ✅ Better (add more descriptive title)
+test('1.1-UNIT-DOM-001 [P2]: should export correct version string', () => {
+  expect(version).toBe('0.0.1');
 });
 ```
 
-**Use as Reference**:
-All infrastructure tests should include proper cleanup and isolation patterns.
+**Knowledge Reference**: test-priorities.md - Clear priority classification helps with test execution planning.
 
-### 3. Application Layer Use Case Testing
+### 6. Extract Common Test Setup to Fixtures (P2)
 
-**Location**: `/packages/application/src/use-cases/user-management.test.ts:1-310`
-**Pattern**: Use Case Testing with Mocked Dependencies
-**Knowledge Base**: [fixture-architecture.md](../../../testarch/knowledge/fixture-architecture.md)
+**Current State**: Some repetitive setup patterns in route tests.
 
-**Why This Is Good**:
-Use case tests properly mock infrastructure dependencies and focus on business logic validation.
+**Files Affected**:
 
-**Code Example**:
+- `packages/api-gateway/src/routes/auth.test.ts:7-8` (beforeEach cleanup)
+- `packages/api-gateway/src/routes/projects.test.ts:7-8` (same pattern)
+
+**Recommended Fix**:
 
 ```typescript
-// ✅ Excellent pattern demonstrated in this test
-beforeEach(() => {
-  mockUserRepository = {
-    create: mock(() => Promise.resolve({} as User)),
-    findById: mock(() => Promise.resolve(null)),
-    // ... other mocked methods
-  } as UserRepository;
-  userUseCase = new UserManagementUseCase(mockUserRepository);
+// test-helpers.ts (extend existing)
+export function createAuthenticatedContext(
+  db: any,
+  overrides: UserFactoryData = {}
+) {
+  const user = db.createUser({
+    email: TEST_CREDENTIALS.EMAIL,
+    name: TEST_CREDENTIALS.NAME,
+    password: TEST_CREDENTIALS.PASSWORD,
+    ...overrides,
+  });
+  const token = db.createSession(user.id);
+  return { user, token };
+}
+
+// In test files
+describe('Project Routes', () => {
+  let authenticatedContext: ReturnType<typeof createAuthenticatedContext>;
+
+  beforeEach(() => {
+    db.clear();
+    authenticatedContext = createAuthenticatedContext(db);
+  });
+
+  it('should create project', () => {
+    const { token } = authenticatedContext;
+    // test implementation
+  });
 });
 ```
 
-**Use as Reference**:
-Application layer tests should always mock external dependencies and test business logic in isolation.
+**Knowledge Reference**: fixture-architecture.md - Pure function → Fixture pattern reduces duplication.
 
-### 4. Cross-Layer Integration Testing
+### 7. Improve Test Descriptions for Clarity (P2)
 
-**Location**: `/packages/api-gateway/src/integration/cross-layer.test.ts:1-331`
-**Pattern**: End-to-End Architecture Validation
-**Knowledge Base**: [test-quality.md](../../../testarch/knowledge/test-quality.md)
+**Current State**: Some test descriptions could be more descriptive about behavior.
 
-**Why This Is Good**:
-Integration tests validate the entire Clean Architecture flow from use cases through infrastructure to API layer.
+**Files Affected**:
 
-**Code Example**:
+- `packages/cli/src/index.test.ts:13-15` - Generic descriptions
+- `packages/api-gateway/src/index.test.ts:144-187` - Could be more specific
+
+**Recommended Fix**:
 
 ```typescript
-// ✅ Excellent pattern demonstrated in this test
-it('should create user and associate projects correctly', async () => {
-  const userData = testFactory.createUserData();
-  const createdUser = await userManagement.createUser(userData);
+// ❌ Current
+it('should create project', async () => {
+  // implementation
+});
 
-  const projectData = testFactory.createProjectData({ userId: createdUser.id });
-  const createdProject = await projectManagement.createProject(
-    projectData,
-    createdUser.id
-  );
-
-  expect(createdProject.userId).toBe(createdUser.id);
+// ✅ Better
+it('should create project with valid authenticated user and minimal data', async () => {
+  // implementation
 });
 ```
 
-**Use as Reference**:
-Integration tests should validate cross-layer consistency and data flow through the architecture.
+## Best Practices Examples Found
 
----
+### 1. Excellent Test Factory Implementation
 
-## Test File Analysis
+**File**: `packages/api-gateway/src/test-factories.ts`
 
-### File Metadata
+```typescript
+export function createTestUser(
+  overrides: UserFactoryData = {}
+): Required<UserFactoryData> {
+  return {
+    email: faker.internet.email(),
+    name: faker.person.fullName(),
+    password: faker.internet.password({ length: 16 }),
+    tier: 'free',
+    ...overrides,
+  } as Required<UserFactoryData>;
+}
+```
 
-- **File Path**: 4 core test files reviewed
-- **File Size**: 1,033 total lines across all files
-- **Test Framework**: Bun Test
-- **Language**: TypeScript
+**Why Excellent**:
 
-### Test Structure
+- Uses faker for unique, realistic data
+- Supports overrides for specific test scenarios
+- TypeScript interfaces for type safety
+- Parallel-safe (no hardcoded values)
 
-- **Describe Blocks**: 32 total
-- **Test Cases (it/test)**: 73 total
-- **Average Test Length**: 14 lines per test
-- **Fixtures Used**: 1 (TestFactory)
-- **Data Factories Used**: 1 (TestFactory helpers)
+### 2. Proper Test Constants Management
 
-### Test Coverage Scope
+**File**: `packages/api-gateway/src/test-constants.ts`
 
-- **Test IDs**: 0 formatted
-- **Priority Distribution**:
-  - P0 (Critical): 0 tests
-  - P1 (High): 0 tests
-  - P2 (Medium): 0 tests
-  - P3 (Low): 0 tests
-  - Unknown: 73 tests
+```typescript
+export const TEST_CREDENTIALS = {
+  EMAIL: 'test@example.com',
+  NAME: 'Test User',
+  PASSWORD: 'TestPassword123!',
+} as const;
+```
 
-### Assertions Analysis
+**Why Good**:
 
-- **Total Assertions**: 285 estimated
-- **Assertions per Test**: 3.9 (avg)
-- **Assertion Types**: expect().toBe(), expect().toEqual(), expect().rejects.toThrow(), expect().not.toBeNull()
+- Centralized test constants reduce duplication
+- `as const` ensures immutability
+- Clear, descriptive naming
 
----
+### 3. Comprehensive Edge Case Coverage
 
-## Context and Integration
+**File**: `packages/api-gateway/src/routes/auth.test.ts:83-112`
 
-### Related Artifacts
+```typescript
+it('should reject duplicate email registration', async () => {
+  // Create first user
+  await authRoutes.handle(/* valid registration */);
 
-- **Story File**: [story-1.5.md](../../../stories/story-1.5.md)
-- **Acceptance Criteria Mapped**: 8/8 (100%) - Covered implicitly through architecture tests
+  // Try to create duplicate
+  const response = await authRoutes.handle(/* same email */);
 
-### Acceptance Criteria Validation
+  expect(response.status).toBe(409);
+  expect(data.error).toContain('already exists');
+});
+```
 
-| Acceptance Criterion           | Test Coverage                  | Status  | Notes                       |
-| ------------------------------ | ------------------------------ | ------- | --------------------------- |
-| Folder structure created       | ✅ Domain/Infrastructure Tests | Covered | Layer structure validated   |
-| Domain layer entities          | ✅ entities/index.test.ts      | Covered | All entities tested         |
-| Application layer use cases    | ✅ user-management.test.ts     | Covered | Use case patterns validated |
-| Infrastructure layer adapters  | ✅ user-repository.test.ts     | Covered | Repository pattern tested   |
-| Presentation layer structure   | ❌ Not in reviewed files       | Missing | API tests need review       |
-| Dependency injection container | ✅ container.test.ts           | Covered | DI patterns validated       |
-| Repository pattern             | ✅ user-repository.test.ts     | Covered | Full CRUD tested            |
-| Example use case demonstration | ✅ cross-layer.test.ts         | Covered | End-to-end flow validated   |
+**Why Good**:
 
-**Coverage**: 7/8 criteria covered (87.5%)
+- Tests important business rule (email uniqueness)
+- Clear setup, action, assertion flow
+- Proper status code and error message validation
 
----
+## Quality Score Breakdown
+
+**Starting Score**: 100
+
+**Violations**:
+
+- Medium violations (2 points each): -8 points
+  - Missing BDD structure (4 files)
+  - Incomplete priority markers (2 files)
+- **Mutation Testing Below Threshold**: -10 points
+  - Mutation score: 79.08% (below 80% requirement)
+
+**Bonus Points**:
+
+- +5: Excellent test factory implementation
+- +5: Proper isolation and cleanup
+- +5: Good test ID conventions
+- +5: Comprehensive edge case coverage
+
+**Final Score**: 72/100 (C - Needs Improvement)
 
 ## Knowledge Base References
 
-This review consulted the following knowledge base fragments:
-
-- **[test-quality.md](../../../testarch/knowledge/test-quality.md)** - Definition of Done for tests (no hard waits, <300 lines, <1.5 min, self-cleaning)
-- **[fixture-architecture.md](../../../testarch/knowledge/fixture-architecture.md)** - Pure function → Fixture → mergeTests pattern
-- **[network-first.md](../../../testarch/knowledge/network-first.md)** - Route intercept before navigate (race condition prevention)
-- **[data-factories.md](../../../testarch/knowledge/data-factories.md)** - Factory functions with overrides, API-first setup
-- **[test-levels-framework.md](../../../testarch/knowledge/test-levels-framework.md)** - E2E vs API vs Component vs Unit appropriateness
-
-See [tea-index.csv](../../../testarch/tea-index.csv) for complete knowledge base.
-
----
+- **test-quality.md**: Definition of Done for deterministic, isolated tests
+- **fixture-architecture.md**: Pure function → Fixture patterns for test setup
+- **data-factories.md**: Factory functions with faker for unique test data
+- **test-priorities.md**: P0-P3 classification for test execution planning
+- **test-healing-patterns.md**: Common patterns to avoid test flakiness
 
 ## Next Steps
 
-### Immediate Actions (Before Merge)
+1. **Immediate (Next iteration)**: Add BDD structure to high-priority authentication tests
+2. **Short-term (Story 1.6)**: Complete priority marker coverage across all tests
+3. **Medium-term (Epic 2)**: Extract common setup patterns to fixtures
+4. **Long-term (Epic 4)**: Implement network-first patterns for integration tests
 
-1. **Add Test IDs and Priority Classification** - Update all test descriptions with proper traceability
-   - Priority: P1
-   - Owner: Development Team
-   - Estimated Effort: 2 hours
+## Mutation Testing Analysis
 
-2. **Implement Data Factories** - Replace hardcoded test data with factory functions
-   - Priority: P1
-   - Owner: Development Team
-   - Estimated Effort: 4 hours
+### Current Status: FAILED (79.08% - Below 80% threshold)
 
-### Follow-up Actions (Future PRs)
+**Total Survived Mutants**: 86
+**Coverage Breakdown**:
 
-1. **Review Presentation Layer Tests** - API gateway and controller tests need quality review
-   - Priority: P2
-   - Target: Next sprint
+- api-gateway: 83.07% (65 survived)
+- cli: 12.50% (7 survived)
+- job-worker: 22.22% (14 survived)
+- core-domain: 100% (0 survived)
+- test-factories: 0% (10 survived)
 
-2. **Add Performance Benchmarks** - Integration test performance validation
-   - Priority: P3
-   - Target: Backlog
+### High-Priority Mutants to Fix
 
-### Re-Review Needed?
+1. **Authorization Bypass** (projects.ts:85):
 
-⚠️ Re-review after critical fixes - request changes, then re-review
+   ```typescript
+   // Original: if (project.userId !== authUser.id)
+   // Mutated: if (true) - ALWAYS allows access
+   ```
 
----
+2. **Error Message Mutations** (auth.ts, projects.ts):
+   - All error strings replaced with empty strings
+   - Tests should verify exact error messages
 
-## Decision
+3. **Schema Validation Mutations** (auth.ts, projects.ts):
+   - Literal values in schemas changed ('free' → '')
+   - Array options made empty
 
-**Recommendation**: Approve with Comments
+4. **Test Factory Logic** (test-factories.ts):
+   - All factory return statements replaced with empty objects
+   - Default values mutated (language: 'pt-BR' → '')
 
-**Rationale**:
-Test quality is good with 82/100 score. The Clean Architecture implementation is excellent with proper layer separation, dependency injection, and comprehensive coverage. High-priority recommendations should be addressed but don't block merge. Critical architectural validation is solid, making tests production-ready.
+### Immediate Actions Required
 
-> Test quality is acceptable with 82/100 score. High-priority recommendations should be addressed but don't block merge. Critical issues resolved, but improvements would enhance maintainability.
+1. **Add tests for authorization logic** to kill security bypass mutants
+2. **Add test-factories.test.ts** to validate factory behavior
+3. **Add CLI output verification tests**
+4. **Add job worker validation tests**
 
----
-
-## Appendix
-
-### Violation Summary by Location
-
-| Line  | Severity    | Criterion        | Issue                         | Fix                         |
-| ----- | ----------- | ---------------- | ----------------------------- | --------------------------- |
-| All   | P1 (High)   | Test IDs         | No traceability IDs           | Add 1.5-\* IDs to all tests |
-| All   | P1 (High)   | Priority Markers | No P0/P1/P2/P3 classification | Add priority markers        |
-| 12-35 | P2 (Medium) | Data Factories   | Hardcoded test data           | Implement factory functions |
-
-### Quality Trends
-
-| Review Date | Score  | Grade | Critical Issues | Trend       |
-| ----------- | ------ | ----- | --------------- | ----------- |
-| 2025-10-20  | 82/100 | B     | 0               | ➡️ Baseline |
-
-### Related Reviews
-
-| File                    | Score  | Grade | Critical | Status   |
-| ----------------------- | ------ | ----- | -------- | -------- |
-| entities/index.test.ts  | 85/100 | B     | 0        | Approved |
-| user-repository.test.ts | 88/100 | A     | 0        | Approved |
-| user-management.test.ts | 80/100 | B     | 0        | Approved |
-| cross-layer.test.ts     | 85/100 | B     | 0        | Approved |
-
-**Suite Average**: 82/100 (B)
+**Target**: Kill at least 7 mutants to reach 80% threshold.
 
 ---
 
-## Review Metadata
-
-**Generated By**: BMad TEA Agent (Test Architect)
-**Workflow**: testarch-test-review v4.0
-**Review ID**: test-review-story-1.5-20251020
-**Timestamp**: 2025-10-20 12:00:00
-**Version**: 1.0
-
----
-
-## Feedback on This Review
-
-If you have questions or feedback on this review:
-
-1. Review patterns in knowledge base: `testarch/knowledge/`
-2. Consult tea-index.csv for detailed guidance
-3. Request clarification on specific violations
-4. Pair with QA engineer to apply patterns
-
-This review is guidance, not rigid rules. Context matters - if a pattern is justified, document it with a comment.
+**Review Summary**: The test suite demonstrates solid foundations with excellent use of test factories and proper isolation. However, **critical mutation testing failures** (79.08% vs 80% required) with 86 survived mutants indicate significant gaps in test coverage. **REJECTED** - Must fix authorization bypass mutants, test factory coverage, and CLI tests before merge. The security-related survived mutants are particularly concerning and represent potential production bugs.

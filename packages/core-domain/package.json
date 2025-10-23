@@ -5,20 +5,14 @@
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project ./tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "lint:fix": "eslint . --fix",
-    "lint": "eslint ."
-  },
-  "dependencies": {
-    "tsyringe": "^4.10.0",
-    "reflect-metadata": "^0.2.2"
+    "test:mutate": "stryker run",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/reflect-metadata": "^0.1.0"
+    "@types/bun": "latest"
   }
 }

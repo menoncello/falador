@@ -302,6 +302,86 @@ git commit -m "feat: add new feature"
 
 ---
 
+## 🐳 Docker Development
+
+### Prerequisites
+
+- **Docker** >= 20.10
+- **Docker Compose** >= 2.0
+
+### Local Development with Docker
+
+```bash
+# Start all services (PostgreSQL + Redis + Application)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f app
+
+# Stop services
+docker-compose down
+
+# Start specific service
+docker-compose up -d postgres redis
+
+# Access database directly
+docker-compose exec postgres psql -U falador -d falador
+```
+
+### Docker Build
+
+```bash
+# Build application image
+docker build -t falador-app .
+
+# Build with no cache
+docker build --no-cache -t falador-app .
+
+# Multi-platform build (for production)
+docker buildx build --platform linux/amd64,linux/arm64 -t falador-app .
+```
+
+### Services
+
+| Service  | Port | Description                    |
+| -------- | ---- | ------------------------------ |
+| app      | 3000 | Main application (API Gateway) |
+| postgres | 5432 | PostgreSQL database            |
+| redis    | 6379 | Redis cache and job queue      |
+| pgadmin  | 5050 | Database management (optional) |
+
+### Environment Configuration
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Development environment
+NODE_ENV=development
+DATABASE_URL=postgresql://falador:falador_dev@localhost:5432/falador
+REDIS_URL=redis://localhost:6379
+```
+
+### Hot Reload
+
+The development container includes hot reload capabilities:
+
+- **Source Code**: Changes to `./packages` are automatically reflected
+- **Configuration**: Changes to config files trigger container restart
+- **Database**: Connection automatically re-established
+
+### Database Initialization
+
+Database initialization scripts are located in `scripts/init-db/`:
+
+- `01-init-database.sql` - Database and extensions setup
+- `02-create-tables.sql` - Core table creation
+- `03-seed-data.sql` - Initial seed data
+
+Scripts are automatically executed when PostgreSQL container starts.
+
+---
+
 ## 🚀 Deployment
 
 ### Local Development

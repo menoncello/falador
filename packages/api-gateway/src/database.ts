@@ -5,9 +5,15 @@
  * In production, this would be replaced with PostgreSQL via Drizzle ORM.
  */
 
-import { randomBytes, scryptSync, timingSafeEqual } from 'crypto';
-import { injectable } from 'tsyringe';
-import { CONFIG } from './config';
+import { randomBytes, scryptSync, timingSafeEqual, createHmac } from 'crypto';
+
+// Constants for cryptographic operations
+const SALT_BYTES = 16;
+const HASH_LENGTH = 64;
+const PASSWORD_HASH_PARTS = 2;
+const ID_BYTES = 16;
+const API_KEY_BYTES = 32;
+const TOKEN_EXPIRY_MS = 86_400_000; // 24 hours in milliseconds
 
 export interface User {
   id: string;
@@ -51,12 +57,22 @@ interface Session {
 /**
  * In-memory database singleton
  */
-@injectable()
-export class Database {
+class Database {
   private users: Map<string, User> = new Map();
   private projects: Map<string, Project> = new Map();
   private apiKeys: Map<string, ApiKey> = new Map();
   private sessions: Map<string, Session> = new Map();
+  private readonly jwtSecret: string;
+
+  /**
+   * Initialize the database with JWT secret configuration
+   */
+  constructor() {
+    // Use environment variable for JWT secret in production, or a secure default for development
+    this.jwtSecret =
+      process.env['JWT_SECRET'] ||
+      'development-secret-change-in-production-min-32-chars';
+  }
 
   /**
    * Hash password using scrypt
@@ -64,8 +80,8 @@ export class Database {
    * @returns The hashed password in format "salt:hash"
    */
   hashPassword(password: string): string {
-    const salt = randomBytes(CONFIG.SALT_BYTES).toString('hex');
-    const hash = scryptSync(password, salt, CONFIG.HASH_LENGTH).toString('hex');
+    const salt = randomBytes(SALT_BYTES).toString('hex');
+    const hash = scryptSync(password, salt, HASH_LENGTH).toString('hex');
     return `${salt}:${hash}`;
   }
 
@@ -77,12 +93,12 @@ export class Database {
    */
   verifyPassword(password: string, storedHash: string): boolean {
     const parts = storedHash.split(':');
-    if (parts.length !== CONFIG.PASSWORD_HASH_PARTS || !parts[0] || !parts[1]) {
+    if (parts.length !== PASSWORD_HASH_PARTS || !parts[0] || !parts[1]) {
       return false;
     }
     const salt = parts[0];
     const hash = parts[1];
-    const hashToVerify = scryptSync(password, salt, CONFIG.HASH_LENGTH);
+    const hashToVerify = scryptSync(password, salt, HASH_LENGTH);
     const hashBuffer = Buffer.from(hash, 'hex');
     return timingSafeEqual(hashBuffer, hashToVerify);
   }
@@ -92,11 +108,11 @@ export class Database {
    * @returns A random hex string ID
    */
   private generateId(): string {
-    return randomBytes(CONFIG.ID_BYTES).toString('hex');
+    return randomBytes(ID_BYTES).toString('hex');
   }
 
   /**
-   * Generate JWT-like token
+   * Generate JWT-like token with proper HMAC signature
    * @returns A JWT-like token string
    */
   generateToken(): string {
@@ -104,12 +120,14 @@ export class Database {
       JSON.stringify({ alg: 'HS256', typ: 'JWT' })
     ).toString('base64url');
     const payload = Buffer.from(
-      JSON.stringify({
-        iat: Date.now(),
-        exp: Date.now() + CONFIG.TOKEN_EXPIRY_MS,
-      })
+      JSON.stringify({ iat: Date.now(), exp: Date.now() + TOKEN_EXPIRY_MS })
     ).toString('base64url');
-    const signature = randomBytes(CONFIG.SIGNATURE_BYTES).toString('base64url');
+
+    // Use proper HMAC signature instead of random bytes
+    const signature = createHmac('sha256', this.jwtSecret)
+      .update(`${header}.${payload}`)
+      .digest('base64url');
+
     return `${header}.${payload}.${signature}`;
   }
 
@@ -118,7 +136,7 @@ export class Database {
    * @returns A random base64url-encoded API key
    */
   generateApiKey(): string {
-    return randomBytes(CONFIG.API_KEY_BYTES).toString('base64url');
+    return randomBytes(API_KEY_BYTES).toString('base64url');
   }
 
   // User operations
@@ -336,9 +354,7 @@ export class Database {
    */
   createSession(userId: string): string {
     const token = this.generateToken();
-    const expiresAt = new Date(
-      Date.now() + CONFIG.TOKEN_EXPIRY_MS
-    ).toISOString();
+    const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MS).toISOString();
     this.sessions.set(token, { userId, token, expiresAt });
     return token;
   }
@@ -359,6 +375,15 @@ export class Database {
       return undefined;
     }
     return session;
+  }
+
+  /**
+   * Delete session by token
+   * @param token - The session token to delete
+   * @returns True if deleted, false if not found
+   */
+  deleteSession(token: string): boolean {
+    return this.sessions.delete(token);
   }
 
   /**
@@ -388,15 +413,6 @@ export class Database {
   }
 
   /**
-   * Delete session by token
-   * @param token - The session token to delete
-   * @returns True if deleted, false if not found
-   */
-  deleteSession(token: string): boolean {
-    return this.sessions.delete(token);
-  }
-
-  /**
    * Clear all data (for testing)
    */
   clear(): void {
@@ -407,4 +423,5 @@ export class Database {
   }
 }
 
+export { Database };
 export const db = new Database();

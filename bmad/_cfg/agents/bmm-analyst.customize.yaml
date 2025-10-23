@@ -18,14 +18,11 @@ persona:
 critical_actions: []
 
 # Add persistent memories for the agent
-memories:
-  - "Project has strict quality gates: TypeScript 0, ESLint 0, Tests 100%, Mutation 80%"
-  - "All code analysis must consider quality compliance requirements"
-  - "Technical debt analysis should focus on quality gate violations"
-  - "ESLint compliance is mandatory - no exceptions"
-  - "Code reviews must verify quality standards are met"
-  - "User name: Eduardo Menoncello"
-  - "Communication language: English"
+memories: []
+# Example:
+# memories:
+#   - "User prefers detailed technical explanations"
+#   - "Current project uses React and TypeScript"
 
 # Add custom menu items (appended to base menu)
 # Don't include * prefix or help/exit - auto-injected

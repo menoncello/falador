@@ -9,34 +9,24 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
+    "test:mutate": "stryker run",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:rollback": "drizzle-kit rollback",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "lint:fix": "eslint . --fix",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
-    "@falador/application": "workspace:*",
     "@falador/core-domain": "workspace:*",
     "@falador/infrastructure": "workspace:*",
     "@types/bcrypt": "^6.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "bcrypt": "^6.0.0",
-    "drizzle-orm": "0.44.6",
     "elysia": "1.4.12",
     "jsonwebtoken": "^9.0.2",
-    "pg": "8.11.3",
-    "reflect-metadata": "0.2.2",
-    "tsyringe": "4.8.0"
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.10.0"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.0.0",
-    "@types/bun": "latest",
-    "@types/pg": "8.11.10",
-    "drizzle-kit": "0.28.1"
+    "@types/bun": "latest"
   }
 }

@@ -5,8 +5,12 @@
  * This is an adapter between the clean architecture interface and the concrete implementation
  */
 
-import { UserRepository, PasswordHasher } from '@falador/core-domain';
 import { inject, injectable } from 'tsyringe';
+import {
+  UserRepository,
+  User,
+  CreateUserRequest,
+} from '../../../core-domain/src/index.js';
 import { Database } from '../database.js';
 
 /**
@@ -17,41 +21,22 @@ export class InMemoryUserRepository implements UserRepository {
   /**
    *
    * @param database
-   * @param passwordHasher
    */
-  constructor(
-    @inject('Database') private database: Database,
-    @inject('PasswordHasher') private passwordHasher: PasswordHasher
-  ) {}
+  constructor(@inject('Database') private database: Database) {}
 
   /**
    *
    * @param userData
-   * @param userData.email
-   * @param userData.name
-   * @param userData.password
-   * @param userData.tier
    */
-  async create(userData: {
-    email: string;
-    name: string;
-    password: string;
-    tier?: 'free' | 'pro' | 'enterprise';
-  }): Promise<import('@falador/core-domain').User> {
-    const passwordHash = this.passwordHasher.hash(userData.password);
-    return this.database.createUser({
-      ...userData,
-      passwordHash,
-    });
+  async create(userData: CreateUserRequest): Promise<User> {
+    return this.database.createUser(userData);
   }
 
   /**
    *
    * @param id
    */
-  async findById(
-    id: string
-  ): Promise<import('@falador/core-domain').User | null> {
+  async findById(id: string): Promise<User | null> {
     return this.database.getUserById(id) || null;
   }
 
@@ -59,9 +44,7 @@ export class InMemoryUserRepository implements UserRepository {
    *
    * @param email
    */
-  async findByEmail(
-    email: string
-  ): Promise<import('@falador/core-domain').User | null> {
+  async findByEmail(email: string): Promise<User | null> {
     return this.database.getUserByEmail(email) || null;
   }
 

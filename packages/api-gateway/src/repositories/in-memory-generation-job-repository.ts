@@ -1,7 +1,8 @@
-import type {
+import { injectable } from 'tsyringe';
+import {
   GenerationJob,
   GenerationJobRepository,
-} from '@falador/core-domain';
+} from '../../../core-domain/src/index.js';
 
 /**
  * In-Memory Generation Job Repository Implementation
@@ -9,6 +10,7 @@ import type {
  * This is a temporary implementation for development and testing.
  * In production, this would be replaced with a database implementation.
  */
+@injectable()
 export class InMemoryGenerationJobRepository
   implements GenerationJobRepository
 {

@@ -1,18 +1,18 @@
-import type { PasswordHasher } from '@falador/core-domain';
 import bcrypt from 'bcrypt';
+import type { PasswordHasher } from '../../../core-domain/src/index.js';
 
 /**
  * Bcrypt Password Hasher Implementation
  */
 export class BcryptPasswordHasher implements PasswordHasher {
-  private readonly saltRounds = 12;
+  private readonly SALT_ROUNDS = 12; // eslint-disable-line no-magic-numbers
 
   /**
    *
    * @param password
    */
   async hash(password: string): Promise<string> {
-    return bcrypt.hash(password, this.saltRounds);
+    return bcrypt.hash(password, this.SALT_ROUNDS);
   }
 
   /**

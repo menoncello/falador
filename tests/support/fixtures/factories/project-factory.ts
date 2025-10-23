@@ -1,6 +1,13 @@
 import { faker } from '@faker-js/faker';
 import type { APIRequestContext } from '@playwright/test';
 import type { UserFactory } from './user-factory';
+import {
+  BaseFactory,
+  TestProject,
+  ProjectOverrides,
+  TestUtils
+} from '../base/base-fixture';
+import { waitForResponseWithValidation } from '../../helpers/network-first-helpers';
 
 /**
  * Project factory with faker-based data generation and auto-cleanup
@@ -17,42 +24,20 @@ import type { UserFactory } from './user-factory';
  * });
  */
 
-type ProjectStatus = 'draft' | 'queued' | 'processing' | 'completed' | 'failed';
-type ProjectLanguage = 'pt-BR' | 'en';
-
-interface Project {
-  id: string;
-  userId: string;
-  title: string;
-  author: string | null;
-  language: ProjectLanguage;
-  genre: string | null;
-  status: ProjectStatus;
-  metadata: Record<string, unknown>;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface ProjectOverrides {
-  userId?: string;
-  title?: string;
-  author?: string;
-  language?: ProjectLanguage;
-  genre?: string;
-  status?: ProjectStatus;
-  metadata?: Record<string, unknown>;
-}
-
-export class ProjectFactory {
-  private createdProjectIds: string[] = [];
+/**
+ * Enhanced Project Factory with network-first patterns and base factory integration
+ */
+export class ProjectFactory extends BaseFactory<TestProject, ProjectOverrides> {
   private userTokens: Map<string, string> = new Map(); // userId -> token mapping
   private defaultToken?: string; // Default token to use if none provided
   private defaultUserId?: string;
 
   constructor(
-    private request: APIRequestContext,
+    request: APIRequestContext,
     private userFactory: UserFactory
-  ) {}
+  ) {
+    super(request);
+  }
 
   /**
    * Set default authentication for all project operations
@@ -68,13 +53,23 @@ export class ProjectFactory {
    * @param overrides - Optional project properties to override
    * @returns Created project object
    */
-  async createProject(overrides: ProjectOverrides = {}): Promise<Project> {
+  async create(overrides: ProjectOverrides = {}): Promise<TestProject> {
+    return this.createProject(overrides);
+  }
+
+  /**
+   * Create a test project with optional overrides using network-first pattern
+   *
+   * @param overrides - Optional project properties to override
+   * @returns Created project object
+   */
+  async createProject(overrides: ProjectOverrides = {}): Promise<TestProject> {
     const { token } = await this.getAuthToken();
 
-    const projectData = this.buildProjectData(overrides);
-    const project = await this.createProjectWithAuth(token, projectData);
+    const projectData = TestUtils.generateProjectData(overrides);
+    const project = await this.createProjectWithAuthNetworkFirst(token, projectData, overrides);
 
-    this.createdProjectIds.push(project.id);
+    this.trackCreated(project.id);
     this.userTokens.set(project.userId, token);
 
     return project;
@@ -119,33 +114,34 @@ export class ProjectFactory {
   }
 
   /**
-   * Create project with authentication
+   * Create project with authentication using network-first pattern
    * @param token - Auth token
    * @param projectData - Project data
-   * @param projectData.title - Project title
-   * @param projectData.author - Book author
-   * @param projectData.language - Audio language
-   * @param projectData.genre - Book genre
-   * @param projectData.status - Project status
-   * @param projectData.metadata - Additional metadata
+   * @param overrides - Optional overrides for user assignment
    * @returns Created project
    */
-  private async createProjectWithAuth(
+  private async createProjectWithAuthNetworkFirst(
     token: string,
-    projectData: {
-      title: string;
-      author: string;
-      language: ProjectLanguage;
-      genre: string;
-      status: ProjectStatus;
-      metadata: Record<string, unknown>;
-    }
-  ): Promise<Project> {
+    projectData: ProjectOverrides,
+    overrides: ProjectOverrides
+  ): Promise<TestProject> {
+    // Step 1: Register interception FIRST to prevent race conditions
+    const projectResponsePromise = waitForResponseWithValidation(
+      this.request,
+      'POST',
+      '/api/projects',
+      201
+    );
+
+    // Step 2: THEN trigger the request
     const response = await this.request.post('/api/projects', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      data: projectData,
+      data: {
+        ...projectData,
+        userId: overrides.userId || this.defaultUserId,
+      },
     });
 
     if (!response.ok()) {
@@ -154,7 +150,11 @@ export class ProjectFactory {
       );
     }
 
-    return response.json();
+    // Step 3: THEN await the response (network-first)
+    const projectResponse = await projectResponsePromise;
+    const project = await projectResponse.json();
+
+    return project;
   }
 
   /**
@@ -214,7 +214,8 @@ export class ProjectFactory {
    * Called automatically by the fixture after each test
    */
   async cleanup(): Promise<void> {
-    for (const projectId of this.createdProjectIds) {
+    const projectIds = this.getCreatedIds();
+    for (const projectId of projectIds) {
       try {
         await this.request.delete(`/api/projects/${projectId}`);
       } catch (error) {
@@ -222,6 +223,7 @@ export class ProjectFactory {
       }
     }
 
-    this.createdProjectIds = [];
+    this.resetTracking();
+    this.userTokens.clear();
   }
 }

@@ -10,6 +10,10 @@
       "dependsOn": ["build"],
       "cache": false
     },
+    "test:mutate": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },
@@ -18,10 +22,6 @@
     },
     "typecheck": {
       "dependsOn": ["^typecheck"]
-    },
-    "format": {
-      "dependsOn": ["^format"],
-      "outputs": ["**/*.ts", "**/*.js", "**/*.json", "**/*.md", "**/*.yaml", "**/*.yml"]
     },
     "dev": {
       "cache": false,

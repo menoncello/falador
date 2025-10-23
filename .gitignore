@@ -147,3 +147,4 @@ scratch/
 !.gitkeep
 !.nvmrc
 !.tool-versions
+.env.test
