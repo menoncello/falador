@@ -9,6 +9,9 @@ export interface StorageService {
   delete: (key: string) => Promise<void>;
 }
 
+/**
+ * Local implementation of storage service using Map
+ */
 export class LocalStorageService implements StorageService {
   private storage = new Map<string, unknown>();
 

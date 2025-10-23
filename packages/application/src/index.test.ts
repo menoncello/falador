@@ -9,8 +9,12 @@ describe('Application Layer', () => {
     const service: ProjectService = {
       createProject: async () => 'test-id',
       getProject: async () => ({}),
-      updateProject: async () => {},
-      deleteProject: async () => {},
+      updateProject: async () => {
+        // Placeholder implementation
+      },
+      deleteProject: async () => {
+        // Placeholder implementation
+      },
       listProjects: async () => [],
     };
 
