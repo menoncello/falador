@@ -11,6 +11,6 @@ const app = new Elysia()
   .get('/', () => ({ message: 'Falador API Gateway - Audio Book Generator' }));
 
 // Function to start the server when needed
-export const startServer = () => app.listen(API_PORT);
+export const startServer = (): unknown => app.listen(API_PORT);
 
 export { app, API_PORT };

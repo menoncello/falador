@@ -7,7 +7,7 @@ FROM oven/bun:1.3 AS deps
 WORKDIR /app
 
 # Copy package files for the entire workspace
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 
 # Install all dependencies for building
 # Ignore prepare scripts (husky) as they're only needed for local development
@@ -56,7 +56,7 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 bunuser
 
 # Copy package files
-COPY package.json bun.lockb ./
+COPY package.json bun.lock ./
 COPY packages/api-gateway/package.json ./packages/api-gateway/
 COPY packages/application/package.json ./packages/application/
 COPY packages/cli/package.json ./packages/cli/
