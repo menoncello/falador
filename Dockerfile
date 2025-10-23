@@ -21,6 +21,14 @@ COPY packages/core-domain/package.json ./packages/core-domain/
 COPY packages/infrastructure/package.json ./packages/infrastructure/
 COPY packages/job-worker/package.json ./packages/job-worker/
 
+# Install package-specific dependencies
+RUN bun install --no-cache --ignore-scripts --filter="@falador/api-gateway"
+RUN bun install --no-cache --ignore-scripts --filter="@falador/application"
+RUN bun install --no-cache --ignore-scripts --filter="@falador/cli"
+RUN bun install --no-cache --ignore-scripts --filter="@falador/core-domain"
+RUN bun install --no-cache --ignore-scripts --filter="@falador/infrastructure"
+RUN bun install --no-cache --ignore-scripts --filter="@falador/job-worker"
+
 # Stage 2: Builder
 # Build TypeScript code for all packages using Turborepo
 FROM oven/bun:1.3 AS builder
